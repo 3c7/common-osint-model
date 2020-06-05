@@ -10,8 +10,9 @@ show up correctly.
 Please see the following examples of the data model - given as json but as it's a python dict, you can use other output
 formats:
 
-<details><summary>**Shodan output for 1.1.1.1**</summary>
+<details><summary>Shodan data for 1.1.1.1</summary>
 <p>
+
 ```json
 [
   {
@@ -248,10 +249,12 @@ formats:
   }
 ]
 ```
+
 </p>
 </details>
-<details><summary>**Common model conversion for 1.1.1.1**</summary>
+<details><summary>Common model conversion for 1.1.1.1</summary>
 <p>
+
 ```json
 {
     "as": {
@@ -383,9 +386,9 @@ formats:
 ```
 </p>
 </details>
-<details>
-<summary>**Censys data for 1.1.1.1**</summary>
+<details><summary>Censys data for 1.1.1.1</summary>
 <p>
+
 ```json
 {
   "tags": [
@@ -892,11 +895,12 @@ formats:
   ]
 }
 ```
+
 </p>
 </details>
-<details>
-<summary>**Common model conversion**</summary>
+<details><summary>Common model conversion</summary>
 <p>
+
 ```json
 {
     "ip": "1.1.1.1",
@@ -1027,6 +1031,7 @@ formats:
     ]
 }
 ```
+
 </p>
 </details>
 
