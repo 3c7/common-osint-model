@@ -13,3 +13,27 @@ def flatten(d: dict, parent_key: str = "") -> dict:
         except AttributeError:
             items.append((combined_key, value))
     return dict(items)
+
+
+def common_model_cn_extraction(g: dict) -> list:
+    """
+    Loops through all keys in the already converted model in order to find domains
+    :param g: dictionary of generic model
+    :return: list of domain objects
+    """
+    domains = []
+    for key, value in g.items():
+        if not isinstance(value, dict):
+            continue
+
+        if "tls" in value.keys():
+            for cn in (
+                value["tls"]
+                .get("certificate", {})
+                .get("subject", {})
+                .get("common_name", [])
+            ):
+                # Sloppy check if this is a real domain
+                if "." in cn:
+                    domains.append({"type": "common_name", "value": cn})
+    return domains

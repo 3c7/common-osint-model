@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="common-osint-model",
-    version="0.1.0",
+    version="0.1.1",
     author="Nils Kuhnert",
     description="Converting data from services like Censys and Shodan to a common data model.",
     long_description=long_description,
@@ -17,12 +17,12 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.7',
-    install_requires=[
-        "DateTime",
-        "mmh3"
-    ],
-    entry_points = {
-        'console_scripts': ['convshodan=common_osint_model.cli:convshodan', 'convcensys=common_osint_model.cli:convcensys'],
-    }
+    python_requires=">=3.7",
+    install_requires=["DateTime", "mmh3"],
+    entry_points={
+        "console_scripts": [
+            "convshodan=common_osint_model.cli:convshodan",
+            "convcensys=common_osint_model.cli:convcensys",
+        ],
+    },
 )

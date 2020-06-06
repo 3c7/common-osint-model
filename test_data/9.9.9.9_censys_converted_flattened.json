@@ -1,0 +1,53 @@
+{
+    "ip": "9.9.9.9",
+    "as.number": 19281,
+    "as.name": "QUAD9-AS-1",
+    "as.location": "US",
+    "as.prefix": "9.9.9.0/24",
+    "443.timestamp": 1591343599,
+    "443.timestamp_readable": "2020-06-05T07:53:19+00:00",
+    "443.http.headers.content_length": "9",
+    "443.http.headers.connection": "keep-alive",
+    "443.http.headers.content_type": "text/plain; charset=utf-8",
+    "443.http.headers.server": "h2o/dnsdist",
+    "443.http.headers.date": "Mon, 01 Jun 2020 16:34:19 GMT",
+    "443.http.content.html": "not found",
+    "443.http.content.hash.shodan": -1479470129,
+    "443.http.content.hash.sha256": "907ba78b4545338d3539683e63ecb51cf51c10adc9dabd86e92bd52339f298b9",
+    "443.http.content.favicon.shodan": null,
+    "443.http.content.favicon.sha256": null,
+    "443.tls.certificate.issuer_dn": "C=US, O=DigiCert Inc, CN=DigiCert ECC Secure Server CA",
+    "443.tls.certificate.subject_dn": "C=US, ST=California, L=Berkeley, O=Quad9, CN=*.quad9.net",
+    "443.tls.certificate.issuer.common_name": "DigiCert ECC Secure Server CA",
+    "443.tls.certificate.issuer.country": "US",
+    "443.tls.certificate.issuer.locality": null,
+    "443.tls.certificate.issuer.province": null,
+    "443.tls.certificate.issuer.organization": "DigiCert Inc",
+    "443.tls.certificate.issuer.organizational_unit": null,
+    "443.tls.certificate.issuer.email_address": null,
+    "443.tls.certificate.subject.common_name": [
+        "*.quad9.net"
+    ],
+    "443.tls.certificate.subject.country": "US",
+    "443.tls.certificate.subject.locality": "Berkeley",
+    "443.tls.certificate.subject.province": "California",
+    "443.tls.certificate.subject.organization": "Quad9",
+    "443.tls.certificate.subject.organizational_unit": null,
+    "443.tls.certificate.subject.email_address": null,
+    "53.timestamp": 1591343599,
+    "53.timestamp_readable": "2020-06-05T07:53:19+00:00",
+    "5053.timestamp": 1591343599,
+    "5053.timestamp_readable": "2020-06-05T07:53:19+00:00",
+    "5053.banner": "HTTP/1.0 400 Bad Request\r\n\r\nClient sent an HTTP request to an HTTPS server.\n",
+    "ports": [
+        "443",
+        "53",
+        "5053"
+    ],
+    "domains": [
+        {
+            "type": "common_name",
+            "value": "*.quad9.net"
+        }
+    ]
+}

@@ -1,0 +1,456 @@
+{
+  "tags": [
+    "http",
+    "dns",
+    "https"
+  ],
+  "443": {
+    "https": {
+      "tls": {
+        "server_key_exchange": {
+          "ecdh_params": {
+            "curve_id": {
+              "id": 23,
+              "name": "secp256r1"
+            }
+          }
+        },
+        "certificate": {
+          "parsed": {
+            "tbs_noct_fingerprint": "bb601d44d7f3331dd8fce44c607f6c55665b9788e7c2b69eb2e4e2d7aa29873c",
+            "subject_dn": "C=US, ST=California, L=Berkeley, O=Quad9, CN=*.quad9.net",
+            "subject": {
+              "common_name": [
+                "*.quad9.net"
+              ],
+              "country": [
+                "US"
+              ],
+              "organization": [
+                "Quad9"
+              ],
+              "province": [
+                "California"
+              ],
+              "locality": [
+                "Berkeley"
+              ]
+            },
+            "signature_algorithm": {
+              "oid": "1.2.840.10045.4.3.2",
+              "name": "ECDSAWithSHA256"
+            },
+            "redacted": false,
+            "serial_number": "7868857627267031615456199992043625990",
+            "validation_level": "OV",
+            "issuer_dn": "C=US, O=DigiCert Inc, CN=DigiCert ECC Secure Server CA",
+            "fingerprint_sha1": "fa4f929034d82e9a5eef6e83c0a36ca472499273",
+            "version": 3,
+            "fingerprint_sha256": "9791b69c6682d397a77de50305570b7ed6910e648a9b6473c79a40696137713e",
+            "names": [
+              "149.112.112.13",
+              "149.112.112.15",
+              "9.9.9.10",
+              "9.9.9.13",
+              "9.9.9.15",
+              "149.112.112.11",
+              "9.9.9.11",
+              "9.9.9.14",
+              "149.112.112.12",
+              "9.9.9.9",
+              "9.9.9.12",
+              "149.112.112.9",
+              "149.112.112.10",
+              "149.112.112.14",
+              "149.112.112.112",
+              "*.quad9.net",
+              "quad9.net"
+            ],
+            "tbs_fingerprint": "8f6826a34b02e319d2768b1c7094e6010c570bd05d1dc014593e9e16a3abe56b",
+            "validity": {
+              "start": "2018-09-20T00:00:00Z",
+              "length": 63547200,
+              "end": "2020-09-24T12:00:00Z"
+            },
+            "extensions": {
+              "authority_key_id": "a39de61ff9da394fc06ee891cb95a5da31e20a9f",
+              "certificate_policies": [
+                {
+                  "cps": [
+                    "https://www.digicert.com/CPS"
+                  ],
+                  "id": "2.16.840.1.114412.1.1"
+                },
+                {
+                  "id": "2.23.140.1.2.2"
+                }
+              ],
+              "authority_info_access": {
+                "ocsp_urls": [
+                  "http://ocsp.digicert.com"
+                ],
+                "issuer_urls": [
+                  "http://cacerts.digicert.com/DigiCertECCSecureServerCA.crt"
+                ]
+              },
+              "extended_key_usage": {
+                "client_auth": true,
+                "server_auth": true
+              },
+              "subject_alt_name": {
+                "dns_names": [
+                  "*.quad9.net",
+                  "quad9.net"
+                ],
+                "ip_addresses": [
+                  "9.9.9.9",
+                  "9.9.9.10",
+                  "9.9.9.11",
+                  "9.9.9.12",
+                  "9.9.9.13",
+                  "9.9.9.14",
+                  "9.9.9.15",
+                  "149.112.112.9",
+                  "149.112.112.10",
+                  "149.112.112.11",
+                  "149.112.112.12",
+                  "149.112.112.13",
+                  "149.112.112.14",
+                  "149.112.112.15",
+                  "149.112.112.112",
+                  "2620:fe::9",
+                  "2620:fe::10",
+                  "2620:fe::11",
+                  "2620:fe::12",
+                  "2620:fe::13",
+                  "2620:fe::14",
+                  "2620:fe::15",
+                  "2620:fe::fe",
+                  "2620:fe::fe:9",
+                  "2620:fe::fe:10",
+                  "2620:fe::fe:11",
+                  "2620:fe::fe:12",
+                  "2620:fe::fe:13",
+                  "2620:fe::fe:14",
+                  "2620:fe::fe:15"
+                ]
+              },
+              "basic_constraints": {
+                "is_ca": false
+              },
+              "crl_distribution_points": [
+                "http://crl3.digicert.com/ssca-ecc-g1.crl",
+                "http://crl4.digicert.com/ssca-ecc-g1.crl"
+              ],
+              "key_usage": {
+                "value": 1,
+                "digital_signature": true
+              },
+              "signed_certificate_timestamps": [
+                {
+                  "log_id": "pLkJkLQYWBSHuxOizGdwCjw1mAT5G9+443fNDsgN3BA=",
+                  "timestamp": 1537478975,
+                  "version": 0,
+                  "signature": "BAMARzBFAiBVdowFefdrWfKLSk4ck5Sjl7jBoWjWqc5xKL5ChBLfxAIhAN/15G1Dds7LYmL5YjhQed8RdjQK8Q14WV7X3lzTCZXq"
+                },
+                {
+                  "log_id": "h3W/51l8+IxDmV+9827/Vo1HVjb/SrVgwbTq/16ggw8=",
+                  "timestamp": 1537478975,
+                  "version": 0,
+                  "signature": "BAMARzBFAiAzv7pwkluSvGoOCUQhbzyWIbmZg+3x7kGRd/Jr6FtG8AIhANgsakCRspTzuifSd3kWo6m3lmneGegJSR2FfRRjwZu2"
+                },
+                {
+                  "log_id": "7ku9t3XOYLrhQmkfq+GeZqMPfl+wctiDAMR7iXqo/cs=",
+                  "timestamp": 1537478975,
+                  "version": 0,
+                  "signature": "BAMARzBFAiBFjC+7i2gIcDlnomZCtE3RNUNJxmoNzb6VmGB8/1dJoQIhAPZjj5ASVOM9WqtMTanoAUwsluKXdjH5skSSuQ3WpooK"
+                }
+              ],
+              "subject_key_id": "7fa912a5d7c68b4802c73d2a456e401e4060f497"
+            },
+            "fingerprint_md5": "2bdb9b8588ce20c52c1930925926075d",
+            "subject_key_info": {
+              "fingerprint_sha256": "fd296cbe20646f4e58ffc5e2285f7e099b200adaea3d09396e1e3ba34477fc28",
+              "key_algorithm": {
+                "name": "ECDSA"
+              },
+              "ecdsa_public_key": {
+                "b": "WsY12Ko6k+ez671VdpiGvGUdBrDMU7D2O848PifSYEs=",
+                "curve": "P-256",
+                "gy": "T+NC4v4af5uO5+tKfA+eFivOM1drMV7Oy7ZAaDe/UfU=",
+                "n": "/////wAAAAD//////////7zm+q2nF56E87nKwvxjJVE=",
+                "p": "/////wAAAAEAAAAAAAAAAAAAAAD///////////////8=",
+                "length": 256,
+                "pub": "BH2L1x0DhQ0YJbM0HCmhJ9SsASVIiqDx6gK52FEsCGqsclbs+j2moJ9JCVWOrP65cxdcAvt4zCSRlG9DI4kOHWY=",
+                "y": "clbs+j2moJ9JCVWOrP65cxdcAvt4zCSRlG9DI4kOHWY=",
+                "x": "fYvXHQOFDRglszQcKaEn1KwBJUiKoPHqArnYUSwIaqw=",
+                "gx": "axfR8uEsQkf4vOblY6RA8ncDfYEt6zOg9KE5RdiYwpY="
+              }
+            },
+            "signature": {
+              "self_signed": false,
+              "valid": true,
+              "value": "MGUCMCbyVzZA0Um9mi8iLWCeqm4LWfyNqwgYMk4dCTXejhEdzyBOr0fLMYMt84L/QWv+DAIxALsoIKXG0uwEa6b7ZT2CrXEm98Juepezbfy5akAk821SdeXiJVccUb03tmE8VRLNdA==",
+              "signature_algorithm": {
+                "oid": "1.2.840.10045.4.3.2",
+                "name": "ECDSAWithSHA256"
+              }
+            },
+            "spki_subject_fingerprint": "c0fa92ee487ab93ab9da0be92f7f16c7f962d3626c863ded84752d569f2a4e1f",
+            "issuer": {
+              "common_name": [
+                "DigiCert ECC Secure Server CA"
+              ],
+              "country": [
+                "US"
+              ],
+              "organization": [
+                "DigiCert Inc"
+              ]
+            }
+          }
+        },
+        "chain": [
+          {
+            "parsed": {
+              "tbs_noct_fingerprint": "eb7525f88f0d9458f81a995019bfd34cb89ccdc957e7b0ef315f10f897638118",
+              "subject_dn": "C=US, O=DigiCert Inc, CN=DigiCert ECC Secure Server CA",
+              "subject": {
+                "common_name": [
+                  "DigiCert ECC Secure Server CA"
+                ],
+                "country": [
+                  "US"
+                ],
+                "organization": [
+                  "DigiCert Inc"
+                ]
+              },
+              "signature_algorithm": {
+                "oid": "1.2.840.113549.1.1.12",
+                "name": "SHA384WithRSA"
+              },
+              "redacted": false,
+              "serial_number": "14347142274732774646150233778247550482",
+              "validation_level": "unknown",
+              "issuer_dn": "C=US, O=DigiCert Inc, OU=www.digicert.com, CN=DigiCert Global Root CA",
+              "fingerprint_sha1": "56ee7c270683162d83baeacc790e22471adaabe8",
+              "version": 3,
+              "fingerprint_sha256": "458446ba75d932e914f23c2b57b7d192eddbc2181d958e1181ad5251747a1ee8",
+              "validity": {
+                "start": "2013-03-08T12:00:00Z",
+                "length": 315532800,
+                "end": "2023-03-08T12:00:00Z"
+              },
+              "tbs_fingerprint": "eb7525f88f0d9458f81a995019bfd34cb89ccdc957e7b0ef315f10f897638118",
+              "extensions": {
+                "authority_key_id": "03de503556d14cbb66f0a3e21b1bc397b23dd155",
+                "certificate_policies": [
+                  {
+                    "cps": [
+                      "https://www.digicert.com/CPS"
+                    ],
+                    "id": "2.5.29.32.0"
+                  }
+                ],
+                "authority_info_access": {
+                  "ocsp_urls": [
+                    "http://ocsp.digicert.com"
+                  ]
+                },
+                "basic_constraints": {
+                  "max_path_len": 0,
+                  "is_ca": true
+                },
+                "crl_distribution_points": [
+                  "http://crl3.digicert.com/DigiCertGlobalRootCA.crl"
+                ],
+                "key_usage": {
+                  "certificate_sign": true,
+                  "crl_sign": true,
+                  "value": 97,
+                  "digital_signature": true
+                },
+                "subject_key_id": "a39de61ff9da394fc06ee891cb95a5da31e20a9f"
+              },
+              "fingerprint_md5": "c64ae88aeb2cb31198d70483212fb411",
+              "subject_key_info": {
+                "fingerprint_sha256": "3d95cdde5440cbef2d04a9363b1e85ee32259f3af66339b0a9cdc99f27d7a02c",
+                "key_algorithm": {
+                  "name": "ECDSA"
+                },
+                "ecdsa_public_key": {
+                  "b": "szEvp+I+5+SYjgVr4/gtGRgdnG7+gUESAxQIj1ATh1rGVjmNii7RnSqFyO3T7Crv",
+                  "curve": "P-384",
+                  "gy": "NhfeSpYmLG9dnpi/kpLcKfj0Hb0omhR86doxE7XwuMAKYLHOHX6BnXpDHXyQ6g5f",
+                  "n": "////////////////////////////////x2NNgfQ3Ld9YGg2ySLCneuzsGWrMxSlz",
+                  "p": "//////////////////////////////////////////7/////AAAAAAAAAAD/////",
+                  "length": 384,
+                  "pub": "BOIIQup32CTeoCxkpBPOQJwjcqkCCg43PyE2uI1TFPbVkZVL85YCjXEexNjLp59e76Dmf1qSEZZTb+vAyz+u/Vs/RyTnmgculr6oL7tXGK9xpL14Oh7oWzxrZBErzDQrjA==",
+                  "y": "oOZ/WpIRllNv68DLP679Wz9HJOeaBy6Wvqgvu1cYr3GkvXg6HuhbPGtkESvMNCuM",
+                  "x": "4ghC6nfYJN6gLGSkE85AnCNyqQIKDjc/ITa4jVMU9tWRlUvzlgKNcR7E2Munn17v",
+                  "gx": "qofKIr6LBTeOscce8yCtdG4dO2KLp5uYWfdB4IJUKjhVAvJdv1UpbDpUXjhydgq3"
+                }
+              },
+              "signature": {
+                "self_signed": false,
+                "valid": true,
+                "value": "x4qgQ0vsdMnFq9UfMDU2bphWe0isBWOue5pXJFfMb/req22cx7a67M7nynNk298ENwoASbM/nyatkYwg6B+IDir7ZjfIMOjSwiSnRUgt6gFQSjGUE9+NX9oqu0k8YfN5yJxmkhqWKvR7NlijLEEQdBrT7Ui20ruKBkVxMxAwenqYId0kueyctZIHrYPGxGr4d+Y1vhMPJ2SyQ7+D6XdW2wiHlEcU9V8or6NoTIOPYPeWgHmFanYmnZUMIAONPu56KGVkZqTZg+qZdM1uTX0c642yxa8WG07I81XqiDgRNB0Rrz8HqE9q0nQRLyr8c7dfwhVDBWzWfdoCvSKbT9P5dw==",
+                "signature_algorithm": {
+                  "oid": "1.2.840.113549.1.1.12",
+                  "name": "SHA384WithRSA"
+                }
+              },
+              "spki_subject_fingerprint": "1eed935f0163c0979fd92440ea3660b2327ce1d00d04f73cfd3bd348519b0a23",
+              "issuer": {
+                "common_name": [
+                  "DigiCert Global Root CA"
+                ],
+                "country": [
+                  "US"
+                ],
+                "organizational_unit": [
+                  "www.digicert.com"
+                ],
+                "organization": [
+                  "DigiCert Inc"
+                ]
+              }
+            }
+          }
+        ],
+        "cipher_suite": {
+          "id": "0xCCA9",
+          "name": "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256"
+        },
+        "version": "TLSv1.2",
+        "session_ticket": {
+          "length": 160,
+          "lifetime_hint": 7200
+        },
+        "signature": {
+          "hash_algorithm": "sha256",
+          "valid": true,
+          "signature_algorithm": "ecdsa"
+        },
+        "validation": {
+          "browser_trusted": true
+        },
+        "ocsp_stapling": false,
+        "metadata": {}
+      },
+      "dhe_export": {
+        "support": false,
+        "metadata": {}
+      },
+      "get": {
+        "body": "not found",
+        "headers": {
+          "content_length": "9",
+          "unknown": [
+            {
+              "value": "Mon, 01 Jun 2020 16:34:19 GMT",
+              "key": "date"
+            }
+          ],
+          "connection": "keep-alive",
+          "content_type": "text/plain; charset=utf-8",
+          "server": "h2o/dnsdist"
+        },
+        "status_code": 404,
+        "status_line": "404 File Not Found",
+        "body_sha256": "907ba78b4545338d3539683e63ecb51cf51c10adc9dabd86e92bd52339f298b9",
+        "metadata": {
+          "product": "h2o",
+          "version": "dnsdist",
+          "description": "h2o dnsdist"
+        }
+      },
+      "dhe": {
+        "support": false,
+        "metadata": {}
+      },
+      "heartbleed": {
+        "heartbeat_enabled": false,
+        "heartbleed_vulnerable": false,
+        "metadata": {}
+      },
+      "rsa_export": {
+        "support": false,
+        "metadata": {}
+      }
+    }
+  },
+  "ip": "9.9.9.9",
+  "updated_at": "2020-06-05T07:53:19+00:00",
+  "53": {
+    "dns": {
+      "lookup": {
+        "resolves_correctly": true,
+        "support": true,
+        "open_resolver": true,
+        "answers": [
+          {
+            "type": "A",
+            "name": "c.afekv.com",
+            "response": "192.150.186.1"
+          },
+          {
+            "type": "A",
+            "name": "c.afekv.com",
+            "response": "74.63.28.250"
+          }
+        ],
+        "errors": false,
+        "additionals": [],
+        "questions": [
+          {
+            "type": "A",
+            "name": "c.afekv.com"
+          }
+        ],
+        "authorities": [],
+        "metadata": {}
+      }
+    }
+  },
+  "ports": [
+    443,
+    53,
+    5053
+  ],
+  "location": {
+    "country": "France",
+    "longitude": 2.3387,
+    "registered_country": "United States",
+    "registered_country_code": "US",
+    "country_code": "FR",
+    "latitude": 48.8582,
+    "timezone": "Europe/Paris",
+    "continent": "Europe"
+  },
+  "autonomous_system": {
+    "description": "QUAD9-AS-1",
+    "rir": "unknown",
+    "routed_prefix": "9.9.9.0/24",
+    "country_code": "US",
+    "path": [
+      42,
+      19281
+    ],
+    "asn": 19281,
+    "name": "QUAD9-AS-1"
+  },
+  "protocols": [
+    "443/https",
+    "53/dns",
+    "5053/banner"
+  ],
+  "5053": {
+    "banner": {
+      "banner_decoded": "HTTP/1.0 400 Bad Request\r\n\r\nClient sent an HTTP request to an HTTPS server.\n",
+      "banner": "SFRUUC8xLjAgNDAwIEJhZCBSZXF1ZXN0DQoNCkNsaWVudCBzZW50IGFuIEhUVFAgcmVxdWVzdCB0byBhbiBIVFRQUyBzZXJ2ZXIuCg==",
+      "decoded_to_utf8": true
+    }
+  }
+}

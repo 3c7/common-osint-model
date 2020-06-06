@@ -39,6 +39,6 @@ def parse_args():
 
 
 def convert(filepath: str, f, indent: int = 4) -> None:
-    with io.open(filepath, 'r') as file:
+    with io.open(filepath, "r") as file:
         data = json.loads(file.read())
         print(json.dumps(f(data), indent=indent))

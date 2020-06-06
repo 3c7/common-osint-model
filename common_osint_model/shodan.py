@@ -1,7 +1,7 @@
 import re
 from DateTime import DateTime
 from typing import Union
-from common_osint_model.utils import flatten
+from common_osint_model.utils import flatten, common_model_cn_extraction
 from binascii import hexlify
 from hashlib import sha256
 from base64 import b64decode
@@ -29,6 +29,7 @@ def from_shodan(raw: Union[list, dict]) -> dict:
         ports.append(s["port"])
         g.update(shodan_service_extraction(s))
     g.update(dict(ports=ports))
+    g["domains"].extend(common_model_cn_extraction(g))
     return g
 
 
