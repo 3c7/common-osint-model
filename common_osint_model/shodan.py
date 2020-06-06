@@ -1,3 +1,4 @@
+import re
 from DateTime import DateTime
 from typing import Union
 from common_osint_model.utils import flatten
