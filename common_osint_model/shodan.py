@@ -1,5 +1,6 @@
 import re
 from DateTime import DateTime
+from datetime import datetime
 from typing import Union
 from common_osint_model.utils import flatten, common_model_cn_extraction
 from binascii import hexlify
@@ -174,6 +175,8 @@ def shodan_ssl_extraction(s: dict) -> dict:
             for domain in re.split(r"(\\x[0-9a-z]{2}|\\[a-z^x]{1})", ext["date"]):
                 if "." in domain:
                     common_names.add(domain)
+    cert_issued = int(datetime.strptime(cert.get("issued", None), "%Y%m%d%H%M%SZ").timestamp())
+    cert_expires = int(datetime.strptime(cert.get("expires", None), "%Y%m%d%H%M%SZ").timestamp())
     return {
         "tls": {
             "certificate": {
@@ -200,6 +203,13 @@ def shodan_ssl_extraction(s: dict) -> dict:
                     "sha256": fingerprint.get("sha256", None),
                 },
                 "serial_number": str(int(cert.get("serial", None))),
+                "validity": {
+                    "start": cert_issued,
+                    "start_readable": DateTime(cert_issued, 'UTC').ISO8601(),
+                    "end": cert_expires,
+                    "end_readable": DateTime(cert_expires, 'UTC').ISO8601(),
+                    "length": cert_expires - cert_issued,
+                }
             },
             "dhparam": {
                 "bits": dhparams.get("bits", None),

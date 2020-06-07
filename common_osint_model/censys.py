@@ -102,6 +102,10 @@ def censys_ipv4_tls_extraction(s: dict) -> dict:
     cert = s.get("certificate", {}).get("parsed", {})
     subject = cert.get("subject", None) or dict()
     issuer = cert.get("issuer", None) or dict()
+    validity = cert.get("validity", None) or dict()
+    cert_issued = DateTime(validity.get("start", None))
+    cert_expires = DateTime(validity.get("end", None))
+    cert_length = validity.get("length", None)
     return {
         "certificate": {
             "issuer_dn": cert.get("issuer_dn", None),
@@ -126,5 +130,12 @@ def censys_ipv4_tls_extraction(s: dict) -> dict:
                 "organizational_unit": subject.get("organizational_unit", [None])[0],
                 "email_address": subject.get("email_address", [None])[0],
             },
+            "validity": {
+                "start": int(cert_issued),
+                "start_readable": cert_issued.ISO8601(),
+                "end": int(cert_expires),
+                "end_readable": cert_expires.ISO8601(),
+                "length": cert_length
+            }
         }
     }
