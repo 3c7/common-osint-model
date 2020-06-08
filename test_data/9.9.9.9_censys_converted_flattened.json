@@ -26,7 +26,24 @@
     "443.tls.certificate.issuer.organizational_unit": null,
     "443.tls.certificate.issuer.email_address": null,
     "443.tls.certificate.subject.common_name": [
-        "*.quad9.net"
+        "*.quad9.net",
+        "149.112.112.13",
+        "149.112.112.15",
+        "9.9.9.10",
+        "9.9.9.13",
+        "9.9.9.15",
+        "149.112.112.11",
+        "9.9.9.11",
+        "9.9.9.14",
+        "149.112.112.12",
+        "9.9.9.9",
+        "9.9.9.12",
+        "149.112.112.9",
+        "149.112.112.10",
+        "149.112.112.14",
+        "149.112.112.112",
+        "*.quad9.net",
+        "quad9.net"
     ],
     "443.tls.certificate.subject.country": "US",
     "443.tls.certificate.subject.locality": "Berkeley",
@@ -53,6 +70,74 @@
         {
             "type": "common_name",
             "value": "*.quad9.net"
+        },
+        {
+            "type": "common_name",
+            "value": "149.112.112.13"
+        },
+        {
+            "type": "common_name",
+            "value": "149.112.112.15"
+        },
+        {
+            "type": "common_name",
+            "value": "9.9.9.10"
+        },
+        {
+            "type": "common_name",
+            "value": "9.9.9.13"
+        },
+        {
+            "type": "common_name",
+            "value": "9.9.9.15"
+        },
+        {
+            "type": "common_name",
+            "value": "149.112.112.11"
+        },
+        {
+            "type": "common_name",
+            "value": "9.9.9.11"
+        },
+        {
+            "type": "common_name",
+            "value": "9.9.9.14"
+        },
+        {
+            "type": "common_name",
+            "value": "149.112.112.12"
+        },
+        {
+            "type": "common_name",
+            "value": "9.9.9.9"
+        },
+        {
+            "type": "common_name",
+            "value": "9.9.9.12"
+        },
+        {
+            "type": "common_name",
+            "value": "149.112.112.9"
+        },
+        {
+            "type": "common_name",
+            "value": "149.112.112.10"
+        },
+        {
+            "type": "common_name",
+            "value": "149.112.112.14"
+        },
+        {
+            "type": "common_name",
+            "value": "149.112.112.112"
+        },
+        {
+            "type": "common_name",
+            "value": "*.quad9.net"
+        },
+        {
+            "type": "common_name",
+            "value": "quad9.net"
         }
     ]
 }

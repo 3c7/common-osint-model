@@ -103,6 +103,10 @@ def censys_ipv4_tls_extraction(s: dict) -> dict:
     subject = cert.get("subject", None) or dict()
     issuer = cert.get("issuer", None) or dict()
     validity = cert.get("validity", None) or dict()
+    common_name = subject.get("common_name", [])
+    common_name.extend(cert.get("names", []))
+    if len(common_name) == 0:
+        common_name = None
     cert_issued = DateTime(validity.get("start", None))
     cert_expires = DateTime(validity.get("end", None))
     cert_length = validity.get("length", None)
@@ -122,7 +126,7 @@ def censys_ipv4_tls_extraction(s: dict) -> dict:
             },
             "subject": {
                 # Censys always uses lists for those kind of attributes, multiple CNs are okay, though
-                "common_name": subject.get("common_name", None),
+                "common_name": common_name,
                 "country": subject.get("country", [None])[0],
                 "locality": subject.get("locality", [None])[0],
                 "province": subject.get("province", [None])[0],
