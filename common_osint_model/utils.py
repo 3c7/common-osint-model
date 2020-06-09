@@ -1,3 +1,7 @@
+from hashlib import sha256
+from binascii import hexlify
+
+
 def flatten(d: dict, parent_key: str = "") -> dict:
     """
     Flattens a dictonary so the attributes are accessible like the results of the censys api
@@ -28,12 +32,23 @@ def common_model_cn_extraction(g: dict) -> list:
 
         if "tls" in value.keys():
             for cn in (
-                value["tls"]
-                .get("certificate", {})
-                .get("subject", {})
-                .get("common_name", [])
+                    value["tls"]
+                            .get("certificate", {})
+                            .get("subject", {})
+                            .get("common_name", [])
             ):
                 # Sloppy check if this is a real domain
                 if "." in cn:
                     domains.append({"type": "common_name", "value": cn})
     return domains
+
+
+def sha256_from_body_string(b: str) -> str:
+    """
+    Returns the sha256 hash of an html body given as string
+    :param b: html body as string
+    :return: hex digest of sha256 hash
+    """
+    h = sha256()
+    h.update(bytes(b.encode("utf8")))
+    return hexlify(h.digest()).decode("ascii")

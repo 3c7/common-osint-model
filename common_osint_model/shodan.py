@@ -2,7 +2,7 @@ import re
 from DateTime import DateTime
 from datetime import datetime
 from typing import Union
-from common_osint_model.utils import flatten, common_model_cn_extraction
+from common_osint_model.utils import flatten, common_model_cn_extraction, sha256_from_body_string
 from binascii import hexlify
 from hashlib import sha256
 from base64 import b64decode
@@ -141,17 +141,6 @@ def shodan_http_extraction(s: dict) -> dict:
             },
         }
     }
-
-
-def sha256_from_body_string(b: str) -> str:
-    """
-    Returns the sha256 hash of an html body given as string
-    :param b: html body as string
-    :return: hex digest of sha256 hash
-    """
-    h = sha256()
-    h.update(bytes(b.encode("ascii")))
-    return hexlify(h.digest()).decode("ascii")
 
 
 def shodan_ssl_extraction(s: dict) -> dict:

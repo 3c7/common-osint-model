@@ -12,6 +12,8 @@ formats:
 
  - [Original Shodan data for 9.9.9.9](test_data/9.9.9.9_shodan.json) and the [flattened common model conversion](test_data/9.9.9.9_shodan_converted_flattened.json)
  - [Original Censys data for 9.9.9.9](test_data/9.9.9.9_censys.json) and the [flattened common model conversion](test_data/9.9.9.9_censys_converted_flattened.json)
+ - [Original Shodan data for github.com](test_data/140.82.118.4_shodan.json) and the [flattened common model conversion](test_data/140.82.118.4_shodan_flattened.json) 
+ - [Original Censys data for github.com](test_data/140.82.118.4_censys.json) and the [flattened common model conversion](test_data/140.82.118.4_censys_flattened.json) 
 
 Currently, only HTTP(S), TLS and SSH data as well as some meta data will get converted. TLS data includes information about other services using TLS, beside HTTPS, too.
 
