@@ -1,6 +1,8 @@
 from common_osint_model.utils import flatten, common_model_cn_extraction
 from DateTime import DateTime
 from mmh3 import hash as mmh3_hash
+from struct import pack
+from binascii import hexlify
 
 
 def from_censys_ipv4(raw: dict) -> dict:
@@ -70,6 +72,9 @@ def censys_ipv4_service_extraction(raw: dict, port: str, protocol: str) -> dict:
     if "tls" in keys:
         tls = censys_ipv4_tls_extraction(s["tls"])
         service.update({"tls": tls})
+    if protocol == 'ssh':
+        ssh = censys_ipv4_ssh_extraction(s)
+        service.update({"ssh": ssh})
     return {port: service}
 
 
@@ -141,5 +146,36 @@ def censys_ipv4_tls_extraction(s: dict) -> dict:
                 "end_readable": cert_expires.ISO8601(),
                 "length": cert_length
             }
+        }
+    }
+
+
+def censys_ipv4_ssh_extraction(s: dict) -> dict:
+    """
+    Extracts SSH relevant data out ot service part of Censys IPv4 dict
+    :param s: Service part of a censys dict
+    :return: Dictionary with SSH data
+    """
+    v2 = s.get("v2", None) or dict()
+    banner = v2.get("banner", None) or dict()
+    support = v2.get("support", None) or dict()
+    s2c = support.get("server_to_client", None) or dict()
+    shk = v2.get("server_host_key", None) or dict()
+    return {
+        "version": banner.get("raw", None),
+        "key_exchange": {
+            "algorithms": {
+                "compression": s2c.get("compressions", None),
+                "encryption": s2c.get("ciphers", None),
+                "key_exchange": support.get("kex_algorithms", None),
+                "mac": s2c.get("macs", None),
+                "key_algorithms": support.get("host_key_algorithms", None)
+            }
+        },
+        "key": {
+            "hash": {
+                "sha256": shk.get("fingerprint_sha256", None)
+            },
+            "type": shk.get("key_algorithm", None)
         }
     }

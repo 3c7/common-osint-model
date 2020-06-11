@@ -10,8 +10,8 @@ show up correctly.
 Please see the following examples of the data model - given as json but as it's a python dict, you can use other output
 formats:
 
- - [Original Shodan data for 9.9.9.9](test_data/9.9.9.9_shodan.json) and the [flattened common model conversion](test_data/9.9.9.9_shodan_converted_flattened.json)
- - [Original Censys data for 9.9.9.9](test_data/9.9.9.9_censys.json) and the [flattened common model conversion](test_data/9.9.9.9_censys_converted_flattened.json)
+ - [Original Shodan data for 9.9.9.9](test_data/9.9.9.9_shodan.json) and the [flattened common model conversion](test_data/9.9.9.9_shodan_flattened.json)
+ - [Original Censys data for 9.9.9.9](test_data/9.9.9.9_censys.json) and the [flattened common model conversion](test_data/9.9.9.9_censys_flattened.json)
  - [Original Shodan data for github.com](test_data/140.82.118.4_shodan.json) and the [flattened common model conversion](test_data/140.82.118.4_shodan_flattened.json) 
  - [Original Censys data for github.com](test_data/140.82.118.4_censys.json) and the [flattened common model conversion](test_data/140.82.118.4_censys_flattened.json) 
 

@@ -54,6 +54,47 @@
     "443.tls.certificate.validity.length": 63547200,
     "22.timestamp": 1591593063,
     "22.timestamp_readable": "2020-06-08T05:11:03+00:00",
+    "22.ssh.version": "SSH-2.0-babeld-9732d91f",
+    "22.ssh.key_exchange.algorithms.compression": [
+        "none",
+        "zlib",
+        "zlib@openssh.com"
+    ],
+    "22.ssh.key_exchange.algorithms.encryption": [
+        "chacha20-poly1305@openssh.com",
+        "aes256-gcm@openssh.com",
+        "aes128-gcm@openssh.com",
+        "aes256-ctr",
+        "aes192-ctr",
+        "aes128-ctr",
+        "aes256-cbc",
+        "aes192-cbc",
+        "aes128-cbc"
+    ],
+    "22.ssh.key_exchange.algorithms.key_exchange": [
+        "curve25519-sha256",
+        "curve25519-sha256@libssh.org",
+        "ecdh-sha2-nistp256",
+        "ecdh-sha2-nistp384",
+        "ecdh-sha2-nistp521",
+        "diffie-hellman-group-exchange-sha256"
+    ],
+    "22.ssh.key_exchange.algorithms.mac": [
+        "hmac-sha2-256-etm@openssh.com",
+        "hmac-sha2-512-etm@openssh.com",
+        "hmac-sha1-etm@openssh.com",
+        "hmac-sha2-256",
+        "hmac-sha2-512",
+        "hmac-sha1"
+    ],
+    "22.ssh.key_exchange.algorithms.key_algorithms": [
+        "ssh-dss",
+        "rsa-sha2-512",
+        "rsa-sha2-256",
+        "ssh-rsa"
+    ],
+    "22.ssh.key.hash.sha256": "9d385b83a9175292561a5ec4d4818e0aca51a264f17420112ef88ac3a139498f",
+    "22.ssh.key.type": "ssh-rsa",
     "80.timestamp": 1591593063,
     "80.timestamp_readable": "2020-06-08T05:11:03+00:00",
     "80.http.headers.status": "200 OK",

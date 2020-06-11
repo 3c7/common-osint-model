@@ -61,8 +61,8 @@
         "rsa-sha2-256",
         "ssh-rsa"
     ],
-    "22.ssh.key": "AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PH\nkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETY\nP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoW\nf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lG\nHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==\n",
-    "22.ssh.key_type": "ssh-rsa",
+    "22.ssh.key.hash.sha256": "9d385b83a9175292561a5ec4d4818e0aca51a264f17420112ef88ac3a139498f",
+    "22.ssh.key.type": "ssh-rsa",
     "80.banner": "HTTP/1.1 301 Moved Permanently\r\nContent-length: 0\r\nLocation: https://140.82.118.4/\r\n\r\n",
     "80.timestamp": 1591683357,
     "80.timestamp_readable": "2020-06-09T06:15:57",

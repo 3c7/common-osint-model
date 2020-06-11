@@ -221,6 +221,8 @@ def shodan_ssh_extraction(s: dict) -> dict:
     """
     ssh = s["ssh"]
     key_exchange = ssh.get("kex", None) or dict()
+    h = sha256()
+    h.update(b64decode(ssh.get("key", None)))
     return {
         "ssh": {
             "version": s["data"].split("Key type")[0].strip(),
@@ -235,7 +237,11 @@ def shodan_ssh_extraction(s: dict) -> dict:
                     ),
                 }
             },
-            "key": ssh.get("key", None),
-            "key_type": ssh.get("type", None),
+            "key": {
+                "hash": {
+                    "sha256": hexlify(h.digest()).decode("ascii")
+                },
+                "type": ssh.get("type", None),
+            },
         }
     }
