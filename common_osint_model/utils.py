@@ -19,25 +19,22 @@ def flatten(d: dict, parent_key: str = "") -> dict:
     return dict(items)
 
 
-def unflatten(d: dict, parent_key: str = "") -> dict:
+def unflatten(flattened: dict) -> dict:
     """
     Unflattens a dictionary
-    :param d:  Flattened dictionary
+    :param flattened: Flattened dictionary
     :return: Unflattened dictionary
     """
-    for key, value in d.items():
-        if "." in key:
-            parent_keys = key.split(".")
-            new_key = parent_keys.pop()
-            return unflatten({
-                ".".join(parent_keys): {
-                    new_key: value
-                }
-            })
-        else:
-            return {
-                key: value
-            }
+    unflattened = {}
+    for key, value in flattened.items():
+        parts = key.split(".")
+        d = unflattened
+        for part in parts[:-1]:
+            if part not in d:
+                d[part] = dict()
+            d = d[part]
+        d[parts[-1]] = value
+    return unflattened
 
 
 def common_model_cn_extraction(g: dict) -> list:
