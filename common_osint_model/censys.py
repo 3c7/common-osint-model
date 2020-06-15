@@ -23,7 +23,7 @@ def from_censys_ipv4(raw: dict) -> dict:
     g = {}
     ports = []
     g.update(censys_ipv4_meta_extraction(raw))
-    for protocol in raw["protocols"]:
+    for protocol in raw.get("protocols", []):
         (port, protocol) = protocol.split("/")
         ports.append(port)
         g.update(censys_ipv4_service_extraction(raw, port, protocol))
@@ -49,12 +49,12 @@ def censys_ipv4_meta_extraction(raw: dict) -> dict:
     """
     _as = raw.get("autonomous_system", None) or dict()
     return {
-        "ip": raw["ip"],
+        "ip": raw["ip"],  # Program should fail if IP is not given
         "as": {
-            "number": _as["asn"],
-            "name": _as["name"],
-            "location": _as["country_code"],
-            "prefix": _as["routed_prefix"],
+            "number": _as.get("asn", None),
+            "name": _as.get("name", None),
+            "location": _as.get("country_code", None),
+            "prefix": _as.get("routed_prefix", None),
         },
     }
 
@@ -68,9 +68,10 @@ def censys_ipv4_service_extraction(raw: dict, port: str, protocol: str) -> dict:
     :return: Service dictionary
     """
     s = raw.get(port, {}).get(protocol, None) or dict()
+    timestamp = raw.get("updated_at", None)
     service = {
-        "timestamp": int(DateTime(raw["updated_at"])),
-        "timestamp_readable": DateTime(raw["updated_at"]).ISO8601(),
+        "timestamp": int(DateTime(timestamp)) if timestamp else None,
+        "timestamp_readable": DateTime(timestamp).ISO8601() if timestamp else None,
     }
     keys = s.keys()
     if "banner_decoded" in keys:
@@ -101,8 +102,8 @@ def censys_ipv4_http_extraction(s: dict) -> dict:
     return {
         "headers": headers,
         "content": {
-            "html": s["body"],
-            "hash": {"shodan": mmh3_hash(s["body"]), "sha256": s["body_sha256"]},
+            "html": s.get("body", None),
+            "hash": {"shodan": mmh3_hash(s.get("body", "")), "sha256": s.get("body_sha256", None)},
             "favicon": {"shodan": None, "sha256": None},
         },
     }
