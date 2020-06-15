@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="common-osint-model",
-    version="0.2.4",
+    version="0.2.5",
     author="Nils Kuhnert",
     description="Converting data from services like Censys and Shodan to a common data model.",
     long_description=long_description,

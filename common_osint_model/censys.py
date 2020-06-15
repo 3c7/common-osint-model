@@ -96,7 +96,8 @@ def censys_ipv4_http_extraction(s: dict) -> dict:
     headers = s.get("headers", {})
     for h in headers.get("unknown", []):
         headers.update({h["key"].lower().replace("-", "_"): h["value"]})
-    del headers["unknown"]
+    if "unknown" in headers.keys():
+        del headers["unknown"]
     return {
         "headers": headers,
         "content": {
