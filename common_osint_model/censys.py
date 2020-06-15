@@ -156,6 +156,10 @@ def censys_ipv4_tls_extraction(s: dict) -> dict:
                 "end": int(cert_expires),
                 "end_readable": cert_expires.ISO8601(),
                 "length": cert_length
+            },
+            "fingerprint": {
+                "sha1": cert.get("fingerprint_sha1", None),
+                "sha256": cert.get("fingerprint_sha256", None)
             }
         }
     }
