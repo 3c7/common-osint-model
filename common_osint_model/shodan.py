@@ -150,7 +150,7 @@ def shodan_ssl_extraction(s: dict) -> dict:
     :param s: Shodan service dictionary
     :return: Properly formatted, service related dictionary
     """
-    ssl = s["ssl"]
+    ssl = s.get("ssl", None) or dict()
     cert = ssl.get("cert", {})
     subject = cert.get("subject", None) or dict()
     issuer = cert.get("issuer", None) or dict()
@@ -220,7 +220,7 @@ def shodan_ssh_extraction(s: dict) -> dict:
     :param s: Shodan service dictionary
     :return: Properly formatted, service related dictionary
     """
-    ssh = s["ssh"]
+    ssh = s.get("ssh", None) or dict()
     key_exchange = ssh.get("kex", None) or dict()
     h = sha256()
     h.update(b64decode(ssh.get("key", None)))

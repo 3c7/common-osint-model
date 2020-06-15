@@ -1,8 +1,6 @@
 from common_osint_model.utils import flatten, unflatten, common_model_cn_extraction
 from DateTime import DateTime
 from mmh3 import hash as mmh3_hash
-from struct import pack
-from binascii import hexlify
 
 
 def from_censys_ipv4(raw: dict) -> dict:
@@ -49,7 +47,7 @@ def censys_ipv4_meta_extraction(raw: dict) -> dict:
     :param raw: Censys IPv4 dict
     :return: Metadata part of common format dict
     """
-    _as = raw["autonomous_system"]
+    _as = raw.get("autonomous_system", None) or dict()
     return {
         "ip": raw["ip"],
         "as": {
@@ -69,7 +67,7 @@ def censys_ipv4_service_extraction(raw: dict, port: str, protocol: str) -> dict:
     :param protocol: Protocol as str
     :return: Service dictionary
     """
-    s = raw[port][protocol]
+    s = raw.get(port, {}).get(protocol, None) or dict()
     service = {
         "timestamp": int(DateTime(raw["updated_at"])),
         "timestamp_readable": DateTime(raw["updated_at"]).ISO8601(),
