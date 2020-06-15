@@ -110,6 +110,7 @@ def shodan_http_extraction(s: dict) -> dict:
     :param s: Shodan service dictionary
     :return: Properly formatted, service related dictionary
     """
+    http = s.get("http", None) or dict()
     headers = {}
     for line in s["data"].split("\n"):
         line = line.strip()
@@ -117,7 +118,7 @@ def shodan_http_extraction(s: dict) -> dict:
             continue
         h = line.split(":")
         headers.update({h[0].lower().replace("-", "_"): "".join(h[1:]).strip()})
-    favicon = s["http"].get("favicon", None) or dict()
+    favicon = http.get("favicon", None) or dict()
     favicon_data = favicon.get("data", None)
     favicon_hash = favicon.get("hash", None)
     favicon_sha256 = None
@@ -130,11 +131,11 @@ def shodan_http_extraction(s: dict) -> dict:
         "http": {
             "headers": headers,
             "content": {
-                "html": s["http"].get("html", None),
+                "html": http.get("html", None),
                 "hash": {
-                    "shodan": s["http"].get("html_hash", None),
-                    "sha256": sha256_from_body_string(s["http"].get("html", None))
-                    if s["http"].get("html", None)
+                    "shodan": http.get("html_hash", None),
+                    "sha256": sha256_from_body_string(http.get("html", None))
+                    if http.get("html", None)
                     else None,
                 },
                 "favicon": {"shodan": favicon_hash, "sha256": favicon_sha256},
