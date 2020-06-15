@@ -19,6 +19,27 @@ def flatten(d: dict, parent_key: str = "") -> dict:
     return dict(items)
 
 
+def unflatten(d: dict, parent_key: str = "") -> dict:
+    """
+    Unflattens a dictionary
+    :param d:  Flattened dictionary
+    :return: Unflattened dictionary
+    """
+    for key, value in d.items():
+        if "." in key:
+            parent_keys = key.split(".")
+            new_key = parent_keys.pop()
+            return unflatten({
+                ".".join(parent_keys): {
+                    new_key: value
+                }
+            })
+        else:
+            return {
+                key: value
+            }
+
+
 def common_model_cn_extraction(g: dict) -> list:
     """
     Loops through all keys in the already converted model in order to find domains

@@ -1,4 +1,4 @@
-from common_osint_model.utils import flatten, common_model_cn_extraction
+from common_osint_model.utils import flatten, unflatten, common_model_cn_extraction
 from DateTime import DateTime
 from mmh3 import hash as mmh3_hash
 from struct import pack
@@ -11,6 +11,17 @@ def from_censys_ipv4(raw: dict) -> dict:
     :param raw: Censys IPv4 dict
     :return: Common format dict
     """
+    flattened = False
+    for k in raw.keys():
+        if "." in k:
+            flattened = True
+            break
+        elif k == "443" or k == "80" or k == "22" or k == "autonomous_system":
+            break
+
+    if flattened:
+        raw = unflatten(raw)
+
     g = {}
     ports = []
     g.update(censys_ipv4_meta_extraction(raw))
