@@ -117,7 +117,7 @@ def shodan_http_extraction(s: dict) -> dict:
         if not ":" in line:
             continue
         h = line.split(":")
-        headers.update({h[0].lower().replace("-", "_"): "".join(h[1:]).strip()})
+        headers.update({h[0].lower().replace("-", "_"): ":".join(h[1:]).strip()})
     favicon = http.get("favicon", None) or dict()
     favicon_data = favicon.get("data", None)
     favicon_hash = favicon.get("hash", None)
@@ -134,9 +134,7 @@ def shodan_http_extraction(s: dict) -> dict:
                 "html": http.get("html", None),
                 "hash": {
                     "shodan": http.get("html_hash", None),
-                    "sha256": sha256_from_body_string(http.get("html", None))
-                    if http.get("html", None)
-                    else None,
+                    "sha256": sha256_from_body_string(http.get("html", ""))
                 },
                 "favicon": {"shodan": favicon_hash, "sha256": favicon_sha256},
             },

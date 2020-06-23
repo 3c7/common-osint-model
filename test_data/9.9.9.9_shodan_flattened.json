@@ -11,10 +11,6 @@
         {
             "type": "shodan-hostname",
             "value": "dns9.quad9.net"
-        },
-        {
-            "type": "common_name",
-            "value": "*.quad9.net"
         }
     ],
     "org": "Quad9",
@@ -25,7 +21,7 @@
     "443.banner": "HTTP/1.1 404 File Not Found\r\nDate: Fri, 05 Jun 2020 20:17:47 GMT\r\nConnection: keep-alive\r\nContent-Length: 9\r\nServer: h2o/dnsdist\r\ncontent-type: text/plain; charset=utf-8\r\n\r\n",
     "443.timestamp": 1591388268,
     "443.timestamp_readable": "2020-06-05T20:17:48",
-    "443.http.headers.date": "Fri, 05 Jun 2020 201747 GMT",
+    "443.http.headers.date": "Fri, 05 Jun 2020 20:17:47 GMT",
     "443.http.headers.connection": "keep-alive",
     "443.http.headers.content_length": "9",
     "443.http.headers.server": "h2o/dnsdist",

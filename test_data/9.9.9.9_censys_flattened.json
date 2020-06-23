@@ -56,6 +56,8 @@
     "443.tls.certificate.validity.end": 1600948800,
     "443.tls.certificate.validity.end_readable": "2020-09-24T12:00:00+00:00",
     "443.tls.certificate.validity.length": 63547200,
+    "443.tls.certificate.fingerprint.sha1": "fa4f929034d82e9a5eef6e83c0a36ca472499273",
+    "443.tls.certificate.fingerprint.sha256": "9791b69c6682d397a77de50305570b7ed6910e648a9b6473c79a40696137713e",
     "53.timestamp": 1591343599,
     "53.timestamp_readable": "2020-06-05T07:53:19+00:00",
     "5053.timestamp": 1591343599,
@@ -66,78 +68,5 @@
         "53",
         "5053"
     ],
-    "domains": [
-        {
-            "type": "common_name",
-            "value": "*.quad9.net"
-        },
-        {
-            "type": "common_name",
-            "value": "149.112.112.13"
-        },
-        {
-            "type": "common_name",
-            "value": "149.112.112.15"
-        },
-        {
-            "type": "common_name",
-            "value": "9.9.9.10"
-        },
-        {
-            "type": "common_name",
-            "value": "9.9.9.13"
-        },
-        {
-            "type": "common_name",
-            "value": "9.9.9.15"
-        },
-        {
-            "type": "common_name",
-            "value": "149.112.112.11"
-        },
-        {
-            "type": "common_name",
-            "value": "9.9.9.11"
-        },
-        {
-            "type": "common_name",
-            "value": "9.9.9.14"
-        },
-        {
-            "type": "common_name",
-            "value": "149.112.112.12"
-        },
-        {
-            "type": "common_name",
-            "value": "9.9.9.9"
-        },
-        {
-            "type": "common_name",
-            "value": "9.9.9.12"
-        },
-        {
-            "type": "common_name",
-            "value": "149.112.112.9"
-        },
-        {
-            "type": "common_name",
-            "value": "149.112.112.10"
-        },
-        {
-            "type": "common_name",
-            "value": "149.112.112.14"
-        },
-        {
-            "type": "common_name",
-            "value": "149.112.112.112"
-        },
-        {
-            "type": "common_name",
-            "value": "*.quad9.net"
-        },
-        {
-            "type": "common_name",
-            "value": "quad9.net"
-        }
-    ]
+    "domains": []
 }
