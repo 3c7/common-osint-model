@@ -125,5 +125,18 @@
         "22",
         "80"
     ],
-    "domains": []
+    "domains": [
+        {
+            "type": "common_name",
+            "value": "github.com"
+        },
+        {
+            "type": "common_name",
+            "value": "github.com"
+        },
+        {
+            "type": "common_name",
+            "value": "www.github.com"
+        }
+    ]
 }

@@ -11,6 +11,10 @@
         {
             "type": "shodan-hostname",
             "value": "dns9.quad9.net"
+        },
+        {
+            "type": "common_name",
+            "value": "*.quad9.net"
         }
     ],
     "org": "Quad9",

@@ -49,7 +49,7 @@ def common_model_cn_extraction(g: dict) -> list:
             continue
 
         if "tls" in value.keys():
-            cns = value["tls"].get("certificate", {}).get("subject", {}).get("subject", None) or list()
+            cns = value["tls"].get("certificate", {}).get("subject", {}).get("common_name", None) or list()
             for cn in cns:
                 # Sloppy check if this is a real domain
                 if "." in cn:

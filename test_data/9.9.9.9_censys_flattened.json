@@ -68,5 +68,78 @@
         "53",
         "5053"
     ],
-    "domains": []
+    "domains": [
+        {
+            "type": "common_name",
+            "value": "*.quad9.net"
+        },
+        {
+            "type": "common_name",
+            "value": "149.112.112.13"
+        },
+        {
+            "type": "common_name",
+            "value": "149.112.112.15"
+        },
+        {
+            "type": "common_name",
+            "value": "9.9.9.10"
+        },
+        {
+            "type": "common_name",
+            "value": "9.9.9.13"
+        },
+        {
+            "type": "common_name",
+            "value": "9.9.9.15"
+        },
+        {
+            "type": "common_name",
+            "value": "149.112.112.11"
+        },
+        {
+            "type": "common_name",
+            "value": "9.9.9.11"
+        },
+        {
+            "type": "common_name",
+            "value": "9.9.9.14"
+        },
+        {
+            "type": "common_name",
+            "value": "149.112.112.12"
+        },
+        {
+            "type": "common_name",
+            "value": "9.9.9.9"
+        },
+        {
+            "type": "common_name",
+            "value": "9.9.9.12"
+        },
+        {
+            "type": "common_name",
+            "value": "149.112.112.9"
+        },
+        {
+            "type": "common_name",
+            "value": "149.112.112.10"
+        },
+        {
+            "type": "common_name",
+            "value": "149.112.112.14"
+        },
+        {
+            "type": "common_name",
+            "value": "149.112.112.112"
+        },
+        {
+            "type": "common_name",
+            "value": "*.quad9.net"
+        },
+        {
+            "type": "common_name",
+            "value": "quad9.net"
+        }
+    ]
 }

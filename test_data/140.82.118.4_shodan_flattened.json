@@ -11,6 +11,10 @@
         {
             "type": "shodan-hostname",
             "value": "lb-140-82-118-4-ams.github.com"
+        },
+        {
+            "type": "common_name",
+            "value": "github.com"
         }
     ],
     "org": "GitHub",
