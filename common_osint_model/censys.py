@@ -1,4 +1,4 @@
-from common_osint_model.utils import flatten, unflatten, common_model_cn_extraction
+from common_osint_model.utils import flatten, unflatten, common_model_cn_extraction, sha256_from_body_string
 from DateTime import DateTime
 from mmh3 import hash as mmh3_hash
 
@@ -103,7 +103,10 @@ def censys_ipv4_http_extraction(s: dict) -> dict:
         "headers": headers,
         "content": {
             "html": s.get("body", None),
-            "hash": {"shodan": mmh3_hash(s.get("body", "")), "sha256": s.get("body_sha256", None)},
+            "hash": {
+                "shodan": mmh3_hash(s.get("body", None) or ""),
+                "sha256": s.get("body_sha256", None) or sha256_from_body_string("")
+            },
             "favicon": {"shodan": None, "sha256": None},
         },
     }

@@ -134,7 +134,7 @@ def shodan_http_extraction(s: dict) -> dict:
                 "html": http.get("html", None),
                 "hash": {
                     "shodan": http.get("html_hash", None),
-                    "sha256": sha256_from_body_string(http.get("html", ""))
+                    "sha256": sha256_from_body_string(http.get("html", None) or "")
                 },
                 "favicon": {"shodan": favicon_hash, "sha256": favicon_sha256},
             },
