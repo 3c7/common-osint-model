@@ -26,6 +26,18 @@ def convcensys():
         convert(args.filepath, from_censys_ipv4, args.indent)
 
 
+def convcert():
+    """
+    Converts a certificate PEM file into the common data model
+    """
+    args = parse_args()
+    if args.flatten:
+        d = from_x509_pem_flattened(open(args.filepath).read())
+    else:
+        d = from_x509_pem(open(args.filepath).read())
+    print(json.dumps(d, indent=args.indent))
+
+
 def parse_args():
     parser = ArgumentParser()
     parser.add_argument("filepath", type=str, help="JSON file to read from")

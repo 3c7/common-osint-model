@@ -173,8 +173,8 @@ def shodan_ssl_extraction(s: dict) -> dict:
                     "province": subject.get("ST", None),
                     "locality": subject.get("L", None),
                     "common_name": list(common_names),
-                    "organisation": subject.get("O", None),
-                    "organisational_unit": subject.get("OU", None),
+                    "organization": subject.get("O", None),
+                    "organizational_unit": subject.get("OU", None),
                     "email_address": subject.get("email", None),
                 },
                 "issuer": {
@@ -182,8 +182,8 @@ def shodan_ssl_extraction(s: dict) -> dict:
                     "province": issuer.get("ST", None),
                     "locality": issuer.get("L", None),
                     "common_name": issuer.get("CN", None),
-                    "organisation": issuer.get("O", None),
-                    "organisational_unit": issuer.get("OU", None),
+                    "organization": issuer.get("O", None),
+                    "organizational_unit": issuer.get("OU", None),
                     "email_address": issuer.get("email", None),
                 },
                 "fingerprint": {
