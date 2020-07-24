@@ -31,7 +31,10 @@ def convcensyscert():
     Converts a JSON file with censys certificate data to the common data model
     """
     args = parse_args()
-    convert(args.filepath, from_censys_certificates, args.indent)
+    if args.flatten:
+        convert(args.filepath, from_censys_certificates_flattened, args.indent)
+    else:
+        convert(args.filepath, from_censys_certificates, args.indent)
 
 
 def convcert():

@@ -221,6 +221,15 @@ def from_censys_certificates(raw: dict) -> dict:
     return dict(censys_certificates_parsed_extraction(raw["parsed"]))
 
 
+def from_censys_certificates_flattened(raw: dict) -> dict:
+    """
+    Converts a censys certificates dictionary to the flattened common model format
+    :param raw: Censys certificates dict
+    :return: Common model dict
+    """
+    return flatten(from_censys_certificates(raw))
+
+
 def censys_certificates_parsed_extraction(parsed: dict) -> dict:
     """
     Extracts the parsed certificate data
@@ -268,7 +277,7 @@ def censys_certificates_parsed_extraction(parsed: dict) -> dict:
         "start_readable": start.isoformat(),
         "end": int(end.timestamp()),
         "end_readable": end.isoformat(),
-        "length": int((end-start).total_seconds())
+        "length": int((end - start).total_seconds())
     }
 
     p = {
