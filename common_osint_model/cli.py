@@ -26,6 +26,14 @@ def convcensys():
         convert(args.filepath, from_censys_ipv4, args.indent)
 
 
+def convcensyscert():
+    """
+    Converts a JSON file with censys certificate data to the common data model
+    """
+    args = parse_args()
+    convert(args.filepath, from_censys_certificates, args.indent)
+
+
 def convcert():
     """
     Converts a certificate PEM file into the common data model

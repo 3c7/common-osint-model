@@ -1,5 +1,7 @@
-from common_osint_model.utils import flatten, unflatten, common_model_cn_extraction, sha256_from_body_string
+from common_osint_model.utils import flatten, unflatten, common_model_cn_extraction, sha256_from_body_string, \
+    list_cleanup
 from DateTime import DateTime
+from datetime import datetime
 from mmh3 import hash as mmh3_hash
 
 
@@ -197,3 +199,85 @@ def censys_ipv4_ssh_extraction(s: dict) -> dict:
             "type": shk.get("key_algorithm", None)
         }
     }
+
+
+def from_censys_certificates(raw: dict) -> dict:
+    """
+    Converts a censys certificates dictionary to the common model format
+    :param raw: Censys certificates dict
+    :return: Common model dict
+    """
+    flattened = False
+    for k in raw.keys():
+        if "." in k:
+            flattened = True
+            break
+        elif k == "parsed":
+            break
+
+    if flattened:
+        raw = unflatten(raw)
+
+    return dict(censys_certificates_parsed_extraction(raw["parsed"]))
+
+
+def censys_certificates_parsed_extraction(parsed: dict) -> dict:
+    """
+    Extracts the parsed certificate data
+    :param p: "Parsed" dictionary of censys data
+    :return: Dictionary with parsed certificate data in common model format
+    """
+    issuer = {}
+    subject = {}
+    fingerprint = {}
+    validity = {}
+    for issuer_key, issuer_item in parsed.get("issuer", {}).items():
+        issuer.update({
+            issuer_key: issuer_item
+        })
+    for subject_key, subject_item in parsed.get("subject", {}).items():
+        subject.update({
+            subject_key: subject_item
+        })
+    for fp_key, fp_item in parsed.items():
+        if "fingerprint_" not in fp_key:
+            continue
+        fingerprint.update({
+            fp_key.replace("fingerprint_", ""): fp_item
+        })
+
+    for extension, content in parsed.get("extensions", {}).items():
+        if extension == "subject_alt_name":
+            cn = subject.get("common_name", None)
+            altnames = content.get("dns_names", [])
+            if cn and cn in altnames or not cn:
+                subject["common_name"] = altnames
+            elif cn and cn not in altnames:
+                if isinstance(cn, str):
+                    altnames.append(cn)
+                elif isinstance(cn, list):
+                    for name in cn:
+                        if name not in altnames:
+                            altnames.append(name)
+                subject["common_name"] = altnames
+
+    start = datetime.strptime(parsed["validity"]["start"], "%Y-%m-%dT%H:%M:%SZ")
+    end = datetime.strptime(parsed["validity"]["end"], "%Y-%m-%dT%H:%M:%SZ")
+    validity = {
+        "start": int(start.timestamp()),
+        "start_readable": start.isoformat(),
+        "end": int(end.timestamp()),
+        "end_readable": end.isoformat(),
+        "length": int((end-start).total_seconds())
+    }
+
+    p = {
+        "issuer": issuer,
+        "issuer_dn": parsed.get("issuer_dn", None),
+        "subject": subject,
+        "subject_dn": parsed.get("subject_dn", None),
+        "fingerprint": fingerprint,
+        "validity": validity,
+        "serial_number": parsed.get("serial_number", None)
+    }
+    return list_cleanup(p)

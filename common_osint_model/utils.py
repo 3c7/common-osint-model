@@ -66,3 +66,13 @@ def sha256_from_body_string(b: str) -> str:
     h = sha256()
     h.update(bytes(b.encode("utf8")))
     return hexlify(h.digest()).decode("ascii")
+
+
+def list_cleanup(d: dict) -> dict:
+    for k, v in d.items():
+        if isinstance(v, dict):
+            d[k] = list_cleanup(v)
+        elif isinstance(v, list):
+            if len(v) == 1:
+                d[k] = v[0]
+    return d

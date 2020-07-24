@@ -1,11 +1,12 @@
 from cryptography.x509 import load_pem_x509_certificate
+from cryptography.x509.extensions import SubjectAlternativeName
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.hashes import MD5, SHA1, SHA256
 from cryptography.hazmat.backends.openssl.x509 import _Certificate as Certificate
 from binascii import hexlify
 from typing import Union
 from datetime import timezone
-from common_osint_model.utils import flatten
+from common_osint_model.utils import flatten, list_cleanup
 
 
 def from_x509_pem(pem: Union[str, bytes]) -> dict:
@@ -23,7 +24,7 @@ def from_x509_pem(pem: Union[str, bytes]) -> dict:
     g.update(certificate_fingerprint_extraction(certificate))
     g.update(certificate_validity_extraction(certificate))
     g.update(dict(serial_number=certificate.serial_number))
-    return g
+    return list_cleanup(g)
 
 
 def from_x509_pem_flattened(pem: Union[str, bytes]) -> dict:
@@ -41,7 +42,7 @@ def certificate_dn_extraction(certificate: Certificate) -> dict:
     :param certificate: object of type cryptography.hazmat.backends.openssl.x509._Certificate
     :return: dictionary containing issuer and subject DN
     """
-    dns = dict(subject={}, issuer={})
+    dns = dict(subject={}, issuer={}, subject_dn=None, issuer_dn=None)
     terms = dict(
         CN='common_name',
         C='country',
@@ -52,17 +53,44 @@ def certificate_dn_extraction(certificate: Certificate) -> dict:
         email='email_address'
     )
 
+    dns["issuer_dn"] = certificate.issuer.rfc4514_string()
     for term in certificate.issuer.rfc4514_string().split(','):
         k, v = term.split("=")
-        dns["issuer"].update({
-            terms[k.strip()]: v
-        })
+        key = terms[k.strip()]
+        if key in dns["issuer"].keys():
+            if isinstance(dns["issuer"][key], list):
+                dns["issuer"][key].append(v)
+            else:
+                dns["issuer"][key] = [dns["issuer"][key], v]
+        else:
+            dns["issuer"].update({
+                terms[k.strip()]: v
+            })
 
+    dns["subject_dn"] = certificate.subject.rfc4514_string()
     for term in certificate.subject.rfc4514_string().split(','):
         k, v = term.split("=")
-        dns["subject"].update({
-            terms[k.strip()]: v
-        })
+        key = terms[k.strip()]
+        if key in dns["subject"].keys():
+            if isinstance(dns["subject"][key], list):
+                dns["subject"][key].append(v)
+            else:
+                dns["subject"][key] = [dns["subject"][key], v]
+        else:
+            dns["subject"].update({
+                terms[k.strip()]: v
+            })
+    try:
+        subjectAltName = certificate.extensions.get_extension_for_oid(SubjectAlternativeName.oid)
+    except:
+        subjectAltName = None
+
+    if subjectAltName:
+        dns["subject"]["common_name"] = [dns["subject"]["common_name"]]
+        for v in subjectAltName.value:
+            if v.value not in dns["subject"]["common_name"]:
+                dns["subject"]["common_name"].append(v.value)
+
     return dns
 
 
