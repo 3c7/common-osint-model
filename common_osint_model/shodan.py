@@ -19,7 +19,14 @@ def from_shodan(raw: Union[list, dict]) -> dict:
     if isinstance(raw, dict):
         services.append(raw)
     elif isinstance(raw, list):
-        services.extend(raw)
+        if len(raw) == 1:
+            raw = raw[0]
+            if isinstance(raw.get("data", ""), list):
+                services.extend(raw["data"])
+            else:
+                services.append(raw)
+        else:
+            services.extend(raw)
     else:
         raise TypeError("Given parameter 'raw' must be either a list or a dict.")
     # Get the meta data
