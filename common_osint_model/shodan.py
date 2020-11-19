@@ -17,7 +17,10 @@ def from_shodan(raw: Union[list, dict]) -> dict:
     g = {}
     services = []
     if isinstance(raw, dict):
-        services.append(raw)
+        if isinstance(raw.get("data", ""), list):
+            services.extend(raw["data"])
+        else:
+            services.append(raw)
     elif isinstance(raw, list):
         if len(raw) == 1:
             raw = raw[0]
