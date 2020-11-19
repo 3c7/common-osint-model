@@ -208,6 +208,8 @@ def shodan_ssl_extraction(s: dict) -> dict:
                 "name": ssl.get("cipher", {}).get("name", None),
                 "bits": ssl.get("cipher", {}).get("bits", None),
             },
+            "ja3s": ssl.get("ja3s", None),
+            "jarm": ssl.get("jarm", None)
         }
     }
 
