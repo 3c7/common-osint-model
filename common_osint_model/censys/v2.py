@@ -1,5 +1,5 @@
 from typing import Dict, List, Any
-
+from DateTime import DateTime
 from mmh3 import hash as mmh3_hash
 
 from common_osint_model.utils import sha256_from_body_string, flatten
@@ -55,7 +55,14 @@ def censys_extract_service(service: Dict) -> Dict:
     :param service: Censys Search 2.0 service dictionary
     """
     port = service["port"]
-    s_common = {}
+    timestamp = service.get("observed_at", None)
+    if timestamp:
+        timestamp = DateTime(timestamp)
+    s_common = {
+        "banner": service.get("banner", None),
+        "timestamp": int(timestamp),
+        "timestamp_readable": timestamp.ISO8601()
+    }
     if "http" in service:
         s_common.update({"http": censys_extract_http_service(service)})
     if "tls" in service:
@@ -103,10 +110,12 @@ def censys_extract_tls_service(service: Dict) -> Dict:
     cert = service.get("tls", {}).get("certificates", {}).get("leaf_data", None)
     c_issuer = cert.get("issuer", None) or dict()
     c_subject = cert.get("subject", None) or dict()
-    common_name = [c_subject.get("common_name", [])]
+    common_name = c_subject.get("common_name", [])
     common_name.extend(cert.get("names", []))
     if len(common_name) == 0:
         common_name = None
+    else:
+        common_name = sorted(list(set(common_name)))
     if not cert:
         return {}
 
@@ -137,6 +146,14 @@ def censys_extract_tls_service(service: Dict) -> Dict:
     }
     return s_tls
 
+
+def censys_extract_ssh(service: Dict) -> Dict:
+    """
+    Extracts relevant ssh service fields.
+
+    :param service: Censys Search 2.0 service dictionary
+    """
+    s_ssh = {}
 
 def _first_or_none(l: List) -> Any:
     """Returns first element of list or none, if list is empty."""
