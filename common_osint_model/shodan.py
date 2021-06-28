@@ -77,6 +77,16 @@ def shodan_meta_extraction(raw: Union[dict, list]) -> dict:
             "domains": [],
             "org": o.get("org", None),
             "ip": o.get("ip_str"),
+            "location": {
+                "city": o.get("city", None),
+                "country": o.get("country_name", None),
+                "country_code": o.get("country_code", None),
+                "postal_code": o.get("postal_code", None),
+                "coordinates": {
+                    "latitude": o.get("latitude", None),
+                    "longitude": o.get("longitude", None)
+                }
+            }
         }
     )
     for domain in o.get("domains", []):
