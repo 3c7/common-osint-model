@@ -1,6 +1,7 @@
 import io
 import json
 from argparse import ArgumentParser
+
 from common_osint_model import *
 
 
@@ -35,6 +36,17 @@ def convcensyscert():
         convert(args.filepath, from_censys_certificates_flattened, args.indent)
     else:
         convert(args.filepath, from_censys_certificates, args.indent)
+
+
+def convcensys2():
+    """
+    Converts a JSON file with censys search 2.0 data to the common data model
+    """
+    args = parse_args()
+    if args.flatten:
+        convert(args.filepath, from_censys_flattened, args.indent)
+    else:
+        convert(args.filepath, from_censys, args.indent)
 
 
 def convcert():
