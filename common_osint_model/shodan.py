@@ -6,6 +6,21 @@ from common_osint_model.utils import flatten, common_model_cn_extraction, sha256
 from binascii import hexlify
 from hashlib import sha256
 from base64 import b64decode
+from typing import List, Dict
+from .models import Host
+
+
+def to_pydantic_model(raw: Union[List, Dict]) -> Host:
+    """Creates the according pydantic model from the given Shodan data."""
+    d = from_shodan(raw)
+    d["autonomous_system"] = d["as"]
+    d["autonomous_system"]["number"] = d["autonomous_system"]["number"].replace("AS", "")
+    d["services"] = []
+
+    for port in d["ports"]:
+        d["services"].append({**d[port], "port": port})
+        del d[port]
+    return Host(**d)
 
 
 def from_shodan(raw: Union[list, dict]) -> dict:
