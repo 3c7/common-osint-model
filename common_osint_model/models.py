@@ -42,7 +42,7 @@ class ShodanDataHandler(ABC):
     """Abstract base class indicating that a class implements from_shodan()."""
 
     @classmethod
-    def from_shodan(cls, d: Dict) -> BaseModel:
+    def from_shodan(cls, d: Dict):
         pass
 
 
@@ -50,7 +50,7 @@ class CensysDataHandler(ABC):
     """Abstract base class indicating that a class implements from_censys()."""
 
     @classmethod
-    def from_censys(cls, d: Dict) -> BaseModel:
+    def from_censys(cls, d: Dict):
         pass
 
 
@@ -58,7 +58,7 @@ class BinaryEdgeDataHandler(ABC):
     """Abstract base class indicating that a class implements from_binaryedge()."""
 
     @classmethod
-    def from_binaryedge(cls, d: Dict) -> BaseModel:
+    def from_binaryedge(cls, d: Dict):
         pass
 
 

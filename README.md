@@ -11,7 +11,7 @@ show up correctly.
 ```python
 from common_osint_model.models import Host
 
-host_data = shodan_query_func(...)
+host_data = shodan.host("1.2.3.4")
 host = Host.from_shodan(host_data)
 ```
 ---
@@ -31,16 +31,29 @@ Currently, only HTTP(S), TLS and SSH data as well as some meta data will get con
 
 ### Installation
 ```bash
-pip install git+https://github.com/3c7/common-osint-model
+pip install common-osint-model
 ```
 
 ### Convert all the things
 ```python
+# Post v0.4.0 (Pydantic model)
+from common_osint_model.models import Host
+raw_shodan_data = shodan.host("1.2.3.4")
+host = Host.from_shodan(raw_shodan_data)
+print(host.ip)
+
+for idx, service in enumerate(host.services):
+    print(f"HTTP Headers for Service #{idx+1}:")
+    if service.http:
+        for header, value in service.http.headers.items():
+            print(f"\t{header}: {value}")
+
+# Pre v0.4.0 (Dictionary based approach)
 from common_osint_model import from_shodan, from_shodan_flattened, from_censys_ipv4, from_censys_ipv4_flattened, from_x509_pem, from_x509_pem_flattened
 
 raw_shodan = get_my_shodan_data()
-converted_s = from_shodan(raw_shodan)
-flattened_s = from_shodan_flattened(raw_shodan)
+converted_s = from_shodan(raw_shodan)  # Deprecated
+flattened_s = from_shodan_flattened(raw_shodan)  # Deprecated
 
 raw_censys_ipv4 = get_my_censys_ipv4_data()
 converted_c = from_censys_ipv4(raw_censys_ipv4)
