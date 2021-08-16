@@ -1,5 +1,5 @@
-from hashlib import sha256
 from binascii import hexlify
+from hashlib import sha256
 
 
 def flatten(d: dict, parent_key: str = "") -> dict:

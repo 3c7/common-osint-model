@@ -39,7 +39,7 @@ class Logger(ABC):
 
 
 class ShodanDataHandler(ABC):
-    """Abstract base class indicating that the class implements from_shodan()."""
+    """Abstract base class indicating that a class implements from_shodan()."""
 
     @classmethod
     def from_shodan(cls, d: Dict) -> BaseModel:
@@ -47,10 +47,18 @@ class ShodanDataHandler(ABC):
 
 
 class CensysDataHandler(ABC):
-    """Abstract base class indicating that the class implements from_censys()."""
+    """Abstract base class indicating that a class implements from_censys()."""
 
     @classmethod
-    def from_censys(cls, d: Dict):
+    def from_censys(cls, d: Dict) -> BaseModel:
+        pass
+
+
+class BinaryEdgeDataHandler(ABC):
+    """Abstract base class indicating that a class implements from_binaryedge()."""
+
+    @classmethod
+    def from_binaryedge(cls, d: Dict) -> BaseModel:
         pass
 
 
@@ -504,7 +512,7 @@ class Service(BaseModel, Logger):
         )
 
 
-class Host(BaseModel, ShodanDataHandler):
+class Host(BaseModel, ShodanDataHandler, Logger):
     """This class represents a host and can be used to handle results from the common model in a pythonic way."""
     ip: str
     autonomous_system: AutonomousSystem
@@ -522,7 +530,7 @@ class Host(BaseModel, ShodanDataHandler):
         return v
 
     @property
-    def service_dict(self):
+    def services_dict(self):
         """Returns the services as dictionary in the form of {port: service}. Uses exclude_none to skip empty keys."""
         return {s["port"]: s for s in self.dict(exclude_none=True)["services"]}
 
@@ -538,9 +546,9 @@ class Host(BaseModel, ShodanDataHandler):
         else:
             ip = d["ip_str"]
             services = [Service.from_shodan(d)]
-        a_system = AutonomousSystem.from_shodan(d)
+        autonomous_system = AutonomousSystem.from_shodan(d)
         return Host(
             ip=ip,
-            autonomous_system=a_system,
+            autonomous_system=autonomous_system,
             services=services
         )

@@ -1,26 +1,14 @@
 import re
-from DateTime import DateTime
-from datetime import datetime
-from typing import Union
-from common_osint_model.utils import flatten, common_model_cn_extraction, sha256_from_body_string
-from binascii import hexlify
-from hashlib import sha256
+import warnings
 from base64 import b64decode
-from typing import List, Dict
-from .models import Host
+from binascii import hexlify
+from datetime import datetime
+from hashlib import sha256
+from typing import Union
 
+from DateTime import DateTime
 
-def to_pydantic_model(raw: Union[List, Dict]) -> Host:
-    """Creates the according pydantic model from the given Shodan data."""
-    d = from_shodan(raw)
-    d["autonomous_system"] = d["as"]
-    d["autonomous_system"]["number"] = d["autonomous_system"]["number"].replace("AS", "")
-    d["services"] = []
-
-    for port in d["ports"]:
-        d["services"].append({**d[port], "port": port})
-        del d[port]
-    return Host(**d)
+from common_osint_model.utils import flatten, common_model_cn_extraction, sha256_from_body_string
 
 
 def from_shodan(raw: Union[list, dict]) -> dict:
@@ -29,6 +17,7 @@ def from_shodan(raw: Union[list, dict]) -> dict:
     :param raw: Shodan list or dictionary from host queries
     :return: Generic host describing dictionary
     """
+    warnings.warn("This function was deprecated in v0.4.0.", DeprecationWarning)
     g = {}
     services = []
     if isinstance(raw, dict):
@@ -65,6 +54,7 @@ def from_shodan_flattened(raw: Union[list, dict]) -> dict:
     :param raw: Shodan list or dictionary from host queries
     :return: Generic host describing dictionary, flattened
     """
+    warnings.warn("This function was deprecated in v0.4.0.", DeprecationWarning)
     return flatten(from_shodan(raw))
 
 

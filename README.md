@@ -1,4 +1,4 @@
-# common-osint-model
+# Common OSINT Model
 **Note:** This is work in progress and probably only covers my specific use case. If you find bugs or know how to
 enhance this project, please open an issue or - even better - create a pull request.  
   
@@ -7,6 +7,14 @@ use case often includes HTTP(S), TLS and SSH only, data delivered for other prot
 show up correctly.
 
 ## The data model
+**Update:**  Since v0.4.0 this module implements a Pydantic model (see [models.py](common_osint_model/models.py)). This deprecates the previously used methods after it's implemented for all services (Shodan, Censys, BinaryEdge). For now, only Shodan related methods are implemented. In order to use the pydantic model, import classes from `common_osint_model.models` and use the specific `from_` methods, e.g.
+```python
+from common_osint_model.models import Host
+
+host_data = shodan_query_func(...)
+host = Host.from_shodan(host_data)
+```
+---
 Please see the following examples of the data model - given as json but as it's a python dict, you can use other output
 formats:
 
