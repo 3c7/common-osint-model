@@ -1,0 +1,349 @@
+{
+  "ip": "140.82.121.4",
+  "services": [
+    {
+      "_decoded": "ssh",
+      "_encoding": {
+        "banner": "DISPLAY_UTF8",
+        "banner_hex": "DISPLAY_HEX"
+      },
+      "banner": "SSH-2.0-babeld-322814ef",
+      "banner_hex": "5353482d322e302d626162656c642d3332323831346566",
+      "extended_service_name": "SSH",
+      "observed_at": "2021-08-17T15:00:08.810004998Z",
+      "perspective_id": "PERSPECTIVE_TELIA",
+      "port": 22,
+      "service_name": "SSH",
+      "source_ip": "74.120.14.114",
+      "ssh": {
+        "endpoint_id": {
+          "_encoding": {
+            "raw": "DISPLAY_UTF8"
+          },
+          "raw": "SSH-2.0-babeld-322814ef",
+          "protocol_version": "2.0",
+          "software_version": "babeld-322814ef"
+        },
+        "kex_init_message": {
+          "kex_algorithms": [
+            "curve25519-sha256",
+            "curve25519-sha256@libssh.org",
+            "ecdh-sha2-nistp256",
+            "ecdh-sha2-nistp384",
+            "ecdh-sha2-nistp521",
+            "diffie-hellman-group-exchange-sha256"
+          ],
+          "host_key_algorithms": [
+            "rsa-sha2-512",
+            "rsa-sha2-256",
+            "ssh-rsa",
+            "ssh-dss"
+          ],
+          "client_to_server_ciphers": [
+            "chacha20-poly1305@openssh.com",
+            "aes256-gcm@openssh.com",
+            "aes128-gcm@openssh.com",
+            "aes256-ctr",
+            "aes192-ctr",
+            "aes128-ctr",
+            "aes256-cbc",
+            "aes192-cbc",
+            "aes128-cbc"
+          ],
+          "server_to_client_ciphers": [
+            "chacha20-poly1305@openssh.com",
+            "aes256-gcm@openssh.com",
+            "aes128-gcm@openssh.com",
+            "aes256-ctr",
+            "aes192-ctr",
+            "aes128-ctr",
+            "aes256-cbc",
+            "aes192-cbc",
+            "aes128-cbc"
+          ],
+          "client_to_server_macs": [
+            "hmac-sha2-512-etm@openssh.com",
+            "hmac-sha2-256-etm@openssh.com",
+            "hmac-sha2-512",
+            "hmac-sha2-256",
+            "hmac-sha1-etm@openssh.com",
+            "hmac-sha1"
+          ],
+          "server_to_client_macs": [
+            "hmac-sha2-512-etm@openssh.com",
+            "hmac-sha2-256-etm@openssh.com",
+            "hmac-sha2-512",
+            "hmac-sha2-256",
+            "hmac-sha1-etm@openssh.com",
+            "hmac-sha1"
+          ],
+          "client_to_server_compression": [
+            "none"
+          ],
+          "server_to_client_compression": [
+            "none"
+          ],
+          "first_kex_follows": false
+        },
+        "algorithm_selection": {
+          "kex_algorithm": "curve25519-sha256@libssh.org",
+          "host_key_algorithm": "ssh-rsa",
+          "client_to_server_alg_group": {
+            "cipher": "aes128-ctr",
+            "mac": "hmac-sha2-256",
+            "compression": "none"
+          },
+          "server_to_client_alg_group": {
+            "cipher": "aes128-ctr",
+            "mac": "hmac-sha2-256",
+            "compression": "none"
+          }
+        },
+        "server_host_key": {
+          "fingerprint_sha256": "9d385b83a9175292561a5ec4d4818e0aca51a264f17420112ef88ac3a139498f",
+          "rsa_public_key": {
+            "_encoding": {
+              "modulus": "DISPLAY_BASE64",
+              "exponent": "DISPLAY_BASE64"
+            },
+            "modulus": "q2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==",
+            "exponent": "AAAAIw==",
+            "length": 2048
+          }
+        }
+      },
+      "transport_fingerprint": {
+        "raw": "65535,64,true,MSTNW,1436,false,false",
+        "id": 0
+      },
+      "transport_protocol": "TCP",
+      "truncated": false
+    },
+    {
+      "_decoded": "http",
+      "_encoding": {
+        "banner": "DISPLAY_UTF8",
+        "banner_hex": "DISPLAY_HEX"
+      },
+      "banner": "HTTP/1.1 301 Moved Permanently\nLocation: https://140.82.121.4/\nContent-Length: 0",
+      "banner_hex": "485454502f312e3120333031204d6f766564205065726d616e656e746c790a4c6f636174696f6e3a2068747470733a2f2f3134302e38322e3132312e342f0a436f6e74656e742d4c656e6774683a2030",
+      "extended_service_name": "HTTP",
+      "http": {
+        "request": {
+          "method": "GET",
+          "uri": "http://140.82.121.4/",
+          "headers": {
+            "Accept": [
+              "*/*"
+            ],
+            "_encoding": {
+              "Accept": "DISPLAY_UTF8",
+              "User_Agent": "DISPLAY_UTF8"
+            },
+            "User_Agent": [
+              "Mozilla/5.0 (compatible; CensysInspect/1.1; +https://about.censys.io/)"
+            ]
+          }
+        },
+        "response": {
+          "protocol": "HTTP/1.1",
+          "status_code": 301,
+          "status_reason": "Moved Permanently",
+          "headers": {
+            "Content_Length": [
+              "0"
+            ],
+            "_encoding": {
+              "Content_Length": "DISPLAY_UTF8",
+              "Location": "DISPLAY_UTF8"
+            },
+            "Location": [
+              "https://140.82.121.4/"
+            ]
+          },
+          "body_size": 0
+        }
+      },
+      "observed_at": "2021-08-16T15:31:56.873075663Z",
+      "perspective_id": "PERSPECTIVE_NTT",
+      "port": 80,
+      "service_name": "HTTP",
+      "source_ip": "167.248.133.41",
+      "transport_protocol": "TCP",
+      "truncated": false
+    },
+    {
+      "_decoded": "http",
+      "_encoding": {
+        "banner": "DISPLAY_UTF8",
+        "certificate": "DISPLAY_HEX",
+        "banner_hex": "DISPLAY_HEX"
+      },
+      "banner": "HTTP/1.1 301 Moved Permanently\nLocation: https://github.com/\nContent-Length: 0",
+      "banner_hex": "485454502f312e3120333031204d6f766564205065726d616e656e746c790a4c6f636174696f6e3a2068747470733a2f2f6769746875622e636f6d2f0a436f6e74656e742d4c656e6774683a2030",
+      "certificate": "0ae384bfd4dde9d13e50c5857c05a442c93f8e01445ee4b34540d22bd1e37f1b",
+      "extended_service_name": "HTTPS",
+      "http": {
+        "request": {
+          "method": "GET",
+          "uri": "https://140.82.121.4/",
+          "headers": {
+            "User_Agent": [
+              "Mozilla/5.0 (compatible; CensysInspect/1.1; +https://about.censys.io/)"
+            ],
+            "_encoding": {
+              "User_Agent": "DISPLAY_UTF8",
+              "Accept": "DISPLAY_UTF8"
+            },
+            "Accept": [
+              "*/*"
+            ]
+          }
+        },
+        "response": {
+          "protocol": "HTTP/1.1",
+          "status_code": 301,
+          "status_reason": "Moved Permanently",
+          "headers": {
+            "Content_Length": [
+              "0"
+            ],
+            "_encoding": {
+              "Content_Length": "DISPLAY_UTF8",
+              "Location": "DISPLAY_UTF8"
+            },
+            "Location": [
+              "https://github.com/"
+            ]
+          },
+          "body_size": 0
+        }
+      },
+      "observed_at": "2021-08-16T15:31:57.180408183Z",
+      "perspective_id": "PERSPECTIVE_NTT",
+      "port": 443,
+      "service_name": "HTTP",
+      "source_ip": "167.248.133.41",
+      "tls": {
+        "version_selected": "TLSv1_2",
+        "cipher_selected": "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+        "certificates": {
+          "_encoding": {
+            "leaf_fp_sha_256": "DISPLAY_HEX",
+            "chain_fps_sha_256": "DISPLAY_HEX"
+          },
+          "leaf_fp_sha_256": "0ae384bfd4dde9d13e50c5857c05a442c93f8e01445ee4b34540d22bd1e37f1b",
+          "chain_fps_sha_256": [
+            "74eab573da7db195097be0e90f334934c7a4c89e8083759db4333a00edd243d9"
+          ],
+          "leaf_data": {
+            "names": [
+              "github.com",
+              "www.github.com"
+            ],
+            "subject_dn": "C=US, ST=California, L=San Francisco, O=GitHub\\, Inc., CN=github.com",
+            "issuer_dn": "C=US, O=DigiCert\\, Inc., CN=DigiCert High Assurance TLS Hybrid ECC SHA256 2020 CA1",
+            "pubkey_bit_size": 256,
+            "pubkey_algorithm": "ECDSA",
+            "tbs_fingerprint": "25975b82f166e1fd0ddebbf6f576cc3715e9f0d0b5d04e65874eed8983723fe0",
+            "fingerprint": "0ae384bfd4dde9d13e50c5857c05a442c93f8e01445ee4b34540d22bd1e37f1b",
+            "issuer": {
+              "common_name": [
+                "DigiCert High Assurance TLS Hybrid ECC SHA256 2020 CA1"
+              ],
+              "organization": [
+                "DigiCert, Inc."
+              ],
+              "country": [
+                "US"
+              ]
+            },
+            "subject": {
+              "common_name": [
+                "github.com"
+              ],
+              "locality": [
+                "San Francisco"
+              ],
+              "organization": [
+                "GitHub, Inc."
+              ],
+              "province": [
+                "California"
+              ],
+              "country": [
+                "US"
+              ]
+            },
+            "public_key": {
+              "key_algorithm": "ECDSA",
+              "ecdsa": {
+                "_encoding": {
+                  "b": "DISPLAY_BASE64",
+                  "gx": "DISPLAY_BASE64",
+                  "gy": "DISPLAY_BASE64",
+                  "n": "DISPLAY_BASE64",
+                  "p": "DISPLAY_BASE64",
+                  "x": "DISPLAY_BASE64",
+                  "y": "DISPLAY_BASE64"
+                },
+                "b": "WsY12Ko6k+ez671VdpiGvGUdBrDMU7D2O848PifSYEs=",
+                "curve": "P-256",
+                "gx": "axfR8uEsQkf4vOblY6RA8ncDfYEt6zOg9KE5RdiYwpY=",
+                "gy": "T+NC4v4af5uO5+tKfA+eFivOM1drMV7Oy7ZAaDe/UfU=",
+                "length": 256,
+                "n": "/////wAAAAD//////////7zm+q2nF56E87nKwvxjJVE=",
+                "p": "/////wAAAAEAAAAAAAAAAAAAAAD///////////////8=",
+                "x": "rfb3dbHTSVQKXRBxvdwlBksiHKIjTp+h/rnQjL05vAw=",
+                "y": "I8fPkaaQWthFqwMTvsEjernEyJ1H9pbguXZrUDZm9w0="
+              },
+              "fingerprint": "ef3c0033f614fb377c05930297427de37511bb2177e7379f282ed0228c53abe5"
+            },
+            "signature": {
+              "signature_algorithm": "ECDSA-SHA256",
+              "self_signed": false
+            }
+          },
+          "chain": [
+            {
+              "fingerprint": "74eab573da7db195097be0e90f334934c7a4c89e8083759db4333a00edd243d9",
+              "subject_dn": "C=US, O=DigiCert\\, Inc., CN=DigiCert High Assurance TLS Hybrid ECC SHA256 2020 CA1",
+              "issuer_dn": "C=US, O=DigiCert Inc, OU=www.digicert.com, CN=DigiCert High Assurance EV Root CA"
+            }
+          ]
+        },
+        "server_key_exchange": {
+          "ec_params": {
+            "named_curve": 23
+          }
+        }
+      },
+      "transport_protocol": "TCP",
+      "truncated": false
+    }
+  ],
+  "location": {
+    "continent": "North America",
+    "country": "United States",
+    "country_code": "US",
+    "postal_code": "",
+    "timezone": "America/Chicago",
+    "coordinates": {
+      "latitude": 37.751,
+      "longitude": -97.822
+    },
+    "registered_country": "United States",
+    "registered_country_code": "US"
+  },
+  "autonomous_system": {
+    "asn": 36459,
+    "description": "GITHUB",
+    "bgp_prefix": "140.82.121.0/24",
+    "name": "GITHUB",
+    "country_code": "US"
+  },
+  "operating_system": {},
+  "last_updated_at": "2021-08-17T15:00:09.531Z",
+  "location_updated_at": "2021-08-16T14:10:56.078598Z",
+  "autonomous_system_updated_at": "2021-08-10T06:29:09.519620Z"
+}

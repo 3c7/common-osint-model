@@ -7,6 +7,8 @@ from logging import basicConfig, getLogger
 from typing import Optional, Dict, List, Tuple
 
 import mmh3
+from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicNumbers
+from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
 from cryptography.x509 import load_pem_x509_certificate, ExtensionOID, DNSName, ExtensionNotFound
 from pydantic import BaseModel, validator
 
@@ -532,7 +534,7 @@ class TLSComponent(BaseModel, ShodanDataHandler, CensysDataHandler):
         )
 
 
-class SSHComponentAlgorithms(BaseModel, ShodanDataHandler):
+class SSHComponentAlgorithms(BaseModel, ShodanDataHandler, CensysDataHandler):
     """Represents algorithms supported by SSH server."""
     encryption: Optional[List[str]]
     key_exchange: Optional[List[str]]
@@ -554,8 +556,19 @@ class SSHComponentAlgorithms(BaseModel, ShodanDataHandler):
             compression=d["ssh"]["kex"]["compression_algorithms"]
         )
 
+    @classmethod
+    def from_censys(cls, d: Dict):
+        """Returns an instance of this class based on Censys data given as dictionary."""
+        return SSHComponentAlgorithms(
+            encyption=d["ssh"]["kex_init_message"]["client_to_server_ciphers"],
+            key_exchange=d["ssh"]["kex_init_message"]["kex_algorithms"],
+            mac=d["ssh"]["kex_init_message"]["server_to_client_macs"],
+            key_algorithms=d["ssh"]["kex_init_message"]["host_key_algorithms"],
+            compression=d["ssh"]["kex_init_message"]["server_to_client_compression"]
+        )
 
-class SSHComponentKey(BaseModel, ShodanDataHandler, Logger):
+
+class SSHComponentKey(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
     """Represents the public key exposed by the SSH server."""
     type: Optional[str]
     md5: Optional[str]
@@ -580,6 +593,40 @@ class SSHComponentKey(BaseModel, ShodanDataHandler, Logger):
             sha256=sha256,
             murmur=murmur
         )
+
+    @classmethod
+    def from_censys(cls, d: Dict):
+        """Returns an instance of this class based on Censys data given as dictionary."""
+        cls.info("Censys data does not contain the key as raw data. While it might can be reconstructed from the data,"
+                 " currently this is not supported. The SHA256 hash is given in the data.")
+
+        if "rsa_public_key" in d["ssh"]["server_host_key"]:
+            # Todo: this is broken. The hashes do not match the ones provided in the censys data.
+            cls.info("Seems to be a RSA key. Trying to create public key from modulus and exponent.")
+            public_numbers = RSAPublicNumbers(
+                e=int.from_bytes(
+                    base64.b64decode(d["ssh"]["server_host_key"]["rsa_public_key"]["exponent"]),
+                    byteorder="big",
+                    signed=False
+                ),
+                n=int.from_bytes(
+                    base64.b64decode(d["ssh"]["server_host_key"]["rsa_public_key"]["modulus"]),
+                    byteorder="big",
+                    signed=False
+                )
+            )
+            public_key = public_numbers.public_key()
+            md5, sha1, sha256, murmur = hash_all(public_key.public_bytes(
+                encoding=Encoding.OpenSSH,
+                format=PublicFormat.OpenSSH
+            ))
+            return SSHComponentKey(
+                type="rsa",
+                md5=md5,
+                sha1=sha1,
+                sha256=sha256,
+                murmur=murmur
+            )
 
 
 class SSHComponent(BaseModel, ShodanDataHandler):
@@ -650,7 +697,7 @@ class Service(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
     @classmethod
     def from_censys(cls, d: Dict):
         port = d["port"]
-
+        banner = d["banner"]
         httpobj = None
         if "http" in d:
             httpobj = HTTPComponent.from_censys(d)
@@ -665,6 +712,7 @@ class Service(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
 
         return Service(
             port=port,
+            banner=banner,
             http=httpobj,
             tls=tlsobj,
             ssh=sshobj,
