@@ -62,7 +62,7 @@ class BinaryEdgeDataHandler(ABC):
         pass
 
 
-class AutonomousSystem(BaseModel, ShodanDataHandler, Logger):
+class AutonomousSystem(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
     """Represents an autonomous system"""
     number: int
     name: str
@@ -82,9 +82,7 @@ class AutonomousSystem(BaseModel, ShodanDataHandler, Logger):
 
     @classmethod
     def from_shodan(cls, d: Dict):
-        """
-        Creates an instance of this class using a typical Shodan dictionary.
-        """
+        """Creates an instance of this class using a typical Shodan dictionary."""
         if isinstance(d, List):
             cls.info("Got a list instead of a dictionary. Usually multiple services of the same host are represented"
                      " as multiple list items by shodan, so this should not be a problem as the AS is the same for all."
@@ -97,8 +95,17 @@ class AutonomousSystem(BaseModel, ShodanDataHandler, Logger):
             prefix=None  # Not available in Shodan data
         )
 
+    @classmethod
+    def from_censys(cls, d: Dict):
+        return AutonomousSystem(
+            number=d["autonomous_system"]["asn"],
+            name=d["autonomous_system"]["name"],
+            country=d["autonomous_system"]["country_code"],
+            prefix=d["autonomous_system"]["bgp_prefix"]
+        )
 
-class HTTPComponentContentFavicon(BaseModel, ShodanDataHandler, Logger):
+
+class HTTPComponentContentFavicon(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
     """Represents the favicon which might be included in HTTP components."""
     raw: Optional[str]
     md5: Optional[str]
@@ -130,8 +137,13 @@ class HTTPComponentContentFavicon(BaseModel, ShodanDataHandler, Logger):
             shodan_murmur=shodan_murmur
         )
 
+    @classmethod
+    def from_censys(cls, d: Dict):
+        """Not supported by Censys right now."""
+        return None
 
-class HTTPComponentContentRobots(BaseModel, ShodanDataHandler):
+
+class HTTPComponentContentRobots(BaseModel, ShodanDataHandler, CensysDataHandler):
     """Represents the robots.txt file in webroots."""
     raw: Optional[str]
     md5: Optional[str]
@@ -157,8 +169,13 @@ class HTTPComponentContentRobots(BaseModel, ShodanDataHandler):
             murmur=murmur
         )
 
+    @classmethod
+    def from_censys(cls, d: Dict):
+        """Not supported by Censys right now."""
+        return None
 
-class HTTPComponentContentSecurity(BaseModel, ShodanDataHandler):
+
+class HTTPComponentContentSecurity(BaseModel, ShodanDataHandler, CensysDataHandler):
     """Represents the security.txt file in webroots."""
     raw: Optional[str]
     md5: Optional[str]
@@ -184,8 +201,13 @@ class HTTPComponentContentSecurity(BaseModel, ShodanDataHandler):
             murmur=murmur
         )
 
+    @classmethod
+    def from_censys(cls, d: Dict):
+        """Not supported by Censys right now."""
+        return None
 
-class HTTPComponentContent(BaseModel, ShodanDataHandler, Logger):
+
+class HTTPComponentContent(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
     """Represents the content (body) of HTTP responses."""
     raw: Optional[str]
     length: Optional[int]
@@ -233,8 +255,26 @@ class HTTPComponentContent(BaseModel, ShodanDataHandler, Logger):
             security_txt=security_txt
         )
 
+    @classmethod
+    def from_censys(cls, d: Dict):
+        """Creates an instance of this class based on Censys (2.0) data given as dictionary."""
+        http = d["http"]["response"]
+        raw = http["body"]
+        md5, sha1, sha256, murmur = hash_all(raw.encode("utf-8"))
+        return HTTPComponentContent(
+            raw=raw,
+            length=len(raw),
+            md5=md5,
+            sha1=sha1,
+            sha256=sha256,
+            murmur=murmur,
+            favicon=HTTPComponentContentFavicon.from_censys(d),
+            robots_txt=HTTPComponentContentRobots.from_censys(d),
+            security_txt=HTTPComponentContentSecurity.from_censys(d)
+        )
 
-class HTTPComponent(BaseModel, ShodanDataHandler):
+
+class HTTPComponent(BaseModel, ShodanDataHandler, CensysDataHandler):
     """Represents the HTTP component of services."""
     headers: Optional[Dict[str, str]]
     content: Optional[HTTPComponentContent]
@@ -260,8 +300,24 @@ class HTTPComponent(BaseModel, ShodanDataHandler):
             content=content
         )
 
+    @classmethod
+    def from_censys(cls, d: Dict):
+        http = d["http"]["response"]
+        headers = {}
+        for k, v in http["headers"].items():
+            if k[0] == "_":
+                continue
 
-class TLSComponentCertificateEntity(BaseModel, ShodanDataHandler):
+            headers.update({
+                k.replace("_", "-"): " ".join(v)
+            })
+        return HTTPComponent(
+            headers=headers,
+            content=HTTPComponentContent.from_censys(d)
+        )
+
+
+class TLSComponentCertificateEntity(BaseModel, ShodanDataHandler, CensysDataHandler):
     """Represents certificate entities, typically issuer and subject."""
     dn: Optional[str]
     country: Optional[str]
@@ -275,12 +331,10 @@ class TLSComponentCertificateEntity(BaseModel, ShodanDataHandler):
     @classmethod
     def from_shodan(cls, d: Dict):
         """Creates an instance of this class using a given Shodan data dictionary."""
-
         if all(key not in d for key in ["C", "L", "CN", "O", "ST"]):
             raise KeyError("The dictionary given to TLSComponentCertificateEntity.from_shodan is missing the typical "
                            "shodan keys.")
 
-        # C=AT, ST=Steiermark, L=Graz, O=TrustMe Ltd, OU=Certificate Authority, CN=CA/Email=ca@trustme.dom
         c = d.get("C", None)
         st = d.get("ST", None)
         l = d.get("L", None)
@@ -321,14 +375,77 @@ class TLSComponentCertificateEntity(BaseModel, ShodanDataHandler):
             email=email
         )
 
+    @classmethod
+    def from_censys(cls, d: Dict):
+        """Creates an instance of this class based on Censys data given as dictionary."""
+        if all(key not in d for key in ["common_name", "locality", "organization", "organizational_unit", "province"]):
+            raise KeyError("The dictionary given to TLSComponentCertificateEntity.from_shodan is missing the typical "
+                           "shodan keys.")
 
-class TLSComponentCertificate(BaseModel, ShodanDataHandler):
+        c = d.get("country", [])
+        st = d.get("province", [])
+        l = d.get("locality", [])
+        o = d.get("organization", [])
+        ou = d.get("organizational_unit", [])
+        cn = d.get("common_name", [])
+        email = d.get("email_address", [])
+        dn = ""
+        if c:
+            for item in c:
+                dn += f"C={item}, "
+        if st:
+            for item in st:
+                dn += f"ST={item}, "
+        if l:
+            for item in l:
+                dn += f"L={item}, "
+        if o:
+            for item in o:
+                dn += f"O={item}, "
+        if ou:
+            for item in ou:
+                dn += f"OU={item}, "
+        done = False
+        if email and cn:
+            if len(email) == 1 and len(cn) == 1:
+                dn += f"CN={cn[0]}/Email={email[0]}"
+                done = True
+            else:
+                for item in cn:
+                    dn += f"CN={item}, "
+                for item in email:
+                    dn += f"Email={item}, "
+                done = True
+        if cn and not done:
+            for item in cn:
+                dn += f"CN={item}, "
+
+        # This one is probably wrong.
+        if email and not done:
+            for item in email:
+                dn += f"Email={item}, "
+
+        while dn[-1] in [" ", ","]:
+            dn = dn[:-1]
+        return TLSComponentCertificateEntity(
+            dn=dn,
+            country=", ".join(c),
+            state=", ".join(st),
+            locality=", ".join(l),
+            organization=", ".join(o),
+            organizational_unit=", ".join(ou),
+            common_name=", ".join(cn),
+            email=", ".join(email)
+        )
+
+
+class TLSComponentCertificate(BaseModel, ShodanDataHandler, CensysDataHandler):
     """Represents certificates."""
     issuer: Optional[TLSComponentCertificateEntity]
     subject: Optional[TLSComponentCertificateEntity]
-    issued: datetime
-    expires: datetime
-    expired: bool
+    issued: Optional[datetime]
+    expires: Optional[datetime]
+    expired: Optional[bool]
     # More specifically, this is a certificate extension, but we keep it here because it's easier this way.
     alternative_names: Optional[List[str]]
 
@@ -377,8 +494,20 @@ class TLSComponentCertificate(BaseModel, ShodanDataHandler):
             alternative_names=altnames
         )
 
+    @classmethod
+    def from_censys(cls, d: Dict):
+        """Creates an instance of this class based on Censys data given as dictionary."""
+        return TLSComponentCertificate(
+            issuer=TLSComponentCertificateEntity.from_censys(d["issuer"]),
+            subject=TLSComponentCertificateEntity.from_censys(d["subject"]),
+            issued=None,
+            expires=None,
+            expired=None,
+            alternative_names=d["names"]
+        )
 
-class TLSComponent(BaseModel, ShodanDataHandler):
+
+class TLSComponent(BaseModel, ShodanDataHandler, CensysDataHandler):
     """Represents the TLS component of services."""
     certificate: TLSComponentCertificate
 
@@ -393,6 +522,13 @@ class TLSComponent(BaseModel, ShodanDataHandler):
 
         return TLSComponent(
             certificate=TLSComponentCertificate.from_shodan(d)
+        )
+
+    @classmethod
+    def from_censys(cls, d: Dict):
+        tls = d["tls"]
+        return TLSComponent(
+            certificate=TLSComponentCertificate.from_censys(tls["certificates"]["leaf_data"])
         )
 
 
@@ -464,7 +600,7 @@ class SSHComponent(BaseModel, ShodanDataHandler):
         )
 
 
-class Service(BaseModel, Logger):
+class Service(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
     """Represents a single service answering connections on specific ports."""
     port: int
     # Banner is optional as not every scanning service offers complete banners as response. Banners might be
@@ -511,8 +647,32 @@ class Service(BaseModel, Logger):
             tls=tlsobj
         )
 
+    @classmethod
+    def from_censys(cls, d: Dict):
+        port = d["port"]
 
-class Host(BaseModel, ShodanDataHandler, Logger):
+        httpobj = None
+        if "http" in d:
+            httpobj = HTTPComponent.from_censys(d)
+
+        tlsobj = None
+        if "tls" in d:
+            tlsobj = TLSComponent.from_censys(d)
+
+        sshobj = None
+        if "ssh" in d:
+            sshobj = SSHComponent.from_censys(d)
+
+        return Service(
+            port=port,
+            http=httpobj,
+            tls=tlsobj,
+            ssh=sshobj,
+            timestamp=datetime.fromisoformat(d["observed_at"][:-4])
+        )
+
+
+class Host(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
     """This class represents a host and can be used to handle results from the common model in a pythonic way."""
     ip: str
     autonomous_system: AutonomousSystem
@@ -550,5 +710,18 @@ class Host(BaseModel, ShodanDataHandler, Logger):
         return Host(
             ip=ip,
             autonomous_system=autonomous_system,
+            services=services
+        )
+
+    @classmethod
+    def from_censys(cls, d: Dict):
+        ip = d["ip"]
+        services = []
+        for service in d["services"]:
+            services.append(Service.from_censys(service))
+
+        return Host(
+            ip=ip,
+            autonomous_system=AutonomousSystem.from_censys(d),
             services=services
         )
