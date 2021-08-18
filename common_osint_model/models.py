@@ -600,6 +600,7 @@ class SSHComponentAlgorithms(BaseModel, ShodanDataHandler, CensysDataHandler):
 
 class SSHComponentKey(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
     """Represents the public key exposed by the SSH server."""
+    # Type represents the ssh-key type, e.g. ssh-rsa
     type: Optional[str]
     md5: Optional[str]
     sha1: Optional[str]
@@ -653,7 +654,7 @@ class SSHComponentKey(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
             public_key_raw_data = base64.b64decode(public_key_string.split(" ", maxsplit=1)[1])
             md5, sha1, sha256, murmur = hash_all(public_key_raw_data)
             return SSHComponentKey(
-                type="rsa",
+                type="ssh-rsa",
                 md5=md5,
                 sha1=sha1,
                 sha256=sha256,
@@ -703,7 +704,12 @@ class Service(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
     port: int
     # Banner is optional as not every scanning service offers complete banners as response. Banners might be
     # reconstructed from the data, but some attributes might have the wrong order then (e.g. HTTP headers).
+    # The according hashes are also not reliable because of this.
     banner: Optional[str]
+    md5: Optional[str]
+    sha1: Optional[str]
+    sha256: Optional[str]
+    murmur: Optional[str]
     # Every service object should include these timestamps. "timestamp" can be used for tracking the observation
     # timestamp from scanning services (e.g. Shodan)
     first_seen: Optional[datetime] = datetime.utcnow()
@@ -740,9 +746,16 @@ class Service(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
         if "ssl" in d:
             tlsobj = TLSComponent.from_shodan(d)
 
+        banner = d["data"]
+        md5, sha1, sha256, murmur = hash_all(banner.encode("utf-8"))
+
         return Service(
             port=port,
             banner=d["data"],
+            md5=md5,
+            sha1=sha1,
+            sha256=sha256,
+            murmur=murmur,
             ssh=sshobj,
             http=httpobj,
             tls=tlsobj,
@@ -754,6 +767,7 @@ class Service(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
     def from_censys(cls, d: Dict):
         port = d["port"]
         banner = d["banner"]
+        md5, sha1, sha256, murmur = hash_all(banner.encode("utf-8"))
         httpobj = None
         if "http" in d:
             httpobj = HTTPComponent.from_censys(d)
@@ -769,6 +783,10 @@ class Service(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
         return Service(
             port=port,
             banner=banner,
+            md5=md5,
+            sha1=sha1,
+            sha256=sha256,
+            murmur=murmur,
             http=httpobj,
             tls=tlsobj,
             ssh=sshobj,
