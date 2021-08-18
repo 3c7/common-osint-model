@@ -70,6 +70,7 @@ class AutonomousSystem(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
     name: str
     country: Optional[str]
     prefix: Optional[str]
+    source: str
 
     @validator("prefix")
     def validate_prefix(cls, v):
@@ -94,7 +95,8 @@ class AutonomousSystem(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
             number=int(d.get("asn").replace("AS", "")),
             name=d.get("isp"),
             country=d.get("location", {}).get("country_code", None),
-            prefix=None  # Not available in Shodan data
+            prefix=None,  # Not available in Shodan data
+            source="shodan"
         )
 
     @classmethod
@@ -103,7 +105,8 @@ class AutonomousSystem(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
             number=d["autonomous_system"]["asn"],
             name=d["autonomous_system"]["name"],
             country=d["autonomous_system"]["country_code"],
-            prefix=d["autonomous_system"]["bgp_prefix"]
+            prefix=d["autonomous_system"]["bgp_prefix"],
+            source="censys"
         )
 
 
@@ -261,7 +264,7 @@ class HTTPComponentContent(BaseModel, ShodanDataHandler, CensysDataHandler, Logg
     def from_censys(cls, d: Dict):
         """Creates an instance of this class based on Censys (2.0) data given as dictionary."""
         http = d["http"]["response"]
-        raw = http["body"]
+        raw = http["body"] if http["body_size"] > 0 else ""
         md5, sha1, sha256, murmur = hash_all(raw.encode("utf-8"))
         return HTTPComponentContent(
             raw=raw,
@@ -597,12 +600,11 @@ class SSHComponentKey(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
     @classmethod
     def from_censys(cls, d: Dict):
         """Returns an instance of this class based on Censys data given as dictionary."""
-        cls.info("Censys data does not contain the key as raw data. While it might can be reconstructed from the data,"
-                 " currently this is not supported. The SHA256 hash is given in the data.")
+        cls.info("Censys data does not contain the key as raw data. The public key can be constructed with given "
+                 "data, however, currently this is only supported for RSA keys.")
 
         if "rsa_public_key" in d["ssh"]["server_host_key"]:
-            # Todo: this is broken. The hashes do not match the ones provided in the censys data.
-            cls.info("Seems to be a RSA key. Trying to create public key from modulus and exponent.")
+            cls.debug("Seems to be a RSA key. Trying to create public key from modulus and exponent.")
             public_numbers = RSAPublicNumbers(
                 e=int.from_bytes(
                     base64.b64decode(d["ssh"]["server_host_key"]["rsa_public_key"]["exponent"]),
@@ -616,10 +618,13 @@ class SSHComponentKey(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
                 )
             )
             public_key = public_numbers.public_key()
-            md5, sha1, sha256, murmur = hash_all(public_key.public_bytes(
+            public_key_string = public_key.public_bytes(
                 encoding=Encoding.OpenSSH,
                 format=PublicFormat.OpenSSH
-            ))
+            ).decode("utf-8")
+            cls.debug(f"Created public key from modulus and exponent: {public_key_string}")
+            public_key_raw_data = base64.b64decode(public_key_string.split(" ", maxsplit=1)[1])
+            md5, sha1, sha256, murmur = hash_all(public_key_raw_data)
             return SSHComponentKey(
                 type="rsa",
                 md5=md5,
@@ -627,9 +632,20 @@ class SSHComponentKey(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
                 sha256=sha256,
                 murmur=murmur
             )
+        else:
+            key_type = "unknown"
+            for key in d["ssh"]["server_host_key"].keys():
+                if "public_key" in key:
+                    key_type = key.replace("_public_key", "")
+
+            cls.info(f"SSH key type is {key_type}. Currently, only RSA SSH keys are supported in Censys model.")
+            return SSHComponentKey(
+                type=key_type,
+                sha256=d["ssh"]["server_host_key"]["fingerprint_sha256"]
+            )
 
 
-class SSHComponent(BaseModel, ShodanDataHandler):
+class SSHComponent(BaseModel, ShodanDataHandler, CensysDataHandler):
     """Represents the SSH component of services."""
     algorithms: Optional[SSHComponentAlgorithms]
     key: Optional[SSHComponentKey]
@@ -644,6 +660,14 @@ class SSHComponent(BaseModel, ShodanDataHandler):
         return SSHComponent(
             algorithms=SSHComponentAlgorithms.from_shodan(d),
             key=SSHComponentKey.from_shodan(d)
+        )
+
+    @classmethod
+    def from_censys(cls, d: Dict):
+        """Creates an instance of this class based on Censys data given as dictionary."""
+        return SSHComponent(
+            algorithms=SSHComponentAlgorithms.from_censys(d),
+            key=SSHComponentKey.from_censys(d)
         )
 
 
@@ -663,6 +687,9 @@ class Service(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
     http: Optional[HTTPComponent]
     tls: Optional[TLSComponent]
     ssh: Optional[SSHComponent]
+    # Typically hosts consist of different services which might be discovered by different scanning services, so
+    # remarking which service was observed by which scanner might be a good idea.
+    source: str
 
     @classmethod
     def from_shodan(cls, d: Dict):
@@ -691,7 +718,9 @@ class Service(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
             banner=d["data"],
             ssh=sshobj,
             http=httpobj,
-            tls=tlsobj
+            tls=tlsobj,
+            timestamp=datetime.fromisoformat(d["timestamp"]),
+            source="shodan"
         )
 
     @classmethod
@@ -716,7 +745,8 @@ class Service(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
             http=httpobj,
             tls=tlsobj,
             ssh=sshobj,
-            timestamp=datetime.fromisoformat(d["observed_at"][:-4])
+            timestamp=datetime.fromisoformat(d["observed_at"][:-4]),
+            source="censys"
         )
 
 
