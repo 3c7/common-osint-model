@@ -1,17 +1,18 @@
 import base64
+import binascii
 import hashlib
 import ipaddress
-import binascii
+import pytz
 from abc import ABC
 from datetime import datetime
 from logging import basicConfig, getLogger
-from typing import Optional, Dict, List, Tuple
+from typing import Optional, Dict, List, Tuple, Union
 
 import mmh3
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicNumbers
+from cryptography.hazmat.primitives.hashes import MD5, SHA1, SHA256
 from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
 from cryptography.x509 import load_pem_x509_certificate, ExtensionOID, DNSName, ExtensionNotFound, OID_COMMON_NAME
-from cryptography.hazmat.primitives.hashes import MD5, SHA1, SHA256
 from pydantic import BaseModel, validator
 
 basicConfig(level="INFO")
@@ -62,7 +63,7 @@ class BinaryEdgeDataHandler(ABC):
     """Abstract base class indicating that a class implements from_binaryedge()."""
 
     @classmethod
-    def from_binaryedge(cls, d: Dict):
+    def from_binaryedge(cls, d: Union[Dict, List]):
         pass
 
 
@@ -90,8 +91,8 @@ class AutonomousSystem(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
         """Creates an instance of this class using a typical Shodan dictionary."""
         if isinstance(d, List):
             cls.debug("Got a list instead of a dictionary. Usually multiple services of the same host are represented"
-                     " as multiple list items by shodan, so this should not be a problem as the AS is the same for all."
-                     " Using the first item.")
+                      " as multiple list items by shodan, so this should not be a problem as the AS is the same for all."
+                      " Using the first item.")
             d = d[0]
         return AutonomousSystem(
             number=int(d.get("asn").replace("AS", "")),
@@ -112,7 +113,7 @@ class AutonomousSystem(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
         )
 
 
-class HTTPComponentContentFavicon(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
+class HTTPComponentContentFavicon(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger):
     """Represents the favicon which might be included in HTTP components."""
     raw: Optional[str]
     md5: Optional[str]
@@ -148,6 +149,21 @@ class HTTPComponentContentFavicon(BaseModel, ShodanDataHandler, CensysDataHandle
     def from_censys(cls, d: Dict):
         """Not supported by Censys right now."""
         return None
+
+    @classmethod
+    def from_binaryedge(cls, d: Union[Dict, List]):
+        favicon = d["result"]["data"]["response"]["favicon"]["content"]
+        favicon_bytes = base64.b64decode(favicon.encode("utf-8"))
+        md5, sha1, sha256, murmur = hash_all(favicon_bytes)
+        shodan_murmur = mmh3.hash(favicon.encode("utf-8"))
+        return HTTPComponentContentFavicon(
+            raw=favicon,
+            md5=md5,
+            sha1=sha1,
+            sha256=sha256,
+            murmur=murmur,
+            shodan_murmur=shodan_murmur
+        )
 
 
 class HTTPComponentContentRobots(BaseModel, ShodanDataHandler, CensysDataHandler):
@@ -214,7 +230,7 @@ class HTTPComponentContentSecurity(BaseModel, ShodanDataHandler, CensysDataHandl
         return None
 
 
-class HTTPComponentContent(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
+class HTTPComponentContent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger):
     """Represents the content (body) of HTTP responses."""
     raw: Optional[str]
     length: Optional[int]
@@ -280,8 +296,25 @@ class HTTPComponentContent(BaseModel, ShodanDataHandler, CensysDataHandler, Logg
             security_txt=HTTPComponentContentSecurity.from_censys(d)
         )
 
+    @classmethod
+    def from_binaryedge(cls, d: Union[Dict, List]):
+        """Creates an instance of this class based on BinaryEdge data given as dictionary. Robots and Security.txt are
+        not supported by BinaryEdge."""
+        http_response = d["result"]["data"]["response"]
+        raw = http_response["body"]["content"]
+        md5, sha1, sha256, murmur = hash_all(raw.encode("utf-8"))
+        return HTTPComponentContent(
+            raw=raw,
+            length=len(raw),
+            md5=md5,
+            sha1=sha1,
+            sha256=sha256,
+            murmur=murmur,
+            favicon=HTTPComponentContentFavicon.from_binaryedge(d)
+        )
 
-class HTTPComponent(BaseModel, ShodanDataHandler, CensysDataHandler):
+
+class HTTPComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler):
     """Represents the HTTP component of services."""
     headers: Optional[Dict[str, str]]
     content: Optional[HTTPComponentContent]
@@ -323,8 +356,17 @@ class HTTPComponent(BaseModel, ShodanDataHandler, CensysDataHandler):
             content=HTTPComponentContent.from_censys(d)
         )
 
+    @classmethod
+    def from_binaryedge(cls, d: Union[Dict, List]):
+        http_response = d["result"]["data"]["response"]
+        headers = http_response["headers"]["headers"]
+        return HTTPComponent(
+            headers=headers,
+            content=HTTPComponentContent.from_binaryedge(d)
+        )
 
-class TLSComponentCertificateEntity(BaseModel, ShodanDataHandler, CensysDataHandler):
+
+class TLSComponentCertificateEntity(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler):
     """Represents certificate entities, typically issuer and subject."""
     dn: Optional[str]
     country: Optional[str]
@@ -445,8 +487,51 @@ class TLSComponentCertificateEntity(BaseModel, ShodanDataHandler, CensysDataHand
             email=", ".join(email)
         )
 
+    @classmethod
+    def from_binaryedge(cls, d: Union[Dict, List]):
+        c = d.get("country_name", None)
+        st = d.get("state_or_province_name", None)
+        l = d.get("locality_name", None)
+        o = d.get("organization_name", None)
+        ou = d.get("organizational_unit_name", None)
+        cn = d.get("common_name", None)
+        email = d.get("email_address", None)  # Todo: Check if this key is actually correct
 
-class TLSComponentCertificate(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
+        dn = ""
+        if c:
+            dn += f"C={c}, "
+        if st:
+            dn += f"ST={st}, "
+        if l:
+            dn += f"L={l}, "
+        if o:
+            dn += f"O={o}, "
+        if ou:
+            dn += f"OU={ou}, "
+        if cn:
+            if not email:
+                dn += f"CN={cn}"
+            else:
+                dn += f"CN={cn}/Email={email}"
+        elif not cn and email:
+            dn += f"Email={email}"
+
+        while dn[-1] in [",", " "]:
+            dn = dn[:-1]
+
+        return TLSComponentCertificateEntity(
+            dn=dn,
+            country=c,
+            state=st,
+            locality=l,
+            organization=o,
+            organizational_unit=ou,
+            common_name=cn,
+            email=email
+        )
+
+
+class TLSComponentCertificate(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger):
     """Represents certificates."""
     issuer: Optional[TLSComponentCertificateEntity]
     subject: Optional[TLSComponentCertificateEntity]
@@ -538,8 +623,34 @@ class TLSComponentCertificate(BaseModel, ShodanDataHandler, CensysDataHandler, L
             sha256=d["fingerprint"]
         )
 
+    @classmethod
+    def from_binaryedge(cls, d: Union[Dict, List]):
+        pem = d["as_pem"]
+        data = d["as_dict"]
+        cert = load_pem_x509_certificate(pem.encode("utf-8"))
+        md5, sha1, sha256 = (
+            binascii.hexlify(cert.fingerprint(MD5())).decode("utf-8"),
+            binascii.hexlify(cert.fingerprint(SHA1())).decode("utf-8"),
+            binascii.hexlify(cert.fingerprint(SHA256())).decode("utf-8")
+        )
+        issued = datetime.fromisoformat(data["validity"]["not_before"]).replace(tzinfo=pytz.utc)
+        expires = datetime.fromisoformat(data["validity"]["not_after"]).replace(tzinfo=pytz.utc)
+        expired = datetime.utcnow().replace(tzinfo=pytz.utc) < expires
+        return TLSComponentCertificate(
+            issuer=TLSComponentCertificateEntity.from_binaryedge(data["issuer"]),
+            subject=TLSComponentCertificateEntity.from_binaryedge(data["subject"]),
+            issued=issued,
+            expires=expires,
+            expired=expired,
+            alternative_names=data["extensions"]["subject_alt_name"],
+            pem=pem,
+            md5=md5,
+            sha1=sha1,
+            sha256=sha256
+        )
 
-class TLSComponent(BaseModel, ShodanDataHandler, CensysDataHandler):
+
+class TLSComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler):
     """Represents the TLS component of services."""
     certificate: TLSComponentCertificate
 
@@ -561,6 +672,14 @@ class TLSComponent(BaseModel, ShodanDataHandler, CensysDataHandler):
         tls = d["tls"]
         return TLSComponent(
             certificate=TLSComponentCertificate.from_censys(tls["certificates"]["leaf_data"])
+        )
+
+    @classmethod
+    def from_binaryedge(cls, d: Union[Dict, List]):
+        """Creates an instance of this class based on BinaryEdge data given as dictionary."""
+        certificate_chain = d["result"]["data"]["cert_info"]["certificate_chain"]
+        return TLSComponent(
+            certificate=TLSComponentCertificate.from_binaryedge(certificate_chain[0])
         )
 
 
@@ -699,7 +818,7 @@ class SSHComponent(BaseModel, ShodanDataHandler, CensysDataHandler):
         )
 
 
-class Service(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
+class Service(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger):
     """Represents a single service answering connections on specific ports."""
     port: int
     # Banner is optional as not every scanning service offers complete banners as response. Banners might be
@@ -765,6 +884,7 @@ class Service(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
 
     @classmethod
     def from_censys(cls, d: Dict):
+        """Creates an instance of this class using a dictionary with typical Censys data."""
         port = d["port"]
         banner = d["banner"]
         md5, sha1, sha256, murmur = hash_all(banner.encode("utf-8"))
@@ -794,11 +914,49 @@ class Service(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
             source="censys"
         )
 
+    @classmethod
+    def from_binaryedge(cls, d: List):
+        """Creates an instance of this class using a dictionary with typical BinaryEdge data. Contrary to the other
+        scanning services, binaryedge provides multiple entries per port."""
+        port = d[0]["target"]["port"]
+        type_index = {service["origin"]["type"]: idx for idx, service in enumerate(d)}
 
-class Host(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
+        httpobj = None
+        if "webv2" in type_index:
+            httpobj = HTTPComponent.from_binaryedge(d[type_index["webv2"]])
+
+        tlsobj = None
+        if "ssl-simple" in type_index:
+            tlsobj = TLSComponent.from_binaryedge(d[type_index["ssl-simple"]])
+
+        sshobj = None
+        if "ssh" in type_index:
+            pass  # sshobj = SSHComponent.from_binaryedge(d[type_index["ssh"]])
+
+        banner = None
+        md5, sha1, sha256, murmur = None, None, None, None
+        if "service-simple" in type_index:
+            banner = d[type_index["service-simple"]]["result"]["data"]["service"]["banner"]
+            md5, sha1, sha256, murmur = hash_all(banner.encode("utf-8"))
+
+        return Service(
+            port=port,
+            http=httpobj,
+            tls=tlsobj,
+            ssh=sshobj,
+            banner=banner,
+            md5=md5,
+            sha1=sha1,
+            sha256=sha256,
+            murmur=murmur,
+            source="binaryedge"
+        )
+
+
+class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger):
     """This class represents a host and can be used to handle results from the common model in a pythonic way."""
     ip: str
-    autonomous_system: AutonomousSystem
+    autonomous_system: Optional[AutonomousSystem]
     services: List[Service]
     first_seen: Optional[datetime] = datetime.utcnow()
     last_seen: Optional[datetime] = datetime.utcnow()
@@ -849,4 +1007,25 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
             ip=ip,
             autonomous_system=AutonomousSystem.from_censys(d),
             services=services
+        )
+
+    @classmethod
+    def from_binaryedge(cls, d: Union[Dict, List]):
+        """This can either be a complete query result, or a list of services running on the same ip."""
+        if isinstance(d, Dict) and "results" in d:
+            # This is a complete result dictionary, extract the list of services.
+            d = d["results"][list(d["results"].keys())[0]]
+
+        services = {}
+        for service in d:
+            port = service["target"]["port"]
+            if port not in services:
+                services[port] = [service]
+            else:
+                services[port].append(service)
+
+        ip = d[0]["target"]["ip"]
+        return Host(
+            ip=ip,
+            services=[Service.from_binaryedge(service) for service in services.values()]
         )
