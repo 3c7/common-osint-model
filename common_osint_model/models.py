@@ -1,6 +1,7 @@
 import base64
 import hashlib
 import ipaddress
+import binascii
 from abc import ABC
 from datetime import datetime
 from logging import basicConfig, getLogger
@@ -9,7 +10,8 @@ from typing import Optional, Dict, List, Tuple
 import mmh3
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicNumbers
 from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
-from cryptography.x509 import load_pem_x509_certificate, ExtensionOID, DNSName, ExtensionNotFound
+from cryptography.x509 import load_pem_x509_certificate, ExtensionOID, DNSName, ExtensionNotFound, OID_COMMON_NAME
+from cryptography.hazmat.primitives.hashes import MD5, SHA1, SHA256
 from pydantic import BaseModel, validator
 
 basicConfig(level="INFO")
@@ -87,7 +89,7 @@ class AutonomousSystem(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
     def from_shodan(cls, d: Dict):
         """Creates an instance of this class using a typical Shodan dictionary."""
         if isinstance(d, List):
-            cls.info("Got a list instead of a dictionary. Usually multiple services of the same host are represented"
+            cls.debug("Got a list instead of a dictionary. Usually multiple services of the same host are represented"
                      " as multiple list items by shodan, so this should not be a problem as the AS is the same for all."
                      " Using the first item.")
             d = d[0]
@@ -444,7 +446,7 @@ class TLSComponentCertificateEntity(BaseModel, ShodanDataHandler, CensysDataHand
         )
 
 
-class TLSComponentCertificate(BaseModel, ShodanDataHandler, CensysDataHandler):
+class TLSComponentCertificate(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
     """Represents certificates."""
     issuer: Optional[TLSComponentCertificateEntity]
     subject: Optional[TLSComponentCertificateEntity]
@@ -453,6 +455,12 @@ class TLSComponentCertificate(BaseModel, ShodanDataHandler, CensysDataHandler):
     expired: Optional[bool]
     # More specifically, this is a certificate extension, but we keep it here because it's easier this way.
     alternative_names: Optional[List[str]]
+    # The certificate itself
+    pem: Optional[str]
+    md5: Optional[str]
+    sha1: Optional[str]
+    sha256: Optional[str]
+    murmur: Optional[str]
 
     @property
     def domains(self) -> List[str]:
@@ -476,8 +484,20 @@ class TLSComponentCertificate(BaseModel, ShodanDataHandler, CensysDataHandler):
         expires = datetime.strptime(d["ssl"]["cert"]["expires"], "%Y%m%d%H%M%SZ")
         expired = True if d["ssl"]["cert"]["expired"] in ["true", True] else False
         altnames = []
-        for cert in d["ssl"]["chain"]:
-            cert = load_pem_x509_certificate(cert.encode("utf-8"))
+        pem = None
+        md5, sha1, sha256 = None, None, None
+        for cert_pem in d["ssl"]["chain"]:
+            cert = load_pem_x509_certificate(cert_pem.encode("utf-8"))
+            # Check if this certificate is the leaf certificate by comparing the common name
+            attributes = cert.subject.get_attributes_for_oid(OID_COMMON_NAME)
+            for attribute in attributes:
+                if attribute.value == subject.common_name:
+                    pem = cert_pem
+                    md5, sha1, sha256 = (
+                        binascii.hexlify(cert.fingerprint(MD5())).decode("utf-8"),
+                        binascii.hexlify(cert.fingerprint(SHA1())).decode("utf-8"),
+                        binascii.hexlify(cert.fingerprint(SHA256())).decode("utf-8")
+                    )
             try:
                 ext = cert.extensions.get_extension_for_oid(ExtensionOID.SUBJECT_ALTERNATIVE_NAME)
             except ExtensionNotFound:
@@ -496,19 +516,26 @@ class TLSComponentCertificate(BaseModel, ShodanDataHandler, CensysDataHandler):
             issued=issued,
             expires=expires,
             expired=expired,
-            alternative_names=altnames
+            alternative_names=altnames,
+            pem=pem,
+            md5=md5,
+            sha1=sha1,
+            sha256=sha256
         )
 
     @classmethod
     def from_censys(cls, d: Dict):
         """Creates an instance of this class based on Censys data given as dictionary."""
+        cls.info("Censys does not provide raw certificate data, to hashes must be taken from the data and cannot be "
+                 "calculated.")
         return TLSComponentCertificate(
             issuer=TLSComponentCertificateEntity.from_censys(d["issuer"]),
             subject=TLSComponentCertificateEntity.from_censys(d["subject"]),
             issued=None,
             expires=None,
             expired=None,
-            alternative_names=d["names"]
+            alternative_names=d["names"],
+            sha256=d["fingerprint"]
         )
 
 
@@ -778,6 +805,8 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
 
     @classmethod
     def from_shodan(cls, d: Dict):
+        if "data" in d and isinstance(d["data"], List):
+            d = d["data"]
         if isinstance(d, List):
             ip = d[0]["ip_str"]
             services = [Service.from_shodan(service) for service in d]
