@@ -1,0 +1,479 @@
+{
+  "ip": "9.9.9.9",
+  "services": [
+    {
+      "port": 53,
+      "service_name": "DNS",
+      "perspective_id": "PERSPECTIVE_HE",
+      "_encoding": {
+        "banner": "DISPLAY_UTF8"
+      },
+      "banner": "Q9-P-7.0",
+      "observed_at": "2021-06-28T11:42:00.428369050Z",
+      "transport_protocol": "UDP",
+      "source_ip": "162.142.125.54",
+      "software": [
+        {
+          "uniform_resource_identifier": "cpe:2.3:a:ibm:dns:7.0:*:*:*:*:*:*:*",
+          "part": "a",
+          "vendor": "IBM",
+          "product": "DNS",
+          "version": "7.0",
+          "other": {
+            "family": "Quad9"
+          },
+          "component_uniform_resource_identifiers": [],
+          "source": "OSI_APPLICATION_LAYER"
+        }
+      ],
+      "extended_service_name": "DNS",
+      "dns": {
+        "version": "Q9-P-7.0",
+        "server_type": "FORWARDING"
+      },
+      "truncated": false,
+      "_decoded": "dns"
+    },
+    {
+      "port": 443,
+      "service_name": "HTTP",
+      "perspective_id": "PERSPECTIVE_TELIA",
+      "_encoding": {
+        "banner": "DISPLAY_UTF8",
+        "certificate": "DISPLAY_HEX"
+      },
+      "banner": "HTTP/1.1 404 File Not Found\nServer: h2o/dnsdist\nContent-Type: text/plain; charset=utf-8\nDate: <REDACTED>\nConnection: keep-alive\nContent-Length: 9",
+      "observed_at": "2021-06-27T03:15:56.778651026Z",
+      "certificate": "c0f028e71deaf79423b48e51a48eb6a4671e2b0276ea87cfb9671c39997bd390",
+      "source_ip": "74.120.14.40",
+      "extended_service_name": "HTTPS",
+      "http": {
+        "request": {
+          "method": "GET",
+          "uri": "https://9.9.9.9/",
+          "headers": {
+            "Accept": [
+              "*/*"
+            ],
+            "_encoding": {
+              "Accept": "DISPLAY_UTF8",
+              "User_Agent": "DISPLAY_UTF8"
+            },
+            "User_Agent": [
+              "Mozilla/5.0 (compatible; CensysInspect/1.1; +https://about.censys.io/)"
+            ]
+          }
+        },
+        "response": {
+          "protocol": "HTTP/1.1",
+          "status_code": 404,
+          "status_reason": "File Not Found",
+          "headers": {
+            "Date": [
+              "<REDACTED>"
+            ],
+            "_encoding": {
+              "Date": "DISPLAY_UTF8",
+              "Server": "DISPLAY_UTF8",
+              "Connection": "DISPLAY_UTF8",
+              "Content_Type": "DISPLAY_UTF8",
+              "Content_Length": "DISPLAY_UTF8"
+            },
+            "Server": [
+              "h2o/dnsdist"
+            ],
+            "Connection": [
+              "keep-alive"
+            ],
+            "Content_Type": [
+              "text/plain; charset=utf-8"
+            ],
+            "Content_Length": [
+              "9"
+            ]
+          },
+          "body_size": 9,
+          "_encoding": {
+            "body": "DISPLAY_UTF8",
+            "body_hash": "DISPLAY_UTF8"
+          },
+          "body": "not found",
+          "html_tags": [],
+          "body_hash": "sha1:094b763b4cfcc0b05e5d040581cd513c3ca08067"
+        },
+        "_encoding": {}
+      },
+      "transport_protocol": "TCP",
+      "truncated": false,
+      "_decoded": "http",
+      "tls": {
+        "version_selected": "TLSv1_2",
+        "cipher_selected": "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+        "certificates": {
+          "_encoding": {
+            "leaf_fp_sha_256": "DISPLAY_HEX",
+            "chain_fps_sha_256": "DISPLAY_HEX"
+          },
+          "leaf_fp_sha_256": "c0f028e71deaf79423b48e51a48eb6a4671e2b0276ea87cfb9671c39997bd390",
+          "chain_fps_sha_256": [
+            "458446ba75d932e914f23c2b57b7d192eddbc2181d958e1181ad5251747a1ee8"
+          ],
+          "leaf_data": {
+            "names": [
+              "*.quad9.net",
+              "149.112.112.10",
+              "149.112.112.11",
+              "149.112.112.112",
+              "149.112.112.12",
+              "149.112.112.13",
+              "149.112.112.14",
+              "149.112.112.15",
+              "149.112.112.9",
+              "9.9.9.10",
+              "9.9.9.11",
+              "9.9.9.12",
+              "9.9.9.13",
+              "9.9.9.14",
+              "9.9.9.15",
+              "9.9.9.9",
+              "quad9.net"
+            ],
+            "subject_dn": "C=US, ST=California, L=Berkeley, O=Quad9, CN=*.quad9.net",
+            "issuer_dn": "C=US, O=DigiCert Inc, CN=DigiCert ECC Secure Server CA",
+            "pubkey_bit_size": 256,
+            "pubkey_algorithm": "ECDSA",
+            "tbs_fingerprint": "c6b70e76da946bed1b4118e1ec2b46da3d2bb509acea84915500e0555a1dfa76",
+            "fingerprint": "c0f028e71deaf79423b48e51a48eb6a4671e2b0276ea87cfb9671c39997bd390",
+            "issuer": {
+              "common_name": [
+                "DigiCert ECC Secure Server CA"
+              ],
+              "organization": [
+                "DigiCert Inc"
+              ],
+              "domain_component": [],
+              "jurisdiction_country": [],
+              "jurisdiction_locality": [],
+              "jurisdiction_province": [],
+              "locality": [],
+              "organization_id": [],
+              "organizational_unit": [],
+              "postal_code": [],
+              "province": [],
+              "serial_number": [],
+              "street_address": []
+            },
+            "subject": {
+              "common_name": [
+                "*.quad9.net"
+              ],
+              "locality": [
+                "Berkeley"
+              ],
+              "organization": [
+                "Quad9"
+              ],
+              "province": [
+                "California"
+              ],
+              "domain_component": [],
+              "jurisdiction_country": [],
+              "jurisdiction_locality": [],
+              "jurisdiction_province": [],
+              "organization_id": [],
+              "organizational_unit": [],
+              "postal_code": [],
+              "serial_number": [],
+              "street_address": []
+            },
+            "public_key": {
+              "key_algorithm": "ECDSA",
+              "ecdsa": {
+                "_encoding": {
+                  "b": "DISPLAY_BASE64",
+                  "gx": "DISPLAY_BASE64",
+                  "gy": "DISPLAY_BASE64",
+                  "n": "DISPLAY_BASE64",
+                  "p": "DISPLAY_BASE64",
+                  "x": "DISPLAY_BASE64",
+                  "y": "DISPLAY_BASE64",
+                  "pub": "DISPLAY_BASE64"
+                },
+                "b": "WsY12Ko6k+ez671VdpiGvGUdBrDMU7D2O848PifSYEs=",
+                "curve": "P-256",
+                "gx": "axfR8uEsQkf4vOblY6RA8ncDfYEt6zOg9KE5RdiYwpY=",
+                "gy": "T+NC4v4af5uO5+tKfA+eFivOM1drMV7Oy7ZAaDe/UfU=",
+                "length": 256,
+                "n": "/////wAAAAD//////////7zm+q2nF56E87nKwvxjJVE=",
+                "p": "/////wAAAAEAAAAAAAAAAAAAAAD///////////////8=",
+                "x": "fYvXHQOFDRglszQcKaEn1KwBJUiKoPHqArnYUSwIaqw=",
+                "y": "clbs+j2moJ9JCVWOrP65cxdcAvt4zCSRlG9DI4kOHWY=",
+                "pub": ""
+              },
+              "fingerprint": "fd296cbe20646f4e58ffc5e2285f7e099b200adaea3d09396e1e3ba34477fc28"
+            },
+            "signature": {
+              "signature_algorithm": "ECDSA-SHA384",
+              "self_signed": false
+            }
+          },
+          "chain": [
+            {
+              "fingerprint": "458446ba75d932e914f23c2b57b7d192eddbc2181d958e1181ad5251747a1ee8",
+              "subject_dn": "C=US, O=DigiCert Inc, CN=DigiCert ECC Secure Server CA",
+              "issuer_dn": "C=US, O=DigiCert Inc, OU=www.digicert.com, CN=DigiCert Global Root CA"
+            }
+          ]
+        },
+        "server_key_exchange": {
+          "ec_params": {
+            "named_curve": 23,
+            "_encoding": {
+              "public_key": "DISPLAY_BASE64"
+            },
+            "public_key": ""
+          },
+          "signature": ""
+        },
+        "session_ticket": {
+          "length": 160,
+          "lifetime_hint": 7200
+        }
+      }
+    },
+    {
+      "port": 5053,
+      "service_name": "HTTP",
+      "perspective_id": "PERSPECTIVE_HE",
+      "_encoding": {
+        "banner": "DISPLAY_UTF8",
+        "certificate": "DISPLAY_HEX"
+      },
+      "banner": "HTTP/1.1 404 Not Found\nContent-Length: 19\nContent-Type: text/plain; charset=utf-8\nX-Content-Type-Options: nosniff\nDate: <REDACTED>",
+      "observed_at": "2021-06-27T14:43:45.418269666Z",
+      "certificate": "c0f028e71deaf79423b48e51a48eb6a4671e2b0276ea87cfb9671c39997bd390",
+      "source_ip": "162.142.125.55",
+      "extended_service_name": "HTTPS",
+      "transport_fingerprint": {
+        "raw": "28960,64,true,MNNTNW,1460,false,false"
+      },
+      "http": {
+        "request": {
+          "method": "GET",
+          "uri": "https://9.9.9.9:5053/",
+          "headers": {
+            "Accept": [
+              "*/*"
+            ],
+            "_encoding": {
+              "Accept": "DISPLAY_UTF8",
+              "User_Agent": "DISPLAY_UTF8"
+            },
+            "User_Agent": [
+              "Mozilla/5.0 (compatible; CensysInspect/1.1; +https://about.censys.io/)"
+            ]
+          }
+        },
+        "response": {
+          "protocol": "HTTP/1.1",
+          "status_code": 404,
+          "status_reason": "Not Found",
+          "headers": {
+            "Content_Length": [
+              "19"
+            ],
+            "_encoding": {
+              "Content_Length": "DISPLAY_UTF8",
+              "X_Content_Type_Options": "DISPLAY_UTF8",
+              "Content_Type": "DISPLAY_UTF8",
+              "Date": "DISPLAY_UTF8"
+            },
+            "X_Content_Type_Options": [
+              "nosniff"
+            ],
+            "Content_Type": [
+              "text/plain; charset=utf-8"
+            ],
+            "Date": [
+              "<REDACTED>"
+            ]
+          },
+          "body_size": 19,
+          "_encoding": {
+            "body": "DISPLAY_UTF8",
+            "body_hash": "DISPLAY_UTF8"
+          },
+          "body": "404 page not found\n",
+          "html_tags": [],
+          "body_hash": "sha1:da3968197e7bf67aa45a77515b52ba2710c5fc34"
+        },
+        "_encoding": {}
+      },
+      "transport_protocol": "TCP",
+      "truncated": false,
+      "_decoded": "http",
+      "tls": {
+        "version_selected": "TLSv1_2",
+        "cipher_selected": "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+        "certificates": {
+          "_encoding": {
+            "leaf_fp_sha_256": "DISPLAY_HEX",
+            "chain_fps_sha_256": "DISPLAY_HEX"
+          },
+          "leaf_fp_sha_256": "c0f028e71deaf79423b48e51a48eb6a4671e2b0276ea87cfb9671c39997bd390",
+          "chain_fps_sha_256": [
+            "458446ba75d932e914f23c2b57b7d192eddbc2181d958e1181ad5251747a1ee8"
+          ],
+          "leaf_data": {
+            "names": [
+              "*.quad9.net",
+              "149.112.112.10",
+              "149.112.112.11",
+              "149.112.112.112",
+              "149.112.112.12",
+              "149.112.112.13",
+              "149.112.112.14",
+              "149.112.112.15",
+              "149.112.112.9",
+              "9.9.9.10",
+              "9.9.9.11",
+              "9.9.9.12",
+              "9.9.9.13",
+              "9.9.9.14",
+              "9.9.9.15",
+              "9.9.9.9",
+              "quad9.net"
+            ],
+            "subject_dn": "C=US, ST=California, L=Berkeley, O=Quad9, CN=*.quad9.net",
+            "issuer_dn": "C=US, O=DigiCert Inc, CN=DigiCert ECC Secure Server CA",
+            "pubkey_bit_size": 256,
+            "pubkey_algorithm": "ECDSA",
+            "tbs_fingerprint": "c6b70e76da946bed1b4118e1ec2b46da3d2bb509acea84915500e0555a1dfa76",
+            "fingerprint": "c0f028e71deaf79423b48e51a48eb6a4671e2b0276ea87cfb9671c39997bd390",
+            "issuer": {
+              "common_name": [
+                "DigiCert ECC Secure Server CA"
+              ],
+              "organization": [
+                "DigiCert Inc"
+              ],
+              "domain_component": [],
+              "jurisdiction_country": [],
+              "jurisdiction_locality": [],
+              "jurisdiction_province": [],
+              "locality": [],
+              "organization_id": [],
+              "organizational_unit": [],
+              "postal_code": [],
+              "province": [],
+              "serial_number": [],
+              "street_address": []
+            },
+            "subject": {
+              "common_name": [
+                "*.quad9.net"
+              ],
+              "locality": [
+                "Berkeley"
+              ],
+              "organization": [
+                "Quad9"
+              ],
+              "province": [
+                "California"
+              ],
+              "domain_component": [],
+              "jurisdiction_country": [],
+              "jurisdiction_locality": [],
+              "jurisdiction_province": [],
+              "organization_id": [],
+              "organizational_unit": [],
+              "postal_code": [],
+              "serial_number": [],
+              "street_address": []
+            },
+            "public_key": {
+              "key_algorithm": "ECDSA",
+              "ecdsa": {
+                "_encoding": {
+                  "b": "DISPLAY_BASE64",
+                  "gx": "DISPLAY_BASE64",
+                  "gy": "DISPLAY_BASE64",
+                  "n": "DISPLAY_BASE64",
+                  "p": "DISPLAY_BASE64",
+                  "x": "DISPLAY_BASE64",
+                  "y": "DISPLAY_BASE64",
+                  "pub": "DISPLAY_BASE64"
+                },
+                "b": "WsY12Ko6k+ez671VdpiGvGUdBrDMU7D2O848PifSYEs=",
+                "curve": "P-256",
+                "gx": "axfR8uEsQkf4vOblY6RA8ncDfYEt6zOg9KE5RdiYwpY=",
+                "gy": "T+NC4v4af5uO5+tKfA+eFivOM1drMV7Oy7ZAaDe/UfU=",
+                "length": 256,
+                "n": "/////wAAAAD//////////7zm+q2nF56E87nKwvxjJVE=",
+                "p": "/////wAAAAEAAAAAAAAAAAAAAAD///////////////8=",
+                "x": "fYvXHQOFDRglszQcKaEn1KwBJUiKoPHqArnYUSwIaqw=",
+                "y": "clbs+j2moJ9JCVWOrP65cxdcAvt4zCSRlG9DI4kOHWY=",
+                "pub": ""
+              },
+              "fingerprint": "fd296cbe20646f4e58ffc5e2285f7e099b200adaea3d09396e1e3ba34477fc28"
+            },
+            "signature": {
+              "signature_algorithm": "ECDSA-SHA384",
+              "self_signed": false
+            }
+          },
+          "chain": [
+            {
+              "fingerprint": "458446ba75d932e914f23c2b57b7d192eddbc2181d958e1181ad5251747a1ee8",
+              "subject_dn": "C=US, O=DigiCert Inc, CN=DigiCert ECC Secure Server CA",
+              "issuer_dn": "C=US, O=DigiCert Inc, OU=www.digicert.com, CN=DigiCert Global Root CA"
+            }
+          ]
+        },
+        "server_key_exchange": {
+          "ec_params": {
+            "named_curve": 25,
+            "_encoding": {
+              "public_key": "DISPLAY_BASE64"
+            },
+            "public_key": ""
+          },
+          "signature": ""
+        },
+        "session_ticket": {
+          "length": 120,
+          "lifetime_hint": 0
+        }
+      }
+    }
+  ],
+  "location": {
+    "continent": "North America",
+    "country": "United States",
+    "country_code": "US",
+    "city": "Berkeley",
+    "postal_code": "94709",
+    "timezone": "America/Los_Angeles",
+    "province": "California",
+    "coordinates": {
+      "latitude": 37.8767,
+      "longitude": -122.2676
+    },
+    "registered_country": "United States",
+    "registered_country_code": "US"
+  },
+  "autonomous_system": {
+    "asn": 19281,
+    "description": "QUAD9-AS-1",
+    "bgp_prefix": "9.9.9.0/24",
+    "name": "QUAD9-AS-1",
+    "country_code": "US"
+  },
+  "operating_system": {
+    "component_uniform_resource_identifiers": []
+  },
+  "last_updated_at": "2021-06-28T11:42:02.002Z",
+  "location_updated_at": "2021-06-14T03:52:14.445945Z",
+  "autonomous_system_updated_at": "2021-06-24T04:42:26.320765Z"
+}

@@ -1,11 +1,14 @@
 import re
-from DateTime import DateTime
-from datetime import datetime
-from typing import Union
-from common_osint_model.utils import flatten, common_model_cn_extraction, sha256_from_body_string
-from binascii import hexlify
-from hashlib import sha256
+import warnings
 from base64 import b64decode
+from binascii import hexlify
+from datetime import datetime
+from hashlib import sha256
+from typing import Union
+
+from DateTime import DateTime
+
+from common_osint_model.utils import flatten, common_model_cn_extraction, sha256_from_body_string
 
 
 def from_shodan(raw: Union[list, dict]) -> dict:
@@ -14,6 +17,7 @@ def from_shodan(raw: Union[list, dict]) -> dict:
     :param raw: Shodan list or dictionary from host queries
     :return: Generic host describing dictionary
     """
+    warnings.warn("This function was deprecated in v0.4.0.", DeprecationWarning)
     g = {}
     services = []
     if isinstance(raw, dict):
@@ -50,6 +54,7 @@ def from_shodan_flattened(raw: Union[list, dict]) -> dict:
     :param raw: Shodan list or dictionary from host queries
     :return: Generic host describing dictionary, flattened
     """
+    warnings.warn("This function was deprecated in v0.4.0.", DeprecationWarning)
     return flatten(from_shodan(raw))
 
 
@@ -77,6 +82,16 @@ def shodan_meta_extraction(raw: Union[dict, list]) -> dict:
             "domains": [],
             "org": o.get("org", None),
             "ip": o.get("ip_str"),
+            "location": {
+                "city": o.get("city", None),
+                "country": o.get("country_name", None),
+                "country_code": o.get("country_code", None),
+                "postal_code": o.get("postal_code", None),
+                "coordinates": {
+                    "latitude": o.get("latitude", None),
+                    "longitude": o.get("longitude", None)
+                }
+            }
         }
     )
     for domain in o.get("domains", []):

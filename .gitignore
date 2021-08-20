@@ -140,3 +140,4 @@ cython_debug/
 # Project files
 .idea
 
+/test_data/test.json

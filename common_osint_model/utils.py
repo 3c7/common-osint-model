@@ -1,5 +1,8 @@
-from hashlib import sha256
+import hashlib
 from binascii import hexlify
+from typing import Tuple
+
+import mmh3
 
 
 def flatten(d: dict, parent_key: str = "") -> dict:
@@ -63,8 +66,8 @@ def sha256_from_body_string(b: str) -> str:
     :param b: html body as string
     :return: hex digest of sha256 hash
     """
-    h = sha256()
-    h.update(bytes(b.encode("utf8")))
+    h = hashlib.sha256()
+    h.update(b.encode("utf8"))
     return hexlify(h.digest()).decode("ascii")
 
 
@@ -76,3 +79,14 @@ def list_cleanup(d: dict) -> dict:
             if len(v) == 1:
                 d[k] = v[0]
     return d
+
+
+def hash_all(data: bytes) -> Tuple[str, str, str, str]:
+    """
+    Helper function to create all hashes for data given.
+
+    :returns: Tuple of hashes as string: md5, sha1, sha256, murmur
+    """
+    md5, sha1, sha256, murmur = hashlib.md5(), hashlib.sha1(), hashlib.sha256(), mmh3.hash(data)
+    md5.update(data), sha1.update(data), sha256.update(data)
+    return md5.hexdigest(), sha1.hexdigest(), sha256.hexdigest(), murmur

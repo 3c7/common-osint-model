@@ -1,0 +1,412 @@
+{
+  "area_code": null,
+  "asn": "AS36459",
+  "city": "Frankfurt am Main",
+  "country_code": "DE",
+  "country_code3": null,
+  "country_name": "Germany",
+  "data": [
+    {
+      "_shodan": {
+        "crawler": "487814a778c983e2dcef234806292d88c5cbf3ec",
+        "id": "40d559ed-817a-4338-b516-247754d8c7b8",
+        "module": "https",
+        "options": {
+          "referrer": "4764837b-c462-4b0e-b48f-a3e5ad66bba1"
+        },
+        "ptr": true
+      },
+      "asn": "AS36459",
+      "data": "HTTP/1.1 301 Moved Permanently\r\nContent-Length: 0\r\nLocation: https://github.com/\r\n\r\n",
+      "domains": [
+        "github.com"
+      ],
+      "hash": -1655207803,
+      "hostnames": [
+        "lb-140-82-121-4-fra.github.com"
+      ],
+      "http": {
+        "host": "140.82.121.4",
+        "html": "",
+        "html_hash": 0,
+        "location": "/",
+        "redirects": [],
+        "robots": null,
+        "robots_hash": null,
+        "securitytxt": null,
+        "securitytxt_hash": null,
+        "server": null,
+        "sitemap": null,
+        "sitemap_hash": null,
+        "title": null
+      },
+      "ip": 2354215172,
+      "ip_str": "140.82.121.4",
+      "isp": "GitHub, Inc.",
+      "location": {
+        "area_code": null,
+        "city": "Frankfurt am Main",
+        "country_code": "DE",
+        "country_code3": null,
+        "country_name": "Germany",
+        "dma_code": null,
+        "latitude": 50.11552,
+        "longitude": 8.68417,
+        "postal_code": null,
+        "region_code": "05"
+      },
+      "opts": {
+        "heartbleed": "2021/08/16 20:42:48 140.82.121.4:443 - SAFE\n",
+        "vulns": []
+      },
+      "org": "GitHub, Inc.",
+      "os": null,
+      "port": 443,
+      "ssl": {
+        "acceptable_cas": [],
+        "alpn": [],
+        "cert": {
+          "expired": false,
+          "expires": "20220330235959Z",
+          "extensions": [
+            {
+              "data": "0\\x16\\x80\\x14Pa\\xa6\\xa0\\xd25\\xc4\\x11* \\x8d\\x1f\\x0f\\xacB\\xf0\\xcd)\\xcfK",
+              "name": "authorityKeyIdentifier"
+            },
+            {
+              "data": "\\x04\\x14\\'\\xb1~\\x9f\\xbb&\\x99P\\xd8\\xf3\\xc3S[\\xfe1\\x16\\xb0\\xbb\\x1er",
+              "name": "subjectKeyIdentifier"
+            },
+            {
+              "data": "0\\x1c\\x82\\ngithub.com\\x82\\x0ewww.github.com",
+              "name": "subjectAltName"
+            },
+            {
+              "critical": true,
+              "data": "\\x03\\x02\\x07\\x80",
+              "name": "keyUsage"
+            },
+            {
+              "data": "0\\x14\\x06\\x08+\\x06\\x01\\x05\\x05\\x07\\x03\\x01\\x06\\x08+\\x06\\x01\\x05\\x05\\x07\\x03\\x02",
+              "name": "extendedKeyUsage"
+            },
+            {
+              "data": "0\\x81\\xa60Q\\xa0O\\xa0M\\x86Khttp://crl3.digicert.com/DigiCertHighAssuranceTLSHybridECCSHA2562020CA1.crl0Q\\xa0O\\xa0M\\x86Khttp://crl4.digicert.com/DigiCertHighAssuranceTLSHybridECCSHA2562020CA1.crl",
+              "name": "crlDistributionPoints"
+            },
+            {
+              "data": "0503\\x06\\x06g\\x81\\x0c\\x01\\x02\\x020)0\\'\\x06\\x08+\\x06\\x01\\x05\\x05\\x07\\x02\\x01\\x16\\x1bhttp://www.digicert.com/CPS",
+              "name": "certificatePolicies"
+            },
+            {
+              "data": "0\\x81\\x820$\\x06\\x08+\\x06\\x01\\x05\\x05\\x070\\x01\\x86\\x18http://ocsp.digicert.com0Z\\x06\\x08+\\x06\\x01\\x05\\x05\\x070\\x02\\x86Nhttp://cacerts.digicert.com/DigiCertHighAssuranceTLSHybridECCSHA2562020CA1.crt",
+              "name": "authorityInfoAccess"
+            },
+            {
+              "critical": true,
+              "data": "0\\x00",
+              "name": "basicConstraints"
+            },
+            {
+              "data": "\\x04\\x81\\xf3\\x00\\xf1\\x00v\\x00)y\\xbe\\xf0\\x9e99!\\xf0Vs\\x9fc\\xa5w\\xe5\\xbeW}\\x9c`\\n\\xf8\\xf9M]&\\\\%]\\xc7\\x84\\x00\\x00\\x01xj\\xbf\\xbd\\x1a\\x00\\x00\\x04\\x03\\x00G0E\\x02!\\x00\\x9e\\xe6\\x88D\\x7f\\xfc4E\\x9c2M\\x9f\\xab\\x94\\x86\\x06\\xae\\xddc-\\xe2\\xf5_c\\x97F\\x8a\\x0b\\xa59\\xd8\\xd7\\x02 HT\\'\\xd1\\xc62\\xb5\\xbf\\x81w\\xd7\\xeb\\x15h\\xac\\xf2\\xc8\\xee\\xc9\\x01\\xad\\x1f\\xcc4\\x0c\\xee\\xc9\\x10rD\\x98Y\\x00w\\x00\"EE\\x07YU$V\\x96?\\xa1/\\xf1\\xf7m\\x86\\xe0#&c\\xad\\xc0K\\x7f]\\xc6\\x83\\\\n\\xe2\\x0f\\x02\\x00\\x00\\x01xj\\xbf\\xbd9\\x00\\x00\\x04\\x03\\x00H0F\\x02!\\x00\\x98\\x00\\x12J\\tA\\x18\\xaf\\x06\\\\(\\xef\\x1e\\xbb\\xde\\x85l\\x7fX\\xa9\\xd3\\xde\\x96\\xb2\\x16j\\x99\\x10\\xae/\\xf2i\\x02!\\x00\\xdd\\xc5\\xf8\\xad\\xbd\\xf0h\\xb0\\xcb\\xab\\x80\\xb8\\xf0\\xd4\\xa8Rg0\\xe7\\xa3\\xf0;\\xf9\\xb6\\xbb\\t\\xd0\\xa6\\xb6\\xfe\\xca\\x1d",
+              "name": "ct_precert_scts"
+            }
+          ],
+          "fingerprint": {
+            "sha1": "8463b3a92912ccfd1d314705989bec139937d0d7",
+            "sha256": "0ae384bfd4dde9d13e50c5857c05a442c93f8e01445ee4b34540d22bd1e37f1b"
+          },
+          "issued": "20210325000000Z",
+          "issuer": {
+            "C": "US",
+            "CN": "DigiCert High Assurance TLS Hybrid ECC SHA256 2020 CA1",
+            "O": "DigiCert, Inc."
+          },
+          "pubkey": {
+            "bits": 256,
+            "type": "dsa"
+          },
+          "serial": 1.9335859262210987e+37,
+          "sig_alg": "ecdsa-with-SHA256",
+          "subject": {
+            "C": "US",
+            "CN": "github.com",
+            "L": "San Francisco",
+            "O": "GitHub, Inc.",
+            "ST": "California"
+          },
+          "version": 2
+        },
+        "chain": [
+          "-----BEGIN CERTIFICATE-----\nMIIFBjCCBK2gAwIBAgIQDovzdw2S0Zbwu2H5PEFmvjAKBggqhkjOPQQDAjBnMQsw\nCQYDVQQGEwJVUzEXMBUGA1UEChMORGlnaUNlcnQsIEluYy4xPzA9BgNVBAMTNkRp\nZ2lDZXJ0IEhpZ2ggQXNzdXJhbmNlIFRMUyBIeWJyaWQgRUNDIFNIQTI1NiAyMDIw\nIENBMTAeFw0yMTAzMjUwMDAwMDBaFw0yMjAzMzAyMzU5NTlaMGYxCzAJBgNVBAYT\nAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlhMRYwFAYDVQQHEw1TYW4gRnJhbmNpc2Nv\nMRUwEwYDVQQKEwxHaXRIdWIsIEluYy4xEzARBgNVBAMTCmdpdGh1Yi5jb20wWTAT\nBgcqhkjOPQIBBggqhkjOPQMBBwNCAASt9vd1sdNJVApdEHG93CUGSyIcoiNOn6H+\nudCMvTm8DCPHz5GmkFrYRasDE77BI3q5xMidR/aW4Ll2a1A2ZvcNo4IDOjCCAzYw\nHwYDVR0jBBgwFoAUUGGmoNI1xBEqII0fD6xC8M0pz0swHQYDVR0OBBYEFCexfp+7\nJplQ2PPDU1v+MRawux5yMCUGA1UdEQQeMByCCmdpdGh1Yi5jb22CDnd3dy5naXRo\ndWIuY29tMA4GA1UdDwEB/wQEAwIHgDAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYB\nBQUHAwIwgbEGA1UdHwSBqTCBpjBRoE+gTYZLaHR0cDovL2NybDMuZGlnaWNlcnQu\nY29tL0RpZ2lDZXJ0SGlnaEFzc3VyYW5jZVRMU0h5YnJpZEVDQ1NIQTI1NjIwMjBD\nQTEuY3JsMFGgT6BNhktodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vRGlnaUNlcnRI\naWdoQXNzdXJhbmNlVExTSHlicmlkRUNDU0hBMjU2MjAyMENBMS5jcmwwPgYDVR0g\nBDcwNTAzBgZngQwBAgIwKTAnBggrBgEFBQcCARYbaHR0cDovL3d3dy5kaWdpY2Vy\ndC5jb20vQ1BTMIGSBggrBgEFBQcBAQSBhTCBgjAkBggrBgEFBQcwAYYYaHR0cDov\nL29jc3AuZGlnaWNlcnQuY29tMFoGCCsGAQUFBzAChk5odHRwOi8vY2FjZXJ0cy5k\naWdpY2VydC5jb20vRGlnaUNlcnRIaWdoQXNzdXJhbmNlVExTSHlicmlkRUNDU0hB\nMjU2MjAyMENBMS5jcnQwDAYDVR0TAQH/BAIwADCCAQUGCisGAQQB1nkCBAIEgfYE\ngfMA8QB2ACl5vvCeOTkh8FZzn2Old+W+V32cYAr4+U1dJlwlXceEAAABeGq/vRoA\nAAQDAEcwRQIhAJ7miER//DRFnDJNn6uUhgau3WMt4vVfY5dGigulOdjXAiBIVCfR\nxjK1v4F31+sVaKzyyO7JAa0fzDQM7skQckSYWQB3ACJFRQdZVSRWlj+hL/H3bYbg\nIyZjrcBLf13Gg1xu4g8CAAABeGq/vTkAAAQDAEgwRgIhAJgAEkoJQRivBlwo7x67\n3oVsf1ip096WshZqmRCuL/JpAiEA3cX4rb3waLDLq4C48NSoUmcw56PwO/m2uwnQ\nprb+yh0wCgYIKoZIzj0EAwIDRwAwRAIgK+Kv7G+/KkWkNZg3PcQFp866Z7G6soxo\na4etSZ+SRlYCIBSiXS20Wc+yjD111nPzvQUCfsP4+DKZ3K+2GKsERD6d\n-----END CERTIFICATE-----\n",
+          "-----BEGIN CERTIFICATE-----\nMIIEGzCCAwOgAwIBAgIQBmcDW7sU/WOvwNaoU07+FjANBgkqhkiG9w0BAQsFADBs\nMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYDVQQLExB3\nd3cuZGlnaWNlcnQuY29tMSswKQYDVQQDEyJEaWdpQ2VydCBIaWdoIEFzc3VyYW5j\nZSBFViBSb290IENBMB4XDTIwMTIxNzAwMDAwMFoXDTMwMTIxNjIzNTk1OVowZzEL\nMAkGA1UEBhMCVVMxFzAVBgNVBAoTDkRpZ2lDZXJ0LCBJbmMuMT8wPQYDVQQDEzZE\naWdpQ2VydCBIaWdoIEFzc3VyYW5jZSBUTFMgSHlicmlkIEVDQyBTSEEyNTYgMjAy\nMCBDQTEwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAARnvW/xPOudvtC252wTq9ef\n6fbdFeWPkOscfpRTkciuHj7UcumQSH3lzkPEIx0KpesWa8epsks7QwkZ4fU/Tkf9\no4IBhzCCAYMwEgYDVR0TAQH/BAgwBgEB/wIBADAdBgNVHQ4EFgQUUGGmoNI1xBEq\nII0fD6xC8M0pz0swHwYDVR0jBBgwFoAUsT7DaQP4v0cB1JgmGggC72NkK8MwDgYD\nVR0PAQH/BAQDAgGGMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjB/Bggr\nBgEFBQcBAQRzMHEwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNv\nbTBJBggrBgEFBQcwAoY9aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL0RpZ2lD\nZXJ0SGlnaEFzc3VyYW5jZUVWUm9vdENBLmNydDBLBgNVHR8ERDBCMECgPqA8hjpo\ndHRwOi8vY3JsMy5kaWdpY2VydC5jb20vRGlnaUNlcnRIaWdoQXNzdXJhbmNlRVZS\nb290Q0EuY3JsMDAGA1UdIAQpMCcwCAYGZ4EMAQICMAgGBmeBDAECAzAHBgVngQwB\nATAIBgZngQwBAgEwDQYJKoZIhvcNAQELBQADggEBAHMQH8hhiBfNbxwEwxbbTAnu\njPyUh/oi0JrfZI3u9JuiLqca720D6foS/AB5+4EIxpm7CMG4MdN/l7oAiDipaCPv\nmOmpYUpnT7A63Cr0q4g84rI1ZmdqA40lVUUf6qC6E34tC73qDQF8TJSrfscWFdCl\nRXR9J4QGrkZ2VNMSDzlDRzWCaA95MfO8x01l+ZdopdE8FvM78gGd4zxeWb8v991+\nmBxTDepqKuy/jF5Rm6Bhfxr33ADRs60s1t16dtZ3pOYLALBTPD5KhZ6a+/dk5dnh\n6c4PaeZQYBUAh+GuxfaBlU4qQ8EtjBMCQHreMIwXHYHW5FRYGjgR4NMuaIw2jD0=\n-----END CERTIFICATE-----\n",
+          "-----BEGIN CERTIFICATE-----\nMIIDxTCCAq2gAwIBAgIQAqxcJmoLQJuPC3nyrkYldzANBgkqhkiG9w0BAQUFADBs\nMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYDVQQLExB3\nd3cuZGlnaWNlcnQuY29tMSswKQYDVQQDEyJEaWdpQ2VydCBIaWdoIEFzc3VyYW5j\nZSBFViBSb290IENBMB4XDTA2MTExMDAwMDAwMFoXDTMxMTExMDAwMDAwMFowbDEL\nMAkGA1UEBhMCVVMxFTATBgNVBAoTDERpZ2lDZXJ0IEluYzEZMBcGA1UECxMQd3d3\nLmRpZ2ljZXJ0LmNvbTErMCkGA1UEAxMiRGlnaUNlcnQgSGlnaCBBc3N1cmFuY2Ug\nRVYgUm9vdCBDQTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMbM5XPm\n+9S75S0tMqbf5YE/yc0lSbZxKsPVlDRnogocsF9ppkCxxLeyj9CYpKlBWTrT3JTW\nPNt0OKRKzE0lgvdKpVMSOO7zSW1xkX5jtqumX8OkhPhPYlG++MXs2ziS4wblCJEM\nxChBVfvLWokVfnHoNb9Ncgk9vjo4UFt3MRuNs8ckRZqnrG0AFFoEt7oT61EKmEFB\nIk5lYYeBQVCmeVyJ3hlKV9Uu5l0cUyx+mM0aBhakaHPQNAQTXKFx01p8VdteZOE3\nhzBWBOURtCmAEvF5OYiiAhF8J2a3iLd48soKqDirCmTCv2ZdlYTBoSUeh10aUAsg\nEsxBu24LUTi4S8sCAwEAAaNjMGEwDgYDVR0PAQH/BAQDAgGGMA8GA1UdEwEB/wQF\nMAMBAf8wHQYDVR0OBBYEFLE+w2kD+L9HAdSYJhoIAu9jZCvDMB8GA1UdIwQYMBaA\nFLE+w2kD+L9HAdSYJhoIAu9jZCvDMA0GCSqGSIb3DQEBBQUAA4IBAQAcGgaX3Nec\nnzyIZgYIVyHbIUf4KmeqvxgydkAQV8GK83rZEWWONfqe/EW1ntlMMUu4kehDLI6z\neM7b41N5cdblIZQB2lWHmiRk9opmzN6cN82oNLFpmyPInngiK3BD41VHMWEZ71jF\nhS9OMPagMRYjyOfiZRYzy78aG6A9+MpeizGLYAiJLQwGXFK3xPkKmNEVX58Svnw2\nYzi9RKR/5CYrCsSXaQ3pjOLAEFe4yHYSkVXySGnYvCoCWw9E1CAx2/S6cCZdkGCe\nvEsXCS+0yx5DaMkHJ8HSXPfqIbloEpw8nL+e/IBcm2PN7EeqJSdnoDfzAIJ9VNep\n+OkuE6N36B9K\n-----END CERTIFICATE-----\n"
+        ],
+        "chain_sha256": [
+          "0ae384bfd4dde9d13e50c5857c05a442c93f8e01445ee4b34540d22bd1e37f1b",
+          "74eab573da7db195097be0e90f334934c7a4c89e8083759db4333a00edd243d9",
+          "7431e5f4c3c1ce4690774f0b61e05440883ba9a01ed00ba6abd7806ed3b118cf"
+        ],
+        "cipher": {
+          "bits": 128,
+          "name": "ECDHE-ECDSA-AES128-GCM-SHA256",
+          "version": "TLSv1/SSLv3"
+        },
+        "dhparams": null,
+        "handshake_states": [
+          "before/connect initialization",
+          "SSLv2/v3 write client hello",
+          "SSLv2/v3 read server hello",
+          "SSLv3/TLS read server hello",
+          "SSLv3/TLS read server certificate",
+          "SSLv3/TLS read server key exchange",
+          "SSLv3/TLS read server done",
+          "SSLv3/TLS write client key exchange",
+          "SSLv3/TLS write change cipher spec",
+          "SSLv3/TLS write finished",
+          "SSLv3/TLS flush data",
+          "SSLv3/TLS read finished",
+          "SSL negotiation finished successfully"
+        ],
+        "ja3s": "f9a66afdd1f499d415ca470974ec00c8",
+        "jarm": "27d27d27d29d27d00041d41d0000000be49cc25222308abd09720df24eb301",
+        "ocsp": {},
+        "tlsext": [
+          {
+            "id": 65281,
+            "name": "renegotiation_info"
+          },
+          {
+            "id": 11,
+            "name": "ec_point_formats"
+          }
+        ],
+        "trust": {
+          "browser": {
+            "apple": true,
+            "microsoft": true,
+            "mozilla": true
+          },
+          "revoked": false
+        },
+        "versions": [
+          "-TLSv1",
+          "-SSLv2",
+          "-SSLv3",
+          "-TLSv1.1",
+          "TLSv1.2",
+          "TLSv1.3"
+        ]
+      },
+      "timestamp": "2021-08-16T20:42:40.325940",
+      "transport": "tcp"
+    },
+    {
+      "_shodan": {
+        "crawler": "487814a778c983e2dcef234806292d88c5cbf3ec",
+        "id": "4764837b-c462-4b0e-b48f-a3e5ad66bba1",
+        "module": "http",
+        "options": {},
+        "ptr": true
+      },
+      "asn": "AS36459",
+      "data": "HTTP/1.1 301 Moved Permanently\r\nContent-Length: 0\r\nLocation: https://140.82.121.4/\r\n\r\n",
+      "domains": [
+        "github.com"
+      ],
+      "hash": 1256792822,
+      "hostnames": [
+        "lb-140-82-121-4-fra.github.com"
+      ],
+      "http": {
+        "host": "140.82.121.4",
+        "html": "",
+        "html_hash": 0,
+        "location": "/",
+        "redirects": [],
+        "robots": null,
+        "robots_hash": null,
+        "securitytxt": null,
+        "securitytxt_hash": null,
+        "server": null,
+        "sitemap": null,
+        "sitemap_hash": null,
+        "title": null
+      },
+      "ip": 2354215172,
+      "ip_str": "140.82.121.4",
+      "isp": "GitHub, Inc.",
+      "location": {
+        "area_code": null,
+        "city": "Frankfurt am Main",
+        "country_code": "DE",
+        "country_code3": null,
+        "country_name": "Germany",
+        "dma_code": null,
+        "latitude": 50.11552,
+        "longitude": 8.68417,
+        "postal_code": null,
+        "region_code": "05"
+      },
+      "opts": {},
+      "org": "GitHub, Inc.",
+      "os": null,
+      "port": 80,
+      "timestamp": "2021-08-16T20:42:38.012570",
+      "transport": "tcp"
+    },
+    {
+      "_shodan": {
+        "crawler": "487814a778c983e2dcef234806292d88c5cbf3ec",
+        "id": "30cdf707-deaf-4107-9658-403b59d2b563",
+        "module": "git",
+        "options": {},
+        "ptr": true
+      },
+      "asn": "AS36459",
+      "data": "0020ERR \n  Repository not found.",
+      "domains": [
+        "github.com"
+      ],
+      "hash": -1636861384,
+      "hostnames": [
+        "lb-140-82-121-4-fra.github.com"
+      ],
+      "ip": 2354215172,
+      "ip_str": "140.82.121.4",
+      "isp": "GitHub, Inc.",
+      "location": {
+        "area_code": null,
+        "city": "Frankfurt am Main",
+        "country_code": "DE",
+        "country_code3": null,
+        "country_name": "Germany",
+        "dma_code": null,
+        "latitude": 50.11552,
+        "longitude": 8.68417,
+        "postal_code": null,
+        "region_code": "05"
+      },
+      "opts": {},
+      "org": "GitHub, Inc.",
+      "os": null,
+      "port": 9418,
+      "timestamp": "2021-08-12T02:10:13.136596",
+      "transport": "tcp"
+    },
+    {
+      "_shodan": {
+        "crawler": "50ff92ade07e6d7e2cfd2af30c145ff9277dd115",
+        "id": "328f158a-f64e-47d6-9cdc-3dae22c6d229",
+        "module": "ssh",
+        "options": {}
+      },
+      "asn": "AS36459",
+      "data": "SSH-2.0-babeld-968490c5\nKey type: ssh-rsa\nKey: AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PH\nkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETY\nP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoW\nf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lG\nHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==\nFingerprint: 16:27:ac:a5:76:28:2d:36:63:1b:56:4d:eb:df:a6:48\n\nKex Algorithms:\n\tcurve25519-sha256\n\tcurve25519-sha256@libssh.org\n\tecdh-sha2-nistp256\n\tecdh-sha2-nistp384\n\tecdh-sha2-nistp521\n\tdiffie-hellman-group-exchange-sha256\n\nServer Host Key Algorithms:\n\trsa-sha2-512\n\trsa-sha2-256\n\tssh-rsa\n\tssh-dss\n\nEncryption Algorithms:\n\tchacha20-poly1305@openssh.com\n\taes256-gcm@openssh.com\n\taes128-gcm@openssh.com\n\taes256-ctr\n\taes192-ctr\n\taes128-ctr\n\taes256-cbc\n\taes192-cbc\n\taes128-cbc\n\nMAC Algorithms:\n\thmac-sha2-512-etm@openssh.com\n\thmac-sha2-256-etm@openssh.com\n\thmac-sha2-512\n\thmac-sha2-256\n\thmac-sha1-etm@openssh.com\n\thmac-sha1\n\nCompression Algorithms:\n\tnone\n\n",
+      "domains": [
+        "github.com"
+      ],
+      "hash": 1023136053,
+      "hostnames": [
+        "lb-140-82-121-4-fra.github.com"
+      ],
+      "info": "protocol 2.0",
+      "ip": 2354215172,
+      "ip_str": "140.82.121.4",
+      "isp": "GitHub, Inc.",
+      "location": {
+        "area_code": null,
+        "city": "Frankfurt am Main",
+        "country_code": "DE",
+        "country_code3": null,
+        "country_name": "Germany",
+        "dma_code": null,
+        "latitude": 50.11552,
+        "longitude": 8.68417,
+        "postal_code": null,
+        "region_code": "05"
+      },
+      "opts": {},
+      "org": "GitHub, Inc.",
+      "os": null,
+      "port": 22,
+      "ssh": {
+        "cipher": "aes128-ctr",
+        "fingerprint": "16:27:ac:a5:76:28:2d:36:63:1b:56:4d:eb:df:a6:48",
+        "hassh": "5cc9bbf8282349c9de04f4786b6f22aa",
+        "kex": {
+          "compression_algorithms": [
+            "none"
+          ],
+          "encryption_algorithms": [
+            "chacha20-poly1305@openssh.com",
+            "aes256-gcm@openssh.com",
+            "aes128-gcm@openssh.com",
+            "aes256-ctr",
+            "aes192-ctr",
+            "aes128-ctr",
+            "aes256-cbc",
+            "aes192-cbc",
+            "aes128-cbc"
+          ],
+          "kex_algorithms": [
+            "curve25519-sha256",
+            "curve25519-sha256@libssh.org",
+            "ecdh-sha2-nistp256",
+            "ecdh-sha2-nistp384",
+            "ecdh-sha2-nistp521",
+            "diffie-hellman-group-exchange-sha256"
+          ],
+          "kex_follows": false,
+          "languages": [
+            ""
+          ],
+          "mac_algorithms": [
+            "hmac-sha2-512-etm@openssh.com",
+            "hmac-sha2-256-etm@openssh.com",
+            "hmac-sha2-512",
+            "hmac-sha2-256",
+            "hmac-sha1-etm@openssh.com",
+            "hmac-sha1"
+          ],
+          "server_host_key_algorithms": [
+            "rsa-sha2-512",
+            "rsa-sha2-256",
+            "ssh-rsa",
+            "ssh-dss"
+          ],
+          "unused": 0
+        },
+        "key": "AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PH\nkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETY\nP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoW\nf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lG\nHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==\n",
+        "mac": "hmac-sha2-256",
+        "type": "ssh-rsa"
+      },
+      "timestamp": "2021-08-03T21:10:29.568093",
+      "transport": "tcp"
+    }
+  ],
+  "dma_code": null,
+  "domains": [
+    "github.com"
+  ],
+  "hostnames": [
+    "lb-140-82-121-4-fra.github.com"
+  ],
+  "ip": 2354215172,
+  "ip_str": "140.82.121.4",
+  "isp": "GitHub, Inc.",
+  "last_update": "2021-08-16T20:42:40.325940",
+  "latitude": 50.11552,
+  "longitude": 8.68417,
+  "org": "GitHub, Inc.",
+  "os": null,
+  "ports": [
+    80,
+    9418,
+    443,
+    22
+  ],
+  "postal_code": null,
+  "region_code": "05",
+  "tags": []
+}
