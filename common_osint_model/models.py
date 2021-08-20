@@ -695,7 +695,7 @@ class TLSComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDa
         )
 
 
-class SSHComponentAlgorithms(BaseModel, ShodanDataHandler, CensysDataHandler):
+class SSHComponentAlgorithms(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler):
     """Represents algorithms supported by SSH server."""
     encryption: Optional[List[str]]
     key_exchange: Optional[List[str]]
@@ -728,10 +728,22 @@ class SSHComponentAlgorithms(BaseModel, ShodanDataHandler, CensysDataHandler):
             compression=d["ssh"]["kex_init_message"]["server_to_client_compression"]
         )
 
+    @classmethod
+    def from_binaryedge(cls, d: Dict):
+        """Returns an instance of this class based on BinaryEdge data given as dictionary."""
+        return SSHComponentAlgorithms(
+            encryption=d["encryption"],
+            key_exchange=d["kex"],
+            mac=d["mac"],
+            key_algorithms=d["server_host_key"],
+            compression=d["compression"]
+        )
 
-class SSHComponentKey(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
+
+class SSHComponentKey(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger):
     """Represents the public key exposed by the SSH server."""
     # Type represents the ssh-key type, e.g. ssh-rsa
+    raw: Optional[str]
     type: Optional[str]
     md5: Optional[str]
     sha1: Optional[str]
@@ -749,6 +761,7 @@ class SSHComponentKey(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
         key = base64.b64decode(key)
         md5, sha1, sha256, murmur = hash_all(key)
         return SSHComponentKey(
+            raw=d["ssh"]["key"],
             type=d["ssh"]["type"],
             md5=md5,
             sha1=sha1,
@@ -782,9 +795,11 @@ class SSHComponentKey(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
                 format=PublicFormat.OpenSSH
             ).decode("utf-8")
             cls.debug(f"Created public key from modulus and exponent: {public_key_string}")
-            public_key_raw_data = base64.b64decode(public_key_string.split(" ", maxsplit=1)[1])
+            public_key_b64 = public_key_string.split(" ", maxsplit=1)[1]
+            public_key_raw_data = base64.b64decode(public_key_b64)
             md5, sha1, sha256, murmur = hash_all(public_key_raw_data)
             return SSHComponentKey(
+                raw=public_key_b64,
                 type="ssh-rsa",
                 md5=md5,
                 sha1=sha1,
@@ -803,8 +818,22 @@ class SSHComponentKey(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
                 sha256=d["ssh"]["server_host_key"]["fingerprint_sha256"]
             )
 
+    @classmethod
+    def from_binaryedge(cls, d: Dict):
+        """Returns an instance of this class based on BinaryEdge data given as dictionary."""
+        public_key_raw_data = base64.b64decode(d["key"])
+        md5, sha1, sha256, murmur = hash_all(public_key_raw_data)
+        return SSHComponentKey(
+            raw=d["key"],
+            type=d["cypher"],
+            md5=md5,
+            sha1=sha1,
+            sha256=sha256,
+            murmur=murmur
+        )
 
-class SSHComponent(BaseModel, ShodanDataHandler, CensysDataHandler):
+
+class SSHComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler):
     """Represents the SSH component of services."""
     algorithms: Optional[SSHComponentAlgorithms]
     key: Optional[SSHComponentKey]
@@ -827,6 +856,21 @@ class SSHComponent(BaseModel, ShodanDataHandler, CensysDataHandler):
         return SSHComponent(
             algorithms=SSHComponentAlgorithms.from_censys(d),
             key=SSHComponentKey.from_censys(d)
+        )
+
+    @classmethod
+    def from_binaryedge(cls, d: Dict):
+        """Creates an instance of this class based on BinaryEdge data given as dictionary."""
+        cyphers = d["result"]["data"]["cyphers"]
+        algorithms = d["result"]["data"]["algorithms"]
+        cypher = None
+        for c in cyphers:
+            if c["cypher"] == "ssh-dss":
+                continue
+            cypher = c
+        return SSHComponent(
+            algorithms=SSHComponentAlgorithms.from_binaryedge(algorithms),
+            key=SSHComponentKey.from_binaryedge(cypher)
         )
 
 
@@ -943,7 +987,7 @@ class Service(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHan
 
         sshobj = None
         if "ssh" in type_index:
-            pass  # sshobj = SSHComponent.from_binaryedge(d[type_index["ssh"]])
+            sshobj = SSHComponent.from_binaryedge(d[type_index["ssh"]])
 
         banner = None
         md5, sha1, sha256, murmur = None, None, None, None
