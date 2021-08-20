@@ -2,18 +2,21 @@ import base64
 import binascii
 import hashlib
 import ipaddress
-import pytz
+import json
 from abc import ABC
 from datetime import datetime
 from logging import basicConfig, getLogger
 from typing import Optional, Dict, List, Tuple, Union
 
 import mmh3
+import pytz
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicNumbers
 from cryptography.hazmat.primitives.hashes import MD5, SHA1, SHA256
 from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
 from cryptography.x509 import load_pem_x509_certificate, ExtensionOID, DNSName, ExtensionNotFound, OID_COMMON_NAME
 from pydantic import BaseModel, validator
+
+from common_osint_model.utils import flatten
 
 basicConfig(level="INFO")
 
@@ -65,6 +68,15 @@ class BinaryEdgeDataHandler(ABC):
     @classmethod
     def from_binaryedge(cls, d: Union[Dict, List]):
         pass
+
+
+class Domain(BaseModel):
+    """Represents a domain pointing to a specific host."""
+    domain: str
+    first_seen: datetime = datetime.utcnow()
+    last_seen: datetime = datetime.utcnow()
+    source: Optional[str]
+    type: Optional[str]
 
 
 class AutonomousSystem(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
@@ -960,6 +972,7 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
     services: List[Service]
     first_seen: Optional[datetime] = datetime.utcnow()
     last_seen: Optional[datetime] = datetime.utcnow()
+    domains: Optional[List[Domain]]
 
     @validator("ip")
     def validates_ip(cls, v):
@@ -973,27 +986,65 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
     @property
     def services_dict(self):
         """Returns the services as dictionary in the form of {port: service}. Uses exclude_none to skip empty keys."""
-        return {s["port"]: s for s in self.dict(exclude_none=True)["services"]}
+        # Load the JSON dump, so datetime objects are in iso format.
+        json_dict = json.loads(self.json(exclude_none=True))
+        return {s["port"]: s for s in json_dict["services"]}
+
+    @property
+    def flattened_dict(self):
+        """Dict in the flattened format."""
+        return flatten(self.services_dict)
 
     @property
     def ports(self):
         return [service.port for service in self.services]
 
+    def flattened_json(self) -> str:
+        """Returns in the structure formally introduced with the common model."""
+        return json.dumps(self.flattened_dict, indent=2)
+
     @classmethod
     def from_shodan(cls, d: Dict):
         if "data" in d and isinstance(d["data"], List):
             d = d["data"]
+        domains = []
+        domain_strings = []
         if isinstance(d, List):
+            for entry in d:
+                if "domains" in entry:
+                    for domain in entry["domains"]:
+                        if domain not in domain_strings:
+                            domain_strings.append(domain)
+                            domains.append(Domain(domain=domain, source="shodan", type="domain"))
+                # Check Shodans reverse dns lookups
+                if "hostnames" in entry:
+                    for hostname in entry["hostnames"]:
+                        if hostname not in domain_strings:
+                            domain_strings.append(hostname)
+                            domains.append(Domain(domain=hostname, source="shodan", type="rdns"))
             ip = d[0]["ip_str"]
             services = [Service.from_shodan(service) for service in d]
         else:
             ip = d["ip_str"]
             services = [Service.from_shodan(d)]
+        for service in services:
+            if service.tls:
+                for domain in service.tls.certificate.domains:
+                    if domain not in domain_strings:
+                        domain_strings.append(domain)
+                        domains.append(Domain(
+                            domain=domain,
+                            first_seen=service.tls.certificate.issued,
+                            last_seen=service.tls.certificate.expires,
+                            source="shodan",
+                            type="common_name"
+                        ))
         autonomous_system = AutonomousSystem.from_shodan(d)
         return Host(
             ip=ip,
             autonomous_system=autonomous_system,
-            services=services
+            services=services,
+            domains=domains
         )
 
     @classmethod
@@ -1003,10 +1054,26 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
         for service in d["services"]:
             services.append(Service.from_censys(service))
 
+        domains = []
+        domain_strings = []
+        for service in services:
+            if service.tls:
+                for domain in service.tls.certificate.domains:
+                    if domain not in domain_strings:
+                        domain_strings.append(domain)
+                        domains.append(Domain(
+                            domain=domain,
+                            # Currently not given by API
+                            # first_seen=service.tls.certificate.issued,
+                            # last_seen=service.tls.certificate.expires,
+                            source="censys",
+                            type="common_name"
+                        ))
         return Host(
             ip=ip,
             autonomous_system=AutonomousSystem.from_censys(d),
-            services=services
+            services=services,
+            domains=domains
         )
 
     @classmethod
@@ -1023,9 +1090,24 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
                 services[port] = [service]
             else:
                 services[port].append(service)
-
+        services_objects = [Service.from_binaryedge(service) for service in services.values()]
         ip = d[0]["target"]["ip"]
+        domains = []
+        domain_strings = []
+        for service in services_objects:
+            if service.tls:
+                for domain in service.tls.certificate.domains:
+                    if domain not in domain_strings:
+                        domain_strings.append(domain)
+                        domains.append(Domain(
+                            domain=domain,
+                            first_seen=service.tls.certificate.issued,
+                            last_seen=service.tls.certificate.expires,
+                            source="binaryedge",
+                            type="common_name"
+                        ))
         return Host(
             ip=ip,
-            services=[Service.from_binaryedge(service) for service in services.values()]
+            services=services_objects,
+            domains=domains
         )
