@@ -1,4 +1,6 @@
+import warnings
 from typing import Dict, List, Any
+
 from DateTime import DateTime
 from mmh3 import hash as mmh3_hash
 
@@ -11,6 +13,7 @@ def from_censys(raw: Dict) -> Dict:
 
     :param raw: Censys Search 2.0 dictionary
     """
+    warnings.warn("This function was deprecated in v0.4.0.", DeprecationWarning)
     common = {}
     common.update(
         censys_meta_extraction(raw)
@@ -22,6 +25,7 @@ def from_censys(raw: Dict) -> Dict:
 
 
 def from_censys_flattened(raw: Dict) -> Dict:
+    warnings.warn("This function was deprecated in v0.4.0.", DeprecationWarning)
     return flatten(from_censys(raw))
 
 
@@ -154,6 +158,7 @@ def censys_extract_ssh(service: Dict) -> Dict:
     :param service: Censys Search 2.0 service dictionary
     """
     s_ssh = {}
+
 
 def _first_or_none(l: List) -> Any:
     """Returns first element of list or none, if list is empty."""

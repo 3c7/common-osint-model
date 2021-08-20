@@ -1,8 +1,11 @@
+import warnings
+from datetime import datetime
+
+from DateTime import DateTime
+from mmh3 import hash as mmh3_hash
+
 from common_osint_model.utils import flatten, unflatten, common_model_cn_extraction, sha256_from_body_string, \
     list_cleanup
-from DateTime import DateTime
-from datetime import datetime
-from mmh3 import hash as mmh3_hash
 
 
 def from_censys_ipv4(raw: dict) -> dict:
@@ -11,6 +14,7 @@ def from_censys_ipv4(raw: dict) -> dict:
     :param raw: Censys IPv4 dict
     :return: Common format dict
     """
+    warnings.warn("This function was deprecated in v0.4.0.", DeprecationWarning)
     flattened = False
     for k in raw.keys():
         if "." in k:
@@ -40,6 +44,7 @@ def from_censys_ipv4_flattened(raw: dict) -> dict:
     :param raw: Censys IPv4 dict
     :return: Common format dict, flattened
     """
+    warnings.warn("This function was deprecated in v0.4.0.", DeprecationWarning)
     return flatten(from_censys_ipv4(raw))
 
 
