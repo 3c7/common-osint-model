@@ -75,6 +75,11 @@ from common_osint_model import Host
 shodan_client = shodan.Shodan("My API key")
 raw_shodan_response = shodan_client.host("140.82.121.4")
 host = Host.from_shodan(raw_shodan_response)
+# Similarly:
+# Host.from_censys(raw_censys_response)
+# Host.from_binaryedge(raw_binaryedge_response)
+# Make sure to only pass results for *one* host. Currently there is no functionality provided to wrap around different 
+# return types, such as lists of hosts from a query. You need to loop through them yourself.
 print(f"Got {host.ip}.")
 print(f"Providing {len(host.services)} services.")
 
