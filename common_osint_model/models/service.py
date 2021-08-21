@@ -7,6 +7,7 @@ from common_osint_model.models import ShodanDataHandler, CensysDataHandler, Bina
 from common_osint_model.models.http import HTTPComponent
 from common_osint_model.models.ssh import SSHComponent
 from common_osint_model.models.tls import TLSComponent
+from common_osint_model.models.dns import DNSComponent
 from common_osint_model.utils import hash_all
 
 
@@ -31,6 +32,7 @@ class Service(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHan
     http: Optional[HTTPComponent]
     tls: Optional[TLSComponent]
     ssh: Optional[SSHComponent]
+    dns: Optional[DNSComponent]
     # Typically hosts consist of different services which might be discovered by different scanning services, so
     # remarking which service was observed by which scanner might be a good idea.
     source: str
@@ -57,6 +59,10 @@ class Service(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHan
         if "ssl" in d:
             tlsobj = TLSComponent.from_shodan(d)
 
+        dnsobj = None
+        if "dns" in d:
+            dnsobj = DNSComponent.from_shodan(d)
+
         banner = d["data"]
         md5, sha1, sha256, murmur = hash_all(banner.encode("utf-8"))
 
@@ -70,6 +76,7 @@ class Service(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHan
             ssh=sshobj,
             http=httpobj,
             tls=tlsobj,
+            dns=dnsobj,
             timestamp=datetime.fromisoformat(d["timestamp"]),
             source="shodan"
         )
@@ -95,6 +102,10 @@ class Service(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHan
         if "ssh" in d:
             sshobj = SSHComponent.from_censys(d)
 
+        dnsobj = None
+        if "dns" in d:
+            dnsobj = DNSComponent.from_censys(d)
+
         return Service(
             port=port,
             banner=banner,
@@ -105,6 +116,7 @@ class Service(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHan
             http=httpobj,
             tls=tlsobj,
             ssh=sshobj,
+            dns=dnsobj,
             timestamp=datetime.fromisoformat(d["observed_at"][:-4]),
             source="censys"
         )
