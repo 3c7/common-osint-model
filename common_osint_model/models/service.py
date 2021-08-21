@@ -78,8 +78,11 @@ class Service(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHan
     def from_censys(cls, d: Dict):
         """Creates an instance of this class using a dictionary with typical Censys data."""
         port = d["port"]
-        banner = d["banner"]
-        md5, sha1, sha256, murmur = hash_all(banner.encode("utf-8"))
+        banner = d.get("banner", None)
+        md5, sha1, sha256, murmur = None, None, None, None
+        if banner:
+            md5, sha1, sha256, murmur = hash_all(banner.encode("utf-8"))
+
         httpobj = None
         if "http" in d:
             httpobj = HTTPComponent.from_censys(d)
