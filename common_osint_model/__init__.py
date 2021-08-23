@@ -9,7 +9,7 @@ from common_osint_model.censys.v2 import from_censys, from_censys_flattened
 from common_osint_model.certificate import from_x509_pem, from_x509_pem_flattened
 
 from common_osint_model.models.host import Host
-from common_osint_model.models.domain import Domain
+from common_osint_model.models.domain import *
 from common_osint_model.models.service import Service
 from common_osint_model.models.autonomous_system import AutonomousSystem
 from common_osint_model.models.http import *
