@@ -40,7 +40,14 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
     @property
     def flattened_dict(self):
         """Dict in the flattened format."""
-        return flatten(self.services_dict)
+        d = self.services_dict
+        d.update({
+            "autonomous_system": self.autonomous_system.dict(exclude_none=True),
+            "ip": self.ip,
+            "domains": [domain.domain for domain in self.domains],
+            "ports": self.ports
+        })
+        return flatten(d)
 
     @property
     def ports(self):
