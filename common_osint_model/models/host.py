@@ -20,6 +20,7 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
     first_seen: Optional[datetime] = datetime.utcnow()
     last_seen: Optional[datetime] = datetime.utcnow()
     domains: Optional[List[Domain]]
+    source: Optional[str]
 
     @validator("ip")
     def validates_ip(cls, v):
@@ -91,7 +92,8 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
             ip=ip,
             autonomous_system=autonomous_system,
             services=services,
-            domains=domains
+            domains=domains,
+            source="shodan"
         )
 
     @classmethod
@@ -120,7 +122,8 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
             ip=ip,
             autonomous_system=AutonomousSystem.from_censys(d),
             services=services,
-            domains=domains
+            domains=domains,
+            source="censys"
         )
 
     @classmethod
@@ -156,5 +159,6 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
         return Host(
             ip=ip,
             services=services_objects,
-            domains=domains
+            domains=domains,
+            source="binaryedge"
         )
