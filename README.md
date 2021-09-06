@@ -1,7 +1,10 @@
 # Common OSINT Model
 
 **Note:** This is work in progress and probably only covers my specific use case. If you find bugs or know how to
-enhance this project, please open an issue or - even better - create a pull request.
+enhance this project, please open an issue or - even better - create a pull request. The presented data model is
+evolving continuously. Therefore, it is recommended to use it in your project with a fixed version constraint (e.g. 
+`common-osint-model==0.4.1`) and take a look at what has changed here before updating `common-osint-model` as a
+dependency.
 
 This project aims to create an easy to use data model as well as implement converters for commonly used sources. As my
 use case often includes HTTP(S), TLS and SSH only, data delivered for other protocols by the given sources might not
