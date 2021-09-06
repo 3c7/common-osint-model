@@ -15,12 +15,20 @@ from common_osint_model.utils import flatten
 class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger):
     """This class represents a host and can be used to handle results from the common model in a pythonic way."""
     ip: str
+    # Information about the autonomous system the host is assigned to
     autonomous_system: Optional[AutonomousSystem]
+    # List of services running (listening) on the IP
     services: List[Service]
+    # Timestamps for activity tracking
     first_seen: Optional[datetime] = datetime.utcnow()
     last_seen: Optional[datetime] = datetime.utcnow()
+    # A list of domains, fqdns, common names - or other attributes which represent domainnames -  assigned to the host
     domains: Optional[List[Domain]]
+    # This represents the source where the host information was obtained, e.g. shodan, censys...
     source: Optional[str]
+    # Optionally, the used query to find the host can be assigned to the object also which might be useful for comparing
+    # different hosts later on
+    query: Optional[str]
 
     @validator("ip")
     def validates_ip(cls, v):
