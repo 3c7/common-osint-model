@@ -147,6 +147,8 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
         if isinstance(d, Dict) and "results" in d:
             # This is a complete result dictionary, extract the list of services.
             d = d["results"][list(d["results"].keys())[0]]
+        elif isinstance(d, Dict) and "events" in d:
+            d = d["events"]
 
         services = {}
         for service in d:
