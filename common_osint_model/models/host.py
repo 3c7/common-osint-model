@@ -18,7 +18,9 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
     # Information about the autonomous system the host is assigned to
     autonomous_system: Optional[AutonomousSystem]
     # List of services running (listening) on the IP
-    services: List[Service]
+    services: Optional[List[Service]]
+    # List of open ports also mentioned in the open
+    ports: Optional[List[int]]
     # Timestamps for activity tracking
     first_seen: Optional[datetime] = datetime.utcnow()
     last_seen: Optional[datetime] = datetime.utcnow()
@@ -44,22 +46,20 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
         """Returns the services as dictionary in the form of {port: service}. Uses exclude_none to skip empty keys."""
         # Load the JSON dump, so datetime objects are in iso format.
         json_dict = json.loads(self.json(exclude_none=True))
-        return {s["port"]: s for s in json_dict["services"]}
+        json_dict.update({s["port"]: s for s in json_dict["services"]})
+        del json_dict["services"]
+        return json_dict
 
     @property
     def flattened_dict(self):
         """Dict in the flattened format."""
-        d = self.services_dict
-        d.update({
-            "autonomous_system": self.autonomous_system.dict(exclude_none=True),
-            "ip": self.ip,
-            "domains": [domain.domain for domain in self.domains],
-            "ports": self.ports
-        })
-        return flatten(d)
+        return flatten(self.services_dict)
 
     @property
-    def ports(self):
+    def service_ports(self):
+        """Dynamic attribute which loops over available services and grabs the port number. This is kind of redundant
+        to the ports attribute, if given, but can help to easily get the values needed for the attribute. Unfortunately
+        Pydantic does not support these kind of properties in the data model right now."""
         return [service.port for service in self.services]
 
     def flattened_json(self) -> str:
@@ -108,7 +108,8 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
             autonomous_system=autonomous_system,
             services=services,
             domains=domains,
-            source="shodan"
+            source="shodan",
+            ports=[service.port for service in services]
         )
 
     @classmethod
@@ -138,7 +139,8 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
             autonomous_system=AutonomousSystem.from_censys(d),
             services=services,
             domains=domains,
-            source="censys"
+            source="censys",
+            ports=[service.port for service in services]
         )
 
     @classmethod
@@ -177,5 +179,6 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
             ip=ip,
             services=services_objects,
             domains=domains,
-            source="binaryedge"
+            source="binaryedge",
+            ports=[service.port for service in services]
         )
