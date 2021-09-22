@@ -143,7 +143,8 @@ class Service(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHan
         banner = None
         md5, sha1, sha256, murmur = None, None, None, None
         if "service-simple" in type_index:
-            banner = d[type_index["service-simple"]]["result"]["data"]["service"]["banner"]
+            banner = d[type_index["service-simple"]]["result"]["data"]["service"].get("banner", None)
+        if banner:
             md5, sha1, sha256, murmur = hash_all(banner.encode("utf-8"))
 
         return Service(

@@ -264,7 +264,7 @@ class TLSComponentCertificate(BaseModel, ShodanDataHandler, CensysDataHandler, B
             issued=None,
             expires=None,
             expired=None,
-            alternative_names=d["names"],
+            alternative_names=d.get("names", None),
             sha256=d["fingerprint"]
         )
 
