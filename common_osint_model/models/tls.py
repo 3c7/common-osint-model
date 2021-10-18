@@ -55,8 +55,9 @@ class TLSComponentCertificateEntity(BaseModel, ShodanDataHandler, CensysDataHand
         elif not cn and email:
             dn += f"Email={email}"
 
-        while dn[-1] in [",", " "]:
-            dn = dn[:-1]
+        if len(dn) > 0:
+            while dn[-1] in [",", " "]:
+                dn = dn[:-1]
 
         return TLSComponentCertificateEntity(
             dn=dn,

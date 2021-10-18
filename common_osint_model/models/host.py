@@ -180,5 +180,5 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
             services=services_objects,
             domains=domains,
             source="binaryedge",
-            ports=[service.port for service in services]
+            ports=[service.port for service in services_objects]
         )
