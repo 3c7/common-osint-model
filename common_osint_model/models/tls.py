@@ -216,24 +216,45 @@ class TLSComponentCertificate(BaseModel, ShodanDataHandler, CensysDataHandler, B
         expired = True if d["ssl"]["cert"]["expired"] in ["true", True] else False
         altnames = []
         pem = None
+        cert = None
         md5, sha1, sha256 = None, None, None
-        for cert_pem in d["ssl"]["chain"]:
-            cert = load_pem_x509_certificate(cert_pem.encode("utf-8"))
-            # Check if this certificate is the leaf certificate by comparing the common name
-            attributes = cert.subject.get_attributes_for_oid(OID_COMMON_NAME)
-            for attribute in attributes:
-                if attribute.value == subject.common_name:
-                    pem = cert_pem
-                    md5, sha1, sha256 = (
-                        binascii.hexlify(cert.fingerprint(MD5())).decode("utf-8"),
-                        binascii.hexlify(cert.fingerprint(SHA1())).decode("utf-8"),
-                        binascii.hexlify(cert.fingerprint(SHA256())).decode("utf-8")
-                    )
+        certificate_chain = d["ssl"]["chain"]
+
+        # If only a single certificate is given in the chain, use it.
+        if len(certificate_chain) == 1:
+            pem = certificate_chain[0]
+            cert = load_pem_x509_certificate(pem.encode("utf-8"))
+        # If there are multiple certificates given, we need to loop over them and compare the common name. This _can_
+        # lead to ValueError if the certificates are malformed, such as empty Country values etc. This is why
+        # >>> cert.subject.get_attributes_for_oid(OID_COMMON_NAME)
+        # is in a try/except block. In these cases, no further data will be extracted from the certificate. However,
+        # malformed certificates are often self-signed and the chain length is 1.
+        else:
+            for cert_pem in d["ssl"]["chain"]:
+                cert = load_pem_x509_certificate(cert_pem.encode("utf-8"))
+                # Check if this certificate is the leaf certificate by comparing the common name
+                attributes = []
+                try:
+                    attributes = cert.subject.get_attributes_for_oid(OID_COMMON_NAME)
+                except:
+                    cls.info("Could not get attributes for OID_COMMON_NAME. Skipping this certificate.")
+                    continue
+                for attribute in attributes:
+                    if attribute.value == subject.common_name:
+                        pem = cert_pem
+
+        if cert:
+            md5, sha1, sha256 = (
+                binascii.hexlify(cert.fingerprint(MD5())).decode("utf-8"),
+                binascii.hexlify(cert.fingerprint(SHA1())).decode("utf-8"),
+                binascii.hexlify(cert.fingerprint(SHA256())).decode("utf-8")
+            )
+
             try:
                 ext = cert.extensions.get_extension_for_oid(ExtensionOID.SUBJECT_ALTERNATIVE_NAME)
+                altnames.extend(ext.value.get_values_for_type(DNSName))
             except ExtensionNotFound:
-                continue
-            altnames.extend(ext.value.get_values_for_type(DNSName))
+                cls.debug("Could not extract alternative names from the certificate extensions.")
 
         if len(altnames) == 0:
             altnames = None

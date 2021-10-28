@@ -67,20 +67,20 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
         return json.dumps(self.flattened_dict, indent=2)
 
     @classmethod
-    def from_shodan(cls, d: Dict):
+    def from_shodan(cls, d: Dict, skip_shodan_domains: Optional[bool] = False):
         if "data" in d and isinstance(d["data"], List):
             d = d["data"]
         domains = []
         domain_strings = []
         if isinstance(d, List):
             for entry in d:
-                if "domains" in entry:
+                if "domains" in entry and not skip_shodan_domains:
                     for domain in entry["domains"]:
                         if domain not in domain_strings:
                             domain_strings.append(domain)
                             domains.append(Domain(domain=domain, source="shodan", type="domain"))
                 # Check Shodans reverse dns lookups
-                if "hostnames" in entry:
+                if "hostnames" in entry and not skip_shodan_domains:
                     for hostname in entry["hostnames"]:
                         if hostname not in domain_strings:
                             domain_strings.append(hostname)
