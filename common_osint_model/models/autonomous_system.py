@@ -29,12 +29,13 @@ class AutonomousSystem(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
     def from_shodan(cls, d: Dict):
         """Creates an instance of this class using a typical Shodan dictionary."""
         if isinstance(d, List):
-            cls.debug("Got a list instead of a dictionary. Usually multiple services of the same host are represented"
-                      " as multiple list items by shodan, so this should not be a problem as the AS is the same for all."
+            cls.debug("Got a list instead of a dictionary. Usually multiple services of the same host are represented "
+                      "as multiple list items by shodan, so this should not be a problem as the AS is the same for all."
                       " Using the first item.")
             d = d[0]
+        asn = d.get("asn", None)
         return AutonomousSystem(
-            number=int(d.get("asn").replace("AS", "")),
+            number=int(asn.replace("AS", "")) if asn and isinstance(asn, str) else None,
             name=d.get("isp"),
             country=d.get("location", {}).get("country_code", None),
             prefix=None,  # Not available in Shodan data
