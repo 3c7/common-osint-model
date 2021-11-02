@@ -8,8 +8,8 @@ from common_osint_model.models import ShodanDataHandler, CensysDataHandler, Logg
 
 class AutonomousSystem(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
     """Represents an autonomous system"""
-    number: int
-    name: str
+    number: Optional[int]
+    name: Optional[str]
     country: Optional[str]
     prefix: Optional[str]
     source: str
