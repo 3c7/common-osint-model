@@ -44,10 +44,11 @@ class AutonomousSystem(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
 
     @classmethod
     def from_censys(cls, d: Dict):
+        autonomous_system = d.get("autonomous_system", {})
         return AutonomousSystem(
-            number=d["autonomous_system"]["asn"],
-            name=d["autonomous_system"]["name"],
-            country=d["autonomous_system"]["country_code"],
-            prefix=d["autonomous_system"]["bgp_prefix"],
+            number=autonomous_system.get("asn", None),
+            name=autonomous_system.get("name", None),
+            country=autonomous_system.get("country_code", None),
+            prefix=autonomous_system.get("bgp_prefix", None),
             source="censys"
         )
