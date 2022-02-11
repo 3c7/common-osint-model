@@ -75,7 +75,7 @@ class TLSComponentCertificateEntity(BaseModel, ShodanDataHandler, CensysDataHand
         """Creates an instance of this class based on Censys data given as dictionary."""
         if all(key not in d for key in ["common_name", "locality", "organization", "organizational_unit", "province"]):
             raise KeyError("The dictionary given to TLSComponentCertificateEntity.from_shodan is missing the typical "
-                           "shodan keys.")
+                           "censys keys.")
 
         c = d.get("country", [])
         st = d.get("province", [])
@@ -317,7 +317,7 @@ class TLSComponentCertificate(BaseModel, ShodanDataHandler, CensysDataHandler, B
         )
 
 
-class TLSComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler):
+class TLSComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger):
     """Represents the TLS component of services."""
     certificate: TLSComponentCertificate
 
@@ -336,10 +336,15 @@ class TLSComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDa
 
     @classmethod
     def from_censys(cls, d: Dict):
-        tls = d["tls"]
-        return TLSComponent(
-            certificate=TLSComponentCertificate.from_censys(tls["certificates"]["leaf_data"])
-        )
+        try:
+            tls = d["tls"]
+            return TLSComponent(
+                certificate=TLSComponentCertificate.from_censys(tls["certificates"]["leaf_data"])
+            )
+        except KeyError as e:
+            cls.error(f"Exception during certificate data extraction. "
+                      f"The key 'tls.certificates.leaf_data' is not available: {e}\nReturning None...")
+            return None
 
     @classmethod
     def from_binaryedge(cls, d: Union[Dict, List]):

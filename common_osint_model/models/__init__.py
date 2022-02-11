@@ -18,6 +18,16 @@ class Logger(ABC):
         logger = getLogger(cls.__name__)
         logger.debug(message)
 
+    @classmethod
+    def warning(cls, message: str):
+        logger = getLogger(cls.__name__)
+        logger.warning(message)
+
+    @classmethod
+    def error(cls, message: str):
+        logger = getLogger(cls.__name__)
+        logger.error(message)
+
 
 class ShodanDataHandler(ABC):
     """Abstract base class indicating that a class implements from_shodan()."""
