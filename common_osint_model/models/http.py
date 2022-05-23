@@ -159,7 +159,12 @@ class HTTPComponentContent(BaseModel, ShodanDataHandler, CensysDataHandler, Bina
             cls.debug("Robots.txt key found in Shodan data.")
             robots_txt = HTTPComponentContentRobots.from_shodan(d)
 
-        raw = d["http"]["html"].encode("utf-8")
+        raw = d["http"].get("html", "")
+        if not raw:
+            raw = ""
+
+        raw = raw.encode("utf-8")
+
         md5, sha1, sha256, murmur = hash_all(raw)
         return HTTPComponentContent(
             raw=raw,
@@ -213,6 +218,7 @@ class HTTPComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeD
     """Represents the HTTP component of services."""
     headers: Optional[Dict[str, str]]
     content: Optional[HTTPComponentContent]
+    shodan_headers_hash: Optional[str]
 
     @classmethod
     def from_shodan(cls, d: Dict):
@@ -225,6 +231,7 @@ class HTTPComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeD
         banner = d["data"]
         lines = banner.split("\r\n")
         headers = {}
+        banner_keys = lines[0]
         for line in lines:
             if ":" in line:
                 key, value = line.split(":", maxsplit=1)
@@ -232,11 +239,13 @@ class HTTPComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeD
 
         return HTTPComponent(
             headers=headers,
-            content=content
+            content=content,
+            shodan_headers_hash=d.get("http", {}).get("headers_hash", None)
         )
 
     @classmethod
     def from_censys(cls, d: Dict):
+        """Todo: Is parsing from services.banner better than just looping over the headers found by Censys?"""
         http = d["http"]["response"]
         headers = {}
         for k, v in http["headers"].items():
@@ -246,9 +255,19 @@ class HTTPComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeD
             headers.update({
                 k.replace("_", "-"): " ".join(v)
             })
+
+        banner_lines = d["banner"].replace("\r", "").split("\n")
+        banner_keys = banner_lines[0]
+        for line in banner_lines:
+            if ":" in line:
+                k, _ = line.split(":", maxsplit=1)
+                banner_keys += "\n" + k
+        headers_hash = mmh3.hash(banner_keys.encode("utf-8"))
+
         return HTTPComponent(
             headers=headers,
-            content=HTTPComponentContent.from_censys(d)
+            content=HTTPComponentContent.from_censys(d),
+            shodan_headers_hash=headers_hash
         )
 
     @classmethod
