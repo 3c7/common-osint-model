@@ -319,7 +319,10 @@ class TLSComponentCertificate(BaseModel, ShodanDataHandler, CensysDataHandler, B
 
 class TLSComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger):
     """Represents the TLS component of services."""
-    certificate: TLSComponentCertificate
+    certificate: Optional[TLSComponentCertificate]
+    ja3: Optional[str]
+    ja3s: Optional[str]
+    jarm: Optional[str]
 
     # Todo: Add other attributes relevant to TLS such as CipherSuits etc.
 
@@ -331,7 +334,9 @@ class TLSComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDa
                             f"but it was {type(d)}.")
 
         return TLSComponent(
-            certificate=TLSComponentCertificate.from_shodan(d)
+            certificate=TLSComponentCertificate.from_shodan(d),
+            ja3s=d.get("ssl", {}).get("ja3s", None),
+            jarm=d.get("ssl", {}).get("jarm", None)
         )
 
     @classmethod
@@ -339,7 +344,9 @@ class TLSComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDa
         try:
             tls = d["tls"]
             return TLSComponent(
-                certificate=TLSComponentCertificate.from_censys(tls["certificates"]["leaf_data"])
+                certificate=TLSComponentCertificate.from_censys(tls["certificates"]["leaf_data"]),
+                ja3s=tls.get("ja3s", None),
+                jarm=d.get("jarm", {}).get("fingerprint", None)
             )
         except KeyError as e:
             cls.error(f"Exception during certificate data extraction. "
@@ -349,7 +356,26 @@ class TLSComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDa
     @classmethod
     def from_binaryedge(cls, d: Union[Dict, List]):
         """Creates an instance of this class based on BinaryEdge data given as dictionary."""
-        certificate_chain = d["result"]["data"]["cert_info"]["certificate_chain"]
+        data = d.get("result", {}).get("data", None)
+        if not data:
+            cls.error("No data key available in binary edge dictionary. Returning None...")
+            return None
+
+        cert = None
+        if "cert_info" in data:
+            cert = TLSComponentCertificate.from_binaryedge(
+                data["cert_info"]["certificate_chain"][0]
+            )
+        ja3 = None
+        if "server_info" in data:
+            ja3 = data["server_info"]["ja3_digest"]
+
+        jarm = None
+        if "jarm_hash" in data:
+            jarm = data["jarm_hash"]
+
         return TLSComponent(
-            certificate=TLSComponentCertificate.from_binaryedge(certificate_chain[0])
+            certificate=cert,
+            ja3=ja3,
+            jarm=jarm
         )
