@@ -13,7 +13,7 @@ def from_censys(raw: Dict) -> Dict:
 
     :param raw: Censys Search 2.0 dictionary
     """
-    warnings.warn("This function was deprecated in v0.4.0.", DeprecationWarning)
+    warnings.warn("This function was deprecated in v0.4.0. and will be removed in v0.5.0", DeprecationWarning)
     common = {}
     common.update(
         censys_meta_extraction(raw)
@@ -25,7 +25,7 @@ def from_censys(raw: Dict) -> Dict:
 
 
 def from_censys_flattened(raw: Dict) -> Dict:
-    warnings.warn("This function was deprecated in v0.4.0.", DeprecationWarning)
+    warnings.warn("This function was deprecated in v0.4.0. and will be removed in v0.5.0", DeprecationWarning)
     return flatten(from_censys(raw))
 
 
