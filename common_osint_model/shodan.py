@@ -17,7 +17,7 @@ def from_shodan(raw: Union[list, dict]) -> dict:
     :param raw: Shodan list or dictionary from host queries
     :return: Generic host describing dictionary
     """
-    warnings.warn("This function was deprecated in v0.4.0.", DeprecationWarning)
+    warnings.warn("This function was deprecated in v0.4.0. and will be removed in v0.5.0", DeprecationWarning)
     g = {}
     services = []
     if isinstance(raw, dict):
@@ -54,7 +54,7 @@ def from_shodan_flattened(raw: Union[list, dict]) -> dict:
     :param raw: Shodan list or dictionary from host queries
     :return: Generic host describing dictionary, flattened
     """
-    warnings.warn("This function was deprecated in v0.4.0.", DeprecationWarning)
+    warnings.warn("This function was deprecated in v0.4.0. and will be removed in v0.5.0", DeprecationWarning)
     return flatten(from_shodan(raw))
 
 
