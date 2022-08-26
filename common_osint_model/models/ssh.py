@@ -175,6 +175,7 @@ class SSHComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDa
     """Represents the SSH component of services."""
     algorithms: Optional[SSHComponentAlgorithms]
     key: Optional[SSHComponentKey]
+    hassh: Optional[str]
 
     @classmethod
     def from_shodan(cls, d: Dict):
@@ -183,17 +184,22 @@ class SSHComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDa
             raise TypeError(f"Method SSHComponent.from_shodan expects parameter d to be a dictionary, "
                             f"but it was {type(d)}.")
 
+        hassh = d.get("ssh", {}).get("hashh", None)
+
         return SSHComponent(
             algorithms=SSHComponentAlgorithms.from_shodan(d),
-            key=SSHComponentKey.from_shodan(d)
+            key=SSHComponentKey.from_shodan(d),
+            hassh=hassh
         )
 
     @classmethod
     def from_censys(cls, d: Dict):
         """Creates an instance of this class based on Censys data given as dictionary."""
+        hassh = d.get("ssh", {}).get("hassh_fingerprint", None)
         return SSHComponent(
             algorithms=SSHComponentAlgorithms.from_censys(d),
-            key=SSHComponentKey.from_censys(d)
+            key=SSHComponentKey.from_censys(d),
+            hassh=hassh
         )
 
     @classmethod
@@ -202,6 +208,7 @@ class SSHComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDa
         try:
             cyphers = d["result"]["data"]["cyphers"]
             algorithms = d["result"]["data"]["algorithms"]
+            hassh = d["result"]["data"]["hassh"]["hassh"]
             cypher = None
             for c in cyphers:
                 if c["cypher"] == "ssh-dss":
@@ -209,7 +216,8 @@ class SSHComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDa
                 cypher = c
             return SSHComponent(
                 algorithms=SSHComponentAlgorithms.from_binaryedge(algorithms),
-                key=SSHComponentKey.from_binaryedge(cypher)
+                key=SSHComponentKey.from_binaryedge(cypher),
+                hassh=hassh
             )
         except KeyError as ke:
             cls.warning(f"BinaryEdge data is missing key: {ke}")
