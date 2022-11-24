@@ -192,6 +192,8 @@ class TLSComponentCertificate(BaseModel, ShodanDataHandler, CensysDataHandler, B
     sha1: Optional[str]
     sha256: Optional[str]
     murmur: Optional[str]
+    # If the certificate is trusted by the source
+    trusted: Optional[bool]
 
     @property
     def domains(self) -> List[str]:
@@ -220,10 +222,18 @@ class TLSComponentCertificate(BaseModel, ShodanDataHandler, CensysDataHandler, B
         md5, sha1, sha256 = None, None, None
         certificate_chain = d["ssl"]["chain"]
 
-        # If only a single certificate is given in the chain, use it.
+        trusted = True
+        tags = d.get("tags", None)
+        if tags:
+            if "self-signed" in tags:
+                trusted = False
+
+        # If only a single certificate is given in the chain, use it. Also set trusted to false, as this is likely
+        # self-signed.
         if len(certificate_chain) == 1:
             pem = certificate_chain[0]
             cert = load_pem_x509_certificate(pem.encode("utf-8"))
+            trusted = False
         # If there are multiple certificates given, we need to loop over them and compare the common name. This _can_
         # lead to ValueError if the certificates are malformed, such as empty Country values etc. This is why
         # >>> cert.subject.get_attributes_for_oid(OID_COMMON_NAME)
@@ -272,7 +282,8 @@ class TLSComponentCertificate(BaseModel, ShodanDataHandler, CensysDataHandler, B
             pem=pem,
             md5=md5,
             sha1=sha1,
-            sha256=sha256
+            sha256=sha256,
+            trusted=trusted
         )
 
     @classmethod
@@ -280,6 +291,7 @@ class TLSComponentCertificate(BaseModel, ShodanDataHandler, CensysDataHandler, B
         """Creates an instance of this class based on Censys data given as dictionary."""
         cls.info("Censys does not provide raw certificate data, to hashes must be taken from the data and cannot be "
                  "calculated.")
+        trusted = not d.get("signature", {}).get("self_signed", False)
         return TLSComponentCertificate(
             issuer=TLSComponentCertificateEntity.from_censys(d["issuer"]),
             subject=TLSComponentCertificateEntity.from_censys(d["subject"]),
@@ -287,7 +299,8 @@ class TLSComponentCertificate(BaseModel, ShodanDataHandler, CensysDataHandler, B
             expires=None,
             expired=None,
             alternative_names=d.get("names", None),
-            sha256=d["fingerprint"]
+            sha256=d["fingerprint"],
+            trusted=trusted
         )
 
     @classmethod
@@ -303,6 +316,7 @@ class TLSComponentCertificate(BaseModel, ShodanDataHandler, CensysDataHandler, B
         issued = datetime.fromisoformat(data["validity"]["not_before"]).replace(tzinfo=pytz.utc)
         expires = datetime.fromisoformat(data["validity"]["not_after"]).replace(tzinfo=pytz.utc)
         expired = datetime.utcnow().replace(tzinfo=pytz.utc) < expires
+        trusted = not data.get("self_issued", False) or data.get("self_signed", False)
         return TLSComponentCertificate(
             issuer=TLSComponentCertificateEntity.from_binaryedge(data["issuer"]),
             subject=TLSComponentCertificateEntity.from_binaryedge(data["subject"]),
@@ -313,7 +327,8 @@ class TLSComponentCertificate(BaseModel, ShodanDataHandler, CensysDataHandler, B
             pem=pem,
             md5=md5,
             sha1=sha1,
-            sha256=sha256
+            sha256=sha256,
+            trusted=trusted
         )
 
 
@@ -368,7 +383,7 @@ class TLSComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDa
             )
         ja3 = None
         if "server_info" in data:
-            ja3 = data["server_info"]["ja3_digest"]
+            ja3 = data["server_info"].get("ja3_digest", None)
 
         jarm = None
         if "jarm_hash" in data:
