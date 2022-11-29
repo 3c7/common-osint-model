@@ -74,7 +74,7 @@ class TLSComponentCertificateEntity(BaseModel, ShodanDataHandler, CensysDataHand
     def from_censys(cls, d: Dict):
         """Creates an instance of this class based on Censys data given as dictionary."""
         if all(key not in d for key in ["common_name", "locality", "organization", "organizational_unit", "province"]):
-            raise KeyError("The dictionary given to TLSComponentCertificateEntity.from_shodan is missing the typical "
+            raise KeyError("The dictionary given to TLSComponentCertificateEntity.from_censys is missing the typical "
                            "censys keys.")
 
         c = d.get("country", [])
