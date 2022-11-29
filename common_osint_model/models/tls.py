@@ -233,7 +233,6 @@ class TLSComponentCertificate(BaseModel, ShodanDataHandler, CensysDataHandler, B
         if len(certificate_chain) == 1:
             pem = certificate_chain[0]
             cert = load_pem_x509_certificate(pem.encode("utf-8"))
-            trusted = False
         # If there are multiple certificates given, we need to loop over them and compare the common name. This _can_
         # lead to ValueError if the certificates are malformed, such as empty Country values etc. This is why
         # >>> cert.subject.get_attributes_for_oid(OID_COMMON_NAME)
