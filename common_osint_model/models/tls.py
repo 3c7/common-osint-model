@@ -11,7 +11,7 @@ from pydantic import BaseModel
 from common_osint_model.models import ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger
 
 
-class TLSComponentCertificateEntity(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler):
+class TLSComponentCertificateEntity(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger):
     """Represents certificate entities, typically issuer and subject."""
     dn: Optional[str]
     country: Optional[str]
@@ -23,11 +23,11 @@ class TLSComponentCertificateEntity(BaseModel, ShodanDataHandler, CensysDataHand
     email_address: Optional[str]
 
     @classmethod
-    def from_shodan(cls, d: Dict):
+    def from_shodan(cls, d: Dict) -> Union["TLSComponentCertificateEntity", None]:
         """Creates an instance of this class using a given Shodan data dictionary."""
         if all(key not in d for key in ["C", "L", "CN", "O", "ST"]):
-            raise KeyError("The dictionary given to TLSComponentCertificateEntity.from_shodan is missing the typical "
-                           "shodan keys.")
+            cls.warning(f"The dictionary given does not contain typical values for issuer/subject.")
+            return None
 
         c = d.get("C", None)
         st = d.get("ST", None)
@@ -67,7 +67,7 @@ class TLSComponentCertificateEntity(BaseModel, ShodanDataHandler, CensysDataHand
             organization=o,
             organizational_unit=ou,
             common_name=cn,
-            email=email
+            email_address=email
         )
 
     @classmethod
@@ -198,7 +198,7 @@ class TLSComponentCertificate(BaseModel, ShodanDataHandler, CensysDataHandler, B
     @property
     def domains(self) -> List[str]:
         domains = []
-        if self.subject.common_name:
+        if self.subject and self.subject.common_name:
             domains.append(self.subject.common_name)
         if self.alternative_names:
             domains.extend(self.alternative_names)
