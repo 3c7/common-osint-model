@@ -3,6 +3,7 @@ from typing import Dict, List, Optional, Union
 
 import mmh3
 from pydantic import BaseModel
+from hhhash import hash_from_banner
 
 from common_osint_model.models import ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger
 from common_osint_model.utils import hash_all
@@ -111,7 +112,7 @@ class HTTPComponentContentSecurity(BaseModel, ShodanDataHandler, CensysDataHandl
 
         raw = d["http"]["securitytxt"].encode("utf-8")
         md5, sha1, sha256, murmur = hash_all(raw)
-        return HTTPComponentContentRobots(
+        return HTTPComponentContentSecurity(
             raw=raw,
             md5=md5,
             sha1=sha1,
@@ -219,6 +220,7 @@ class HTTPComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeD
     headers: Optional[Dict[str, str]]
     content: Optional[HTTPComponentContent]
     shodan_headers_hash: Optional[str]
+    hhhash: Optional[str]
 
     @classmethod
     def from_shodan(cls, d: Dict):
@@ -240,7 +242,8 @@ class HTTPComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeD
         return HTTPComponent(
             headers=headers,
             content=content,
-            shodan_headers_hash=d.get("http", {}).get("headers_hash", None)
+            shodan_headers_hash=d.get("http", {}).get("headers_hash", None),
+            hhhash=hash_from_banner(banner)
         )
 
     @classmethod
@@ -267,7 +270,8 @@ class HTTPComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeD
         return HTTPComponent(
             headers=headers,
             content=HTTPComponentContent.from_censys(d),
-            shodan_headers_hash=headers_hash
+            shodan_headers_hash=headers_hash,
+            hhhash=hash_from_banner(d["banner"])
         )
 
     @classmethod
