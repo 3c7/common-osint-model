@@ -3,6 +3,7 @@ from typing import Dict, List, Optional, Union
 
 import mmh3
 from pydantic import BaseModel
+from hhhash import hash_from_banner
 
 from common_osint_model.models import ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger
 from common_osint_model.utils import hash_all
@@ -111,7 +112,7 @@ class HTTPComponentContentSecurity(BaseModel, ShodanDataHandler, CensysDataHandl
 
         raw = d["http"]["securitytxt"].encode("utf-8")
         md5, sha1, sha256, murmur = hash_all(raw)
-        return HTTPComponentContentRobots(
+        return HTTPComponentContentSecurity(
             raw=raw,
             md5=md5,
             sha1=sha1,
