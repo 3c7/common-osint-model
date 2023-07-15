@@ -220,6 +220,7 @@ class HTTPComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeD
     headers: Optional[Dict[str, str]]
     content: Optional[HTTPComponentContent]
     shodan_headers_hash: Optional[str]
+    hhhash: Optional[str]
 
     @classmethod
     def from_shodan(cls, d: Dict):
@@ -241,7 +242,8 @@ class HTTPComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeD
         return HTTPComponent(
             headers=headers,
             content=content,
-            shodan_headers_hash=d.get("http", {}).get("headers_hash", None)
+            shodan_headers_hash=d.get("http", {}).get("headers_hash", None),
+            hhhash=hash_from_banner(banner)
         )
 
     @classmethod
@@ -268,7 +270,8 @@ class HTTPComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeD
         return HTTPComponent(
             headers=headers,
             content=HTTPComponentContent.from_censys(d),
-            shodan_headers_hash=headers_hash
+            shodan_headers_hash=headers_hash,
+            hhhash=hash_from_banner(d["banner"])
         )
 
     @classmethod

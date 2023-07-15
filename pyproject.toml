@@ -19,6 +19,7 @@ DateTime = "^4.3"
 mmh3 = "^3.0.0"
 cryptography = "^38.0.3"
 pydantic = "^1.8.2"
+hhhash = "^0.3"
 
 [tool.poetry.dev-dependencies]
 
