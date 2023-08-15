@@ -96,22 +96,6 @@ for idx, service in enumerate(host.services):
 
 print("Exporting data as flattened json blob for further use, e.g. Elasticsearch indexing...")
 print(host.flattened_json())
-
-# Pre-v0.4.0 (Dictionary based approach - DEPRECATED)
-from common_osint_model import from_shodan, from_shodan_flattened, from_censys_ipv4, from_censys_ipv4_flattened,
-    from_x509_pem, from_x509_pem_flattened
-
-raw_shodan = get_my_shodan_data()
-converted_s = from_shodan(raw_shodan)  # Deprecated
-flattened_s = from_shodan_flattened(raw_shodan)  # Deprecated
-
-raw_censys_ipv4 = get_my_censys_ipv4_data()
-converted_c = from_censys_ipv4(raw_censys_ipv4)
-flattened_c = from_censys_ipv4_flattened(raw_censys_ipv4)
-
-raw_certificate = open('certificate.pem').read()
-converted_certificate = from_x509_pem(raw_shodan)
-flattened_certificate = from_x509_pem_flattened(raw_shodan)
 ```
 
 ### Example output
