@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Dict, List, Optional
 
 from pydantic import BaseModel
@@ -24,8 +24,8 @@ class Service(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHan
     murmur: Optional[str]
     # Every service object should include these timestamps. "timestamp" can be used for tracking the observation
     # timestamp from scanning services (e.g. Shodan)
-    first_seen: Optional[datetime] = datetime.utcnow()
-    last_seen: Optional[datetime] = datetime.utcnow()
+    first_seen: Optional[datetime] = datetime.now(UTC)
+    last_seen: Optional[datetime] = datetime.now(UTC)
     timestamp: Optional[datetime]
     # We need to include every possible service component here. In order to not export empty dictionary keys, the class
     # object can be exported with dict(exclude_none=True), so e.g. empty tls keys are skipped.

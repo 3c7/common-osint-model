@@ -1,5 +1,5 @@
 import binascii
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Dict, List, Optional, Union
 
 import pytz
@@ -314,7 +314,7 @@ class TLSComponentCertificate(BaseModel, ShodanDataHandler, CensysDataHandler, B
         )
         issued = datetime.fromisoformat(data["validity"]["not_before"]).replace(tzinfo=pytz.utc)
         expires = datetime.fromisoformat(data["validity"]["not_after"]).replace(tzinfo=pytz.utc)
-        expired = datetime.utcnow().replace(tzinfo=pytz.utc) < expires
+        expired = datetime.now(UTC) < expires
         trusted = not data.get("self_issued", False) or data.get("self_signed", False)
         return TLSComponentCertificate(
             issuer=TLSComponentCertificateEntity.from_binaryedge(data["issuer"]),

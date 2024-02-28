@@ -1,6 +1,6 @@
 import ipaddress
 import json
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Optional, Dict, List, Union
 
 from pydantic import BaseModel, validator
@@ -22,8 +22,8 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
     # List of open ports also mentioned in the open
     ports: Optional[List[int]]
     # Timestamps for activity tracking
-    first_seen: Optional[datetime] = datetime.utcnow()
-    last_seen: Optional[datetime] = datetime.utcnow()
+    first_seen: Optional[datetime] = datetime.now(UTC)
+    last_seen: Optional[datetime] = datetime.now(UTC)
     # A list of domains, fqdns, common names - or other attributes which represent domainnames -  assigned to the host
     domains: Optional[List[Domain]]
     # This represents the source where the host information was obtained, e.g. shodan, censys...
