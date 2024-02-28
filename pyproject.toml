@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "common-osint-model"
-version = "0.5.0-beta1"
+version = "0.5.0"
 description = "Converting data from services like BinaryEdge, Censys and Shodan to a common data model."
 authors = ["3c7 <3c7@posteo.de>"]
 license = "MIT"
@@ -17,7 +17,7 @@ classifiers = [
 python = "^3.8"
 DateTime = "^4.3"
 mmh3 = "^3.0.0"
-cryptography = "^41.0.2"
+cryptography = "^42.0.5"
 pydantic = "^1.8.2"
 hhhash = "^0.3"
 
