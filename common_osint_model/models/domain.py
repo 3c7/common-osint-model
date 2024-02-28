@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Optional, List
 
 from pydantic import BaseModel
@@ -15,15 +15,15 @@ class Entity(BaseModel):
     postal_code: Optional[str]
     country: Optional[str]
     phone: Optional[str]
-    timestamp: datetime = datetime.utcnow()
+    timestamp: datetime = datetime.now(UTC)
 
 
 class Domain(BaseModel):
     """Represents a domain pointing to a specific host. Also, this object might be used to represent found via other
     sources, therefore a 'query' field might contain the query used to find it"""
     domain: str
-    first_seen: datetime = datetime.utcnow()
-    last_seen: datetime = datetime.utcnow()
+    first_seen: datetime = datetime.now(UTC)
+    last_seen: datetime = datetime.now(UTC)
     source: Optional[str]
     type: Optional[str]
     soa: Optional[List[str]]
