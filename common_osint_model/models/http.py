@@ -5,12 +5,20 @@ import mmh3
 from pydantic import BaseModel
 from hhhash import hash_from_banner
 
-from common_osint_model.models import ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger
+from common_osint_model.models import (
+    ShodanDataHandler,
+    CensysDataHandler,
+    BinaryEdgeDataHandler,
+    Logger,
+)
 from common_osint_model.utils import hash_all
 
 
-class HTTPComponentContentFavicon(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger):
+class HTTPComponentContentFavicon(
+    BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger
+):
     """Represents the favicon which might be included in HTTP components."""
+
     raw: Optional[str]
     md5: Optional[str]
     sha1: Optional[str]
@@ -22,23 +30,27 @@ class HTTPComponentContentFavicon(BaseModel, ShodanDataHandler, CensysDataHandle
     def from_shodan(cls, d: Dict):
         """Creates an instance of this class based on Shodan data given as dictionary."""
         if not isinstance(d, Dict):
-            raise TypeError(f"Method HTTPComponentContentFavicon.from_shodan expects parameter d to be a dictionary, "
-                            f"but it was {type(d)}.")
+            raise TypeError(
+                f"Method HTTPComponentContentFavicon.from_shodan expects parameter d to be a dictionary, "
+                f"but it was {type(d)}."
+            )
 
         raw = d["http"]["favicon"]["data"]
         raw = base64.b64decode(raw)
         md5, sha1, sha256, murmur = hash_all(raw)
         shodan_murmur = mmh3.hash(d["http"]["favicon"]["data"])
-        cls.info("Shodan's favicon hash only hashes the base64 encoded favicon, not the data itself. The hash can be "
-                 "found as \"shodan_murmur\" in this instance. \"murmur\" and the other hashes are calculated based on "
-                 "the raw data of the favicon.")
+        cls.info(
+            "Shodan's favicon hash only hashes the base64 encoded favicon, not the data itself. The hash can be "
+            'found as "shodan_murmur" in this instance. "murmur" and the other hashes are calculated based on '
+            "the raw data of the favicon."
+        )
         return HTTPComponentContentFavicon(
             raw=d["http"]["favicon"]["data"],
             md5=md5,
             sha1=sha1,
             sha256=sha256,
             murmur=murmur,
-            shodan_murmur=shodan_murmur
+            shodan_murmur=shodan_murmur,
         )
 
     @classmethod
@@ -58,12 +70,13 @@ class HTTPComponentContentFavicon(BaseModel, ShodanDataHandler, CensysDataHandle
             sha1=sha1,
             sha256=sha256,
             murmur=murmur,
-            shodan_murmur=shodan_murmur
+            shodan_murmur=shodan_murmur,
         )
 
 
 class HTTPComponentContentRobots(BaseModel, ShodanDataHandler, CensysDataHandler):
     """Represents the robots.txt file in webroots."""
+
     raw: Optional[str]
     md5: Optional[str]
     sha1: Optional[str]
@@ -76,16 +89,13 @@ class HTTPComponentContentRobots(BaseModel, ShodanDataHandler, CensysDataHandler
         if not isinstance(d, Dict):
             raise TypeError(
                 f"Method HTTPComponentContentRobots.from_shodan expects parameter d to be a dictionary, "
-                f"but it was {type(d)}.")
+                f"but it was {type(d)}."
+            )
 
         raw = d["http"]["robots"].encode("utf-8")
         md5, sha1, sha256, murmur = hash_all(raw)
         return HTTPComponentContentRobots(
-            raw=raw,
-            md5=md5,
-            sha1=sha1,
-            sha256=sha256,
-            murmur=murmur
+            raw=raw, md5=md5, sha1=sha1, sha256=sha256, murmur=murmur
         )
 
     @classmethod
@@ -96,6 +106,7 @@ class HTTPComponentContentRobots(BaseModel, ShodanDataHandler, CensysDataHandler
 
 class HTTPComponentContentSecurity(BaseModel, ShodanDataHandler, CensysDataHandler):
     """Represents the security.txt file in webroots."""
+
     raw: Optional[str]
     md5: Optional[str]
     sha1: Optional[str]
@@ -108,16 +119,13 @@ class HTTPComponentContentSecurity(BaseModel, ShodanDataHandler, CensysDataHandl
         if not isinstance(d, Dict):
             raise TypeError(
                 f"Method HTTPComponentContentRobots.from_shodan expects parameter d to be a dictionary, "
-                f"but it was {type(d)}.")
+                f"but it was {type(d)}."
+            )
 
         raw = d["http"]["securitytxt"].encode("utf-8")
         md5, sha1, sha256, murmur = hash_all(raw)
         return HTTPComponentContentSecurity(
-            raw=raw,
-            md5=md5,
-            sha1=sha1,
-            sha256=sha256,
-            murmur=murmur
+            raw=raw, md5=md5, sha1=sha1, sha256=sha256, murmur=murmur
         )
 
     @classmethod
@@ -126,8 +134,11 @@ class HTTPComponentContentSecurity(BaseModel, ShodanDataHandler, CensysDataHandl
         return None
 
 
-class HTTPComponentContent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger):
+class HTTPComponentContent(
+    BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger
+):
     """Represents the content (body) of HTTP responses."""
+
     raw: Optional[str]
     length: Optional[int]
     md5: Optional[str]
@@ -142,8 +153,10 @@ class HTTPComponentContent(BaseModel, ShodanDataHandler, CensysDataHandler, Bina
     def from_shodan(cls, d: Dict):
         """Creates an instance of this class based on Shodan data given as dictionary."""
         if not isinstance(d, Dict):
-            raise TypeError(f"Method HTTPComponentContent.from_shodan expects parameter d to be a dictionary, "
-                            f"but it was {type(d)}.")
+            raise TypeError(
+                f"Method HTTPComponentContent.from_shodan expects parameter d to be a dictionary, "
+                f"but it was {type(d)}."
+            )
 
         favicon = None
         if "favicon" in d["http"]:
@@ -164,7 +177,13 @@ class HTTPComponentContent(BaseModel, ShodanDataHandler, CensysDataHandler, Bina
         if not raw:
             raw = ""
 
-        raw = raw.encode("utf-8")
+        try:
+            raw = raw.encode("utf-8")
+        except UnicodeEncodeError as uee:
+            # TODO: This is very ugly, but spontanously I can't find a solution for the weird Shodan encoding issue.
+            cls.error(f"UnicodeEncodeError during Shodan result encoding: {uee}")
+            cls.warning("Using empty strings as HTML body.")
+            raw = "".encode("utf-8")
 
         md5, sha1, sha256, murmur = hash_all(raw)
         return HTTPComponentContent(
@@ -176,7 +195,7 @@ class HTTPComponentContent(BaseModel, ShodanDataHandler, CensysDataHandler, Bina
             murmur=murmur,
             favicon=favicon,
             robots_txt=robots_txt,
-            security_txt=security_txt
+            security_txt=security_txt,
         )
 
     @classmethod
@@ -194,7 +213,7 @@ class HTTPComponentContent(BaseModel, ShodanDataHandler, CensysDataHandler, Bina
             murmur=murmur,
             favicon=HTTPComponentContentFavicon.from_censys(d),
             robots_txt=HTTPComponentContentRobots.from_censys(d),
-            security_txt=HTTPComponentContentSecurity.from_censys(d)
+            security_txt=HTTPComponentContentSecurity.from_censys(d),
         )
 
     @classmethod
@@ -211,12 +230,15 @@ class HTTPComponentContent(BaseModel, ShodanDataHandler, CensysDataHandler, Bina
             sha1=sha1,
             sha256=sha256,
             murmur=murmur,
-            favicon=HTTPComponentContentFavicon.from_binaryedge(d)
+            favicon=HTTPComponentContentFavicon.from_binaryedge(d),
         )
 
 
-class HTTPComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler):
+class HTTPComponent(
+    BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler
+):
     """Represents the HTTP component of services."""
+
     headers: Optional[Dict[str, str]]
     content: Optional[HTTPComponentContent]
     shodan_headers_hash: Optional[str]
@@ -226,8 +248,10 @@ class HTTPComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeD
     def from_shodan(cls, d: Dict):
         """Creates an instance of this class based on Shodan data given as dictionary."""
         if not isinstance(d, Dict):
-            raise TypeError(f"Method HTTPComponent.from_shodan expects parameter d to be a dictionary, "
-                            f"but it was {type(d)}.")
+            raise TypeError(
+                f"Method HTTPComponent.from_shodan expects parameter d to be a dictionary, "
+                f"but it was {type(d)}."
+            )
 
         content = HTTPComponentContent.from_shodan(d)
         banner = d["data"]
@@ -243,7 +267,7 @@ class HTTPComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeD
             headers=headers,
             content=content,
             shodan_headers_hash=d.get("http", {}).get("headers_hash", None),
-            hhhash=hash_from_banner(banner)
+            hhhash=hash_from_banner(banner),
         )
 
     @classmethod
@@ -255,9 +279,7 @@ class HTTPComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeD
             if k[0] == "_":
                 continue
 
-            headers.update({
-                k.replace("_", "-"): " ".join(v)
-            })
+            headers.update({k.replace("_", "-"): " ".join(v)})
 
         banner_lines = d["banner"].replace("\r", "").split("\n")
         banner_keys = banner_lines[0]
@@ -271,7 +293,7 @@ class HTTPComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeD
             headers=headers,
             content=HTTPComponentContent.from_censys(d),
             shodan_headers_hash=headers_hash,
-            hhhash=hash_from_banner(d["banner"])
+            hhhash=hash_from_banner(d["banner"]),
         )
 
     @classmethod
@@ -279,6 +301,5 @@ class HTTPComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeD
         http_response = d["result"]["data"]["response"]
         headers = http_response["headers"]["headers"]
         return HTTPComponent(
-            headers=headers,
-            content=HTTPComponentContent.from_binaryedge(d)
+            headers=headers, content=HTTPComponentContent.from_binaryedge(d)
         )
