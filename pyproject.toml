@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "common-osint-model"
-version = "0.5.0"
+version = "0.5.1"
 description = "Converting data from services like BinaryEdge, Censys and Shodan to a common data model."
 authors = ["3c7 <3c7@posteo.de>"]
 license = "MIT"
@@ -8,9 +8,9 @@ readme = "README.md"
 homepage = "https://github.com/3c7/common-osint-model"
 repository = "https://github.com/3c7/common-osint-model"
 classifiers = [
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent"
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
 ]
 
 [tool.poetry.dependencies]
