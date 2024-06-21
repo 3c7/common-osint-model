@@ -1,20 +1,21 @@
 import ipaddress
 from typing import Dict, List, Optional
 
-from pydantic import BaseModel, validator
+from pydantic import field_validator, BaseModel
 
 from common_osint_model.models import ShodanDataHandler, CensysDataHandler, Logger
 
 
 class AutonomousSystem(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
     """Represents an autonomous system"""
-    number: Optional[int]
-    name: Optional[str]
-    country: Optional[str]
-    prefix: Optional[str]
+    number: Optional[int] = None
+    name: Optional[str] = None
+    country: Optional[str] = None
+    prefix: Optional[str] = None
     source: str
 
-    @validator("prefix")
+    @field_validator("prefix")
+    @classmethod
     def validate_prefix(cls, v):
         if not v:
             return v

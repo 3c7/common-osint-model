@@ -18,10 +18,13 @@ python = "^3.8"
 DateTime = "^4.3"
 mmh3 = "^3.0.0"
 cryptography = "^42.0.5"
-pydantic = "^1.8.2"
+pydantic = "^2.7.4"
 hhhash = "^0.3"
 
 [tool.poetry.dev-dependencies]
+
+[tool.poetry.group.dev.dependencies]
+bump-pydantic = "^0.8.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

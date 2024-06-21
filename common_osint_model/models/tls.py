@@ -13,14 +13,14 @@ from common_osint_model.models import ShodanDataHandler, CensysDataHandler, Bina
 
 class TLSComponentCertificateEntity(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger):
     """Represents certificate entities, typically issuer and subject."""
-    dn: Optional[str]
-    country: Optional[str]
-    state: Optional[str]
-    locality: Optional[str]
-    organization: Optional[str]
-    organizational_unit: Optional[str]
-    common_name: Optional[str]
-    email_address: Optional[str]
+    dn: Optional[str] = None
+    country: Optional[str] = None
+    state: Optional[str] = None
+    locality: Optional[str] = None
+    organization: Optional[str] = None
+    organizational_unit: Optional[str] = None
+    common_name: Optional[str] = None
+    email_address: Optional[str] = None
 
     @classmethod
     def from_shodan(cls, d: Dict) -> Union["TLSComponentCertificateEntity", None]:
@@ -179,21 +179,21 @@ class TLSComponentCertificateEntity(BaseModel, ShodanDataHandler, CensysDataHand
 
 class TLSComponentCertificate(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger):
     """Represents certificates."""
-    issuer: Optional[TLSComponentCertificateEntity]
-    subject: Optional[TLSComponentCertificateEntity]
-    issued: Optional[datetime]
-    expires: Optional[datetime]
-    expired: Optional[bool]
+    issuer: Optional[TLSComponentCertificateEntity] = None
+    subject: Optional[TLSComponentCertificateEntity] = None
+    issued: Optional[datetime] = None
+    expires: Optional[datetime] = None
+    expired: Optional[bool] = None
     # More specifically, this is a certificate extension, but we keep it here because it's easier this way.
-    alternative_names: Optional[List[str]]
+    alternative_names: Optional[List[str]] = None
     # The certificate itself
-    pem: Optional[str]
-    md5: Optional[str]
-    sha1: Optional[str]
-    sha256: Optional[str]
-    murmur: Optional[str]
+    pem: Optional[str] = None
+    md5: Optional[str] = None
+    sha1: Optional[str] = None
+    sha256: Optional[str] = None
+    murmur: Optional[str] = None
     # If the certificate is trusted by the source
-    trusted: Optional[bool]
+    trusted: Optional[bool] = None
 
     @property
     def domains(self) -> List[str]:
@@ -333,10 +333,10 @@ class TLSComponentCertificate(BaseModel, ShodanDataHandler, CensysDataHandler, B
 
 class TLSComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger):
     """Represents the TLS component of services."""
-    certificate: Optional[TLSComponentCertificate]
-    ja3: Optional[str]
-    ja3s: Optional[str]
-    jarm: Optional[str]
+    certificate: Optional[TLSComponentCertificate] = None
+    ja3: Optional[str] = None
+    ja3s: Optional[str] = None
+    jarm: Optional[str] = None
 
     # Todo: Add other attributes relevant to TLS such as CipherSuits etc.
 

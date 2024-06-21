@@ -11,11 +11,11 @@ from common_osint_model.utils import hash_all
 
 class SSHComponentAlgorithms(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger):
     """Represents algorithms supported by SSH server."""
-    encryption: Optional[List[str]]
-    key_exchange: Optional[List[str]]
-    mac: Optional[List[str]]
-    key_algorithms: Optional[List[str]]
-    compression: Optional[List[str]]
+    encryption: Optional[List[str]] = None
+    key_exchange: Optional[List[str]] = None
+    mac: Optional[List[str]] = None
+    key_algorithms: Optional[List[str]] = None
+    compression: Optional[List[str]] = None
 
     @classmethod
     def from_shodan(cls, d: Dict) -> Union["SSHComponentAlgorithms", None]:
@@ -69,12 +69,12 @@ class SSHComponentAlgorithms(BaseModel, ShodanDataHandler, CensysDataHandler, Bi
 class SSHComponentKey(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger):
     """Represents the public key exposed by the SSH server."""
     # Type represents the ssh-key type, e.g. ssh-rsa
-    raw: Optional[str]
-    type: Optional[str]
-    md5: Optional[str]
-    sha1: Optional[str]
-    sha256: Optional[str]
-    murmur: Optional[str]
+    raw: Optional[str] = None
+    type: Optional[str] = None
+    md5: Optional[str] = None
+    sha1: Optional[str] = None
+    sha256: Optional[str] = None
+    murmur: Optional[str] = None
 
     @classmethod
     def from_shodan(cls, d: Dict) -> Union["SSHComponentKey", None]:
@@ -173,9 +173,9 @@ class SSHComponentKey(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdg
 
 class SSHComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger):
     """Represents the SSH component of services."""
-    algorithms: Optional[SSHComponentAlgorithms]
-    key: Optional[SSHComponentKey]
-    hassh: Optional[str]
+    algorithms: Optional[SSHComponentAlgorithms] = None
+    key: Optional[SSHComponentKey] = None
+    hassh: Optional[str] = None
 
     @classmethod
     def from_shodan(cls, d: Dict):

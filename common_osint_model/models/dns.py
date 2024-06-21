@@ -4,7 +4,7 @@ from common_osint_model.models import ShodanDataHandler, CensysDataHandler
 
 
 class DNSComponent(BaseModel, ShodanDataHandler, CensysDataHandler):
-    recursive: Optional[bool]
+    recursive: Optional[bool] = None
 
     @classmethod
     def from_shodan(cls, d: Dict):
