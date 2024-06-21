@@ -287,7 +287,7 @@ class HTTPComponent(
             if ":" in line:
                 k, _ = line.split(":", maxsplit=1)
                 banner_keys += "\n" + k
-        headers_hash = mmh3.hash(banner_keys.encode("utf-8"))
+        headers_hash = str(mmh3.hash(banner_keys.encode("utf-8")))
 
         return HTTPComponent(
             headers=headers,
