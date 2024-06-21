@@ -38,7 +38,7 @@ class HTTPComponentContentFavicon(
         raw = d["http"]["favicon"]["data"]
         raw = base64.b64decode(raw)
         md5, sha1, sha256, murmur = hash_all(raw)
-        shodan_murmur = mmh3.hash(d["http"]["favicon"]["data"])
+        shodan_murmur = str(mmh3.hash(d["http"]["favicon"]["data"]))
         cls.info(
             "Shodan's favicon hash only hashes the base64 encoded favicon, not the data itself. The hash can be "
             'found as "shodan_murmur" in this instance. "murmur" and the other hashes are calculated based on '
@@ -55,7 +55,10 @@ class HTTPComponentContentFavicon(
 
     @classmethod
     def from_censys(cls, d: Dict):
-        """Not supported by Censys right now."""
+        """
+        Not supported by Censys right now.
+        TODO: Censys implemented Favicons.
+        """
         return None
 
     @classmethod
@@ -63,7 +66,7 @@ class HTTPComponentContentFavicon(
         favicon = d["result"]["data"]["response"]["favicon"]["content"]
         favicon_bytes = base64.b64decode(favicon.encode("utf-8"))
         md5, sha1, sha256, murmur = hash_all(favicon_bytes)
-        shodan_murmur = mmh3.hash(favicon.encode("utf-8"))
+        shodan_murmur = str(mmh3.hash(favicon.encode("utf-8")))
         return HTTPComponentContentFavicon(
             raw=favicon,
             md5=md5,
