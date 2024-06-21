@@ -257,16 +257,15 @@ class HTTPComponent(
         banner = d["data"]
         lines = banner.split("\r\n")
         headers = {}
-        banner_keys = lines[0]
         for line in lines:
             if ":" in line:
                 key, value = line.split(":", maxsplit=1)
                 headers[key.strip()] = value.strip()
-
+        headers_hash = d.get("http", {}).get("headers_hash", None)
         return HTTPComponent(
             headers=headers,
             content=content,
-            shodan_headers_hash=d.get("http", {}).get("headers_hash", None),
+            shodan_headers_hash=str(headers_hash) if headers_hash else None,
             hhhash=hash_from_banner(banner),
         )
 
