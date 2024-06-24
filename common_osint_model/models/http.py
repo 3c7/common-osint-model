@@ -19,12 +19,12 @@ class HTTPComponentContentFavicon(
 ):
     """Represents the favicon which might be included in HTTP components."""
 
-    raw: Optional[str]
-    md5: Optional[str]
-    sha1: Optional[str]
-    sha256: Optional[str]
-    murmur: Optional[str]
-    shodan_murmur: Optional[str]
+    raw: Optional[str] = None
+    md5: Optional[str] = None
+    sha1: Optional[str] = None
+    sha256: Optional[str] = None
+    murmur: Optional[str] = None
+    shodan_murmur: Optional[str] = None
 
     @classmethod
     def from_shodan(cls, d: Dict):
@@ -38,7 +38,7 @@ class HTTPComponentContentFavicon(
         raw = d["http"]["favicon"]["data"]
         raw = base64.b64decode(raw)
         md5, sha1, sha256, murmur = hash_all(raw)
-        shodan_murmur = mmh3.hash(d["http"]["favicon"]["data"])
+        shodan_murmur = str(mmh3.hash(d["http"]["favicon"]["data"]))
         cls.info(
             "Shodan's favicon hash only hashes the base64 encoded favicon, not the data itself. The hash can be "
             'found as "shodan_murmur" in this instance. "murmur" and the other hashes are calculated based on '
@@ -55,7 +55,10 @@ class HTTPComponentContentFavicon(
 
     @classmethod
     def from_censys(cls, d: Dict):
-        """Not supported by Censys right now."""
+        """
+        Not supported by Censys right now.
+        TODO: Censys implemented Favicons.
+        """
         return None
 
     @classmethod
@@ -63,7 +66,7 @@ class HTTPComponentContentFavicon(
         favicon = d["result"]["data"]["response"]["favicon"]["content"]
         favicon_bytes = base64.b64decode(favicon.encode("utf-8"))
         md5, sha1, sha256, murmur = hash_all(favicon_bytes)
-        shodan_murmur = mmh3.hash(favicon.encode("utf-8"))
+        shodan_murmur = str(mmh3.hash(favicon.encode("utf-8")))
         return HTTPComponentContentFavicon(
             raw=favicon,
             md5=md5,
@@ -77,11 +80,11 @@ class HTTPComponentContentFavicon(
 class HTTPComponentContentRobots(BaseModel, ShodanDataHandler, CensysDataHandler):
     """Represents the robots.txt file in webroots."""
 
-    raw: Optional[str]
-    md5: Optional[str]
-    sha1: Optional[str]
-    sha256: Optional[str]
-    murmur: Optional[str]
+    raw: Optional[str] = None
+    md5: Optional[str] = None
+    sha1: Optional[str] = None
+    sha256: Optional[str] = None
+    murmur: Optional[str] = None
 
     @classmethod
     def from_shodan(cls, d: Dict):
@@ -107,11 +110,11 @@ class HTTPComponentContentRobots(BaseModel, ShodanDataHandler, CensysDataHandler
 class HTTPComponentContentSecurity(BaseModel, ShodanDataHandler, CensysDataHandler):
     """Represents the security.txt file in webroots."""
 
-    raw: Optional[str]
-    md5: Optional[str]
-    sha1: Optional[str]
-    sha256: Optional[str]
-    murmur: Optional[str]
+    raw: Optional[str] = None
+    md5: Optional[str] = None
+    sha1: Optional[str] = None
+    sha256: Optional[str] = None
+    murmur: Optional[str] = None
 
     @classmethod
     def from_shodan(cls, d: Dict):
@@ -139,15 +142,15 @@ class HTTPComponentContent(
 ):
     """Represents the content (body) of HTTP responses."""
 
-    raw: Optional[str]
-    length: Optional[int]
-    md5: Optional[str]
-    sha1: Optional[str]
-    sha256: Optional[str]
-    murmur: Optional[str]
-    favicon: Optional[HTTPComponentContentFavicon]
-    robots_txt: Optional[HTTPComponentContentRobots]
-    security_txt: Optional[HTTPComponentContentSecurity]
+    raw: Optional[str] = None
+    length: Optional[int] = None
+    md5: Optional[str] = None
+    sha1: Optional[str] = None
+    sha256: Optional[str] = None
+    murmur: Optional[str] = None
+    favicon: Optional[HTTPComponentContentFavicon] = None
+    robots_txt: Optional[HTTPComponentContentRobots] = None
+    security_txt: Optional[HTTPComponentContentSecurity] = None
 
     @classmethod
     def from_shodan(cls, d: Dict):
@@ -239,10 +242,10 @@ class HTTPComponent(
 ):
     """Represents the HTTP component of services."""
 
-    headers: Optional[Dict[str, str]]
-    content: Optional[HTTPComponentContent]
-    shodan_headers_hash: Optional[str]
-    hhhash: Optional[str]
+    headers: Optional[Dict[str, str]] = None
+    content: Optional[HTTPComponentContent] = None
+    shodan_headers_hash: Optional[str] = None
+    hhhash: Optional[str] = None
 
     @classmethod
     def from_shodan(cls, d: Dict):
@@ -257,16 +260,15 @@ class HTTPComponent(
         banner = d["data"]
         lines = banner.split("\r\n")
         headers = {}
-        banner_keys = lines[0]
         for line in lines:
             if ":" in line:
                 key, value = line.split(":", maxsplit=1)
                 headers[key.strip()] = value.strip()
-
+        headers_hash = d.get("http", {}).get("headers_hash", None)
         return HTTPComponent(
             headers=headers,
             content=content,
-            shodan_headers_hash=d.get("http", {}).get("headers_hash", None),
+            shodan_headers_hash=str(headers_hash) if headers_hash else None,
             hhhash=hash_from_banner(banner),
         )
 
@@ -287,7 +289,7 @@ class HTTPComponent(
             if ":" in line:
                 k, _ = line.split(":", maxsplit=1)
                 banner_keys += "\n" + k
-        headers_hash = mmh3.hash(banner_keys.encode("utf-8"))
+        headers_hash = str(mmh3.hash(banner_keys.encode("utf-8")))
 
         return HTTPComponent(
             headers=headers,

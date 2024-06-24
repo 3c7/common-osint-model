@@ -3,7 +3,7 @@ import json
 from datetime import datetime, UTC
 from typing import Optional, Dict, List, Union
 
-from pydantic import BaseModel, validator
+from pydantic import field_validator, BaseModel
 
 from common_osint_model.models import ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger
 from common_osint_model.models.autonomous_system import AutonomousSystem
@@ -16,23 +16,24 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
     """This class represents a host and can be used to handle results from the common model in a pythonic way."""
     ip: str
     # Information about the autonomous system the host is assigned to
-    autonomous_system: Optional[AutonomousSystem]
+    autonomous_system: Optional[AutonomousSystem] = None
     # List of services running (listening) on the IP
-    services: Optional[List[Service]]
+    services: Optional[List[Service]] = None
     # List of open ports also mentioned in the open
-    ports: Optional[List[int]]
+    ports: Optional[List[int]] = None
     # Timestamps for activity tracking
     first_seen: Optional[datetime] = datetime.now(UTC)
     last_seen: Optional[datetime] = datetime.now(UTC)
     # A list of domains, fqdns, common names - or other attributes which represent domainnames -  assigned to the host
-    domains: Optional[List[Domain]]
+    domains: Optional[List[Domain]] = None
     # This represents the source where the host information was obtained, e.g. shodan, censys...
-    source: Optional[str]
+    source: Optional[str] = None
     # Optionally, the used query to find the host can be assigned to the object also which might be useful for comparing
     # different hosts later on
-    query: Optional[str]
+    query: Optional[str] = None
 
-    @validator("ip")
+    @field_validator("ip")
+    @classmethod
     def validates_ip(cls, v):
         try:
             ipaddress.ip_address(v)

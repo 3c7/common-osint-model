@@ -27,6 +27,11 @@ def hash_all(data: bytes) -> Tuple[str, str, str, str]:
 
     :returns: Tuple of hashes as string: md5, sha1, sha256, murmur
     """
-    md5, sha1, sha256, murmur = hashlib.md5(), hashlib.sha1(), hashlib.sha256(), mmh3.hash(data)
+    md5, sha1, sha256, murmur = (
+        hashlib.md5(),
+        hashlib.sha1(),
+        hashlib.sha256(),
+        mmh3.hash(data),
+    )
     md5.update(data), sha1.update(data), sha256.update(data)
-    return md5.hexdigest(), sha1.hexdigest(), sha256.hexdigest(), murmur
+    return md5.hexdigest(), sha1.hexdigest(), sha256.hexdigest(), str(murmur)

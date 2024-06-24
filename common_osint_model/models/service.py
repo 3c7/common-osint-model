@@ -17,22 +17,22 @@ class Service(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHan
     # Banner is optional as not every scanning service offers complete banners as response. Banners might be
     # reconstructed from the data, but some attributes might have the wrong order then (e.g. HTTP headers).
     # The according hashes are also not reliable because of this.
-    banner: Optional[str]
-    md5: Optional[str]
-    sha1: Optional[str]
-    sha256: Optional[str]
-    murmur: Optional[str]
+    banner: Optional[str] = None
+    md5: Optional[str] = None
+    sha1: Optional[str] = None
+    sha256: Optional[str] = None
+    murmur: Optional[str] = None
     # Every service object should include these timestamps. "timestamp" can be used for tracking the observation
     # timestamp from scanning services (e.g. Shodan)
     first_seen: Optional[datetime] = datetime.now(UTC)
     last_seen: Optional[datetime] = datetime.now(UTC)
-    timestamp: Optional[datetime]
+    timestamp: Optional[datetime] = None
     # We need to include every possible service component here. In order to not export empty dictionary keys, the class
     # object can be exported with dict(exclude_none=True), so e.g. empty tls keys are skipped.
-    http: Optional[HTTPComponent]
-    tls: Optional[TLSComponent]
-    ssh: Optional[SSHComponent]
-    dns: Optional[DNSComponent]
+    http: Optional[HTTPComponent] = None
+    tls: Optional[TLSComponent] = None
+    ssh: Optional[SSHComponent] = None
+    dns: Optional[DNSComponent] = None
     # Typically hosts consist of different services which might be discovered by different scanning services, so
     # remarking which service was observed by which scanner might be a good idea.
     source: str

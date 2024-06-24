@@ -6,15 +6,15 @@ from pydantic import BaseModel
 
 class Entity(BaseModel):
     """Represents an entity which registered a domain."""
-    name: Optional[str]
-    email: Optional[str]
-    organization: Optional[str]
-    street: Optional[str]
-    city: Optional[str]
-    state: Optional[str]
-    postal_code: Optional[str]
-    country: Optional[str]
-    phone: Optional[str]
+    name: Optional[str] = None
+    email: Optional[str] = None
+    organization: Optional[str] = None
+    street: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    postal_code: Optional[str] = None
+    country: Optional[str] = None
+    phone: Optional[str] = None
     timestamp: datetime = datetime.now(UTC)
 
 
@@ -24,10 +24,10 @@ class Domain(BaseModel):
     domain: str
     first_seen: datetime = datetime.now(UTC)
     last_seen: datetime = datetime.now(UTC)
-    source: Optional[str]
-    type: Optional[str]
-    soa: Optional[List[str]]
-    nameserver: Optional[List[str]]
-    registrar: Optional[str]
-    registrant: Optional[Entity]
-    query: Optional[str]
+    source: Optional[str] = None
+    type: Optional[str] = None
+    soa: Optional[List[str]] = None
+    nameserver: Optional[List[str]] = None
+    registrar: Optional[str] = None
+    registrant: Optional[Entity] = None
+    query: Optional[str] = None
