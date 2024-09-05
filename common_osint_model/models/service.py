@@ -118,7 +118,7 @@ class Service(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHan
             tls=tlsobj,
             ssh=sshobj,
             dns=dnsobj,
-            timestamp=datetime.fromisoformat(d["observed_at"][:-4]),
+            timestamp=timestamp,
             source="censys"
         )
 
