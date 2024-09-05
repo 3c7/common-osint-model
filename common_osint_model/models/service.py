@@ -106,6 +106,7 @@ class Service(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHan
         if "dns" in d:
             dnsobj = DNSComponent.from_censys(d)
 
+        timestamp = datetime.fromisoformat(d["observed_at"][:-4]) if "observed_at" in d else None
         return Service(
             port=port,
             banner=banner,
