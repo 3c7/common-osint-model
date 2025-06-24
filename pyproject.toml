@@ -17,7 +17,7 @@ classifiers = [
 python = ">=3.11,<4"
 DateTime = "^4.3"
 mmh3 = "^3.0.0"
-cryptography = "^43.0.1"
+cryptography = ">=43.0.1,<45.0.0"
 pydantic = "^2.7.4"
 hhhash = "^0.3"
 
