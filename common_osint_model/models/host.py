@@ -128,7 +128,7 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
                         )
                     )
             # TODO: Check handling of Reverse DNS
-
+            
             return Host(
                 ip=host.resource.ip,
                 domains=domains,

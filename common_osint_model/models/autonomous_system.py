@@ -47,7 +47,9 @@ class AutonomousSystem(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
 
     @classmethod
     def from_censys(cls, autonomous_system: Dict | CensysAutonomousSystem):
+        print(type(autonomous_system))
         if isinstance(autonomous_system, CensysAutonomousSystem):
+            print(autonomous_system.name)
             return AutonomousSystem(
                 number=autonomous_system.asn,
                 name=autonomous_system.name,
