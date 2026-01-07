@@ -10,6 +10,7 @@ from common_osint_model.models.autonomous_system import AutonomousSystem
 from common_osint_model.models.domain import Domain
 from common_osint_model.models.service import Service
 from common_osint_model.utils import flatten
+from censys_platform.models import HostAsset, HostAssetWithMatchedServices
 
 
 class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger):
@@ -112,37 +113,36 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
             source="shodan",
             ports=[service.port for service in services]
         )
-
     @classmethod
-    def from_censys(cls, d: Dict):
-        ip = d["ip"]
-        services = []
-        for service in d["services"]:
-            services.append(Service.from_censys(service))
+    def from_censys(cls, host: Dict | HostAsset | HostAssetWithMatchedServices):
+        if isinstance(host, HostAsset) or isinstance(host, HostAssetWithMatchedServices):
+            domains = list()
+            for domain in host.resource.dns.forward_dns.keys():
+                domains.append(
+                    Domain(
+                        domain=domain,
+                        first_seen = host.resource.dns.forward_dns.get(domain).resolve_time,
+                        source = "censys",
+                        type = host.resource.dns.forward_dns.get(domain).record_type
+                    )
+                )
+            
+            for domain in host.resource.dns.reverse_dns.keys():
+                domains.append(
+                    Domain(
+                        domain=domain,
+                        first_seen = host.resource.dns.reverse_dns.get(domain).resolve_time,
+                        source = "censys",
+                        type = "reverse"
+                    )
+                )
 
-        domains = []
-        domain_strings = []
-        for service in services:
-            if service.tls:
-                for domain in service.tls.certificate.domains:
-                    if domain not in domain_strings:
-                        domain_strings.append(domain)
-                        domains.append(Domain(
-                            domain=domain,
-                            # Currently not given by API
-                            # first_seen=service.tls.certificate.issued,
-                            # last_seen=service.tls.certificate.expires,
-                            source="censys",
-                            type="common_name"
-                        ))
-        return Host(
-            ip=ip,
-            autonomous_system=AutonomousSystem.from_censys(d),
-            services=services,
-            domains=domains,
-            source="censys",
-            ports=[service.port for service in services]
-        )
+            return Host(
+                ip=host.resource.ip,
+                domains=domains
+            )
+        if isinstance(host, Dict):
+            return cls._from_censys_dict(host)
 
     @classmethod
     def from_binaryedge(cls, d: Union[Dict, List]):
@@ -182,4 +182,35 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
             domains=domains,
             source="binaryedge",
             ports=[service.port for service in services_objects]
+        )
+
+    @classmethod
+    def _from_censys_dict(cls, d: Dict):
+        ip = d["ip"]
+        services = []
+        for service in d["services"]:
+            services.append(Service.from_censys(service))
+
+        domains = []
+        domain_strings = []
+        for service in services:
+            if service.tls:
+                for domain in service.tls.certificate.domains:
+                    if domain not in domain_strings:
+                        domain_strings.append(domain)
+                        domains.append(Domain(
+                            domain=domain,
+                            # Currently not given by API
+                            # first_seen=service.tls.certificate.issued,
+                            # last_seen=service.tls.certificate.expires,
+                            source="censys",
+                            type="common_name"
+                        ))
+        return Host(
+            ip=ip,
+            autonomous_system=AutonomousSystem.from_censys(d),
+            services=services,
+            domains=domains,
+            source="censys",
+            ports=[service.port for service in services]
         )
