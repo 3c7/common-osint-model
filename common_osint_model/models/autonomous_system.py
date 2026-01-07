@@ -14,7 +14,7 @@ class AutonomousSystem(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
     country: Optional[str] = None
     prefix: Optional[str] = None
     source: str
-    # TODO: Add ASN Description
+    # TODO: Add ASN Description and Organization
 
     @field_validator("prefix")
     @classmethod
@@ -53,7 +53,7 @@ class AutonomousSystem(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
             return AutonomousSystem(
                 number=autonomous_system.asn,
                 name=autonomous_system.name,
-                country=autonomous_system.country,
+                country=autonomous_system.country_code,
                 prefix=autonomous_system.bgp_prefix,
                 source="censys"
             )
