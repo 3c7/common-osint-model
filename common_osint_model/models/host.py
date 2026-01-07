@@ -132,7 +132,8 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
             return Host(
                 ip=host.resource.ip,
                 domains=domains,
-                source="censys"
+                source="censys",
+                autonomous_system=AutonomousSystem.from_censys(host.resource.autonomous_system)
             )
         if isinstance(host, Dict):
             return cls._from_censys_dict(host)
