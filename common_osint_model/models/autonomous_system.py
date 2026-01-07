@@ -47,9 +47,7 @@ class AutonomousSystem(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
 
     @classmethod
     def from_censys(cls, autonomous_system: Dict | Routing):
-        print(type(autonomous_system))
         if isinstance(autonomous_system, Routing):
-            print(autonomous_system.name)
             return AutonomousSystem(
                 number=autonomous_system.asn,
                 name=autonomous_system.name,
@@ -67,3 +65,5 @@ class AutonomousSystem(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
                 prefix=autonomous_system.get("bgp_prefix", None),
                 source="censys"
             )
+        
+        return None
