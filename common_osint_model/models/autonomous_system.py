@@ -4,7 +4,7 @@ from typing import Dict, List, Optional
 from pydantic import field_validator, BaseModel
 
 from common_osint_model.models import ShodanDataHandler, CensysDataHandler, Logger
-from censys_platform.models import AutonomousSystem as CensysAutonomousSystem
+from censys_platform.models import Routing
 
 
 class AutonomousSystem(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
@@ -46,9 +46,9 @@ class AutonomousSystem(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
         )
 
     @classmethod
-    def from_censys(cls, autonomous_system: Dict | CensysAutonomousSystem):
+    def from_censys(cls, autonomous_system: Dict | Routing):
         print(type(autonomous_system))
-        if isinstance(autonomous_system, CensysAutonomousSystem):
+        if isinstance(autonomous_system, Routing):
             print(autonomous_system.name)
             return AutonomousSystem(
                 number=autonomous_system.asn,
