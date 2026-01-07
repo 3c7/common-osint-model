@@ -127,16 +127,7 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
                             type = host.resource.dns.forward_dns.get(domain).record_type
                         )
                     )
-            if host.resource.dns is not None and host.resource.dns.reverse_dns is not None:
-                for domain in host.resource.dns.reverse_dns.keys():
-                    domains.append(
-                        Domain(
-                            domain=domain,
-                            first_seen = host.resource.dns.reverse_dns.get(domain).resolve_time,
-                            source = "censys",
-                            type = "reverse"
-                        )
-                    )
+            # TODO: Check handling of Reverse DNS
 
             return Host(
                 ip=host.resource.ip,
