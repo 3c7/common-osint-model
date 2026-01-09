@@ -17,6 +17,7 @@ dependencies = [
     "cryptography==46.0.3",
     "pydantic==2.12.5",
     "hhhash>=0.3,<0.4",
+    "urllib3==2.6.3",
 ]
 
 [project.urls]
