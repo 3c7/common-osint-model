@@ -4,6 +4,7 @@ from typing import Dict, List, Optional
 from pydantic import field_validator, BaseModel
 
 from common_osint_model.models import ShodanDataHandler, CensysDataHandler, Logger
+from censys_platform.models import Routing
 
 
 class AutonomousSystem(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
@@ -13,6 +14,7 @@ class AutonomousSystem(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
     country: Optional[str] = None
     prefix: Optional[str] = None
     source: str
+    # TODO: Add ASN Description and Organization
 
     @field_validator("prefix")
     @classmethod
@@ -44,12 +46,24 @@ class AutonomousSystem(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
         )
 
     @classmethod
-    def from_censys(cls, d: Dict):
-        autonomous_system = d.get("autonomous_system", {})
-        return AutonomousSystem(
-            number=autonomous_system.get("asn", None),
-            name=autonomous_system.get("name", None),
-            country=autonomous_system.get("country_code", None),
-            prefix=autonomous_system.get("bgp_prefix", None),
-            source="censys"
-        )
+    def from_censys(cls, autonomous_system: Dict | Routing):
+        if isinstance(autonomous_system, Routing):
+            return AutonomousSystem(
+                number=autonomous_system.asn,
+                name=autonomous_system.name,
+                country=autonomous_system.country_code,
+                prefix=autonomous_system.bgp_prefix,
+                source="censys"
+            )
+        
+        if isinstance(autonomous_system, Dict):
+            autonomous_system = autonomous_system.get("autonomous_system", {})
+            return AutonomousSystem(
+                number=autonomous_system.get("asn", None),
+                name=autonomous_system.get("name", None),
+                country=autonomous_system.get("country_code", None),
+                prefix=autonomous_system.get("bgp_prefix", None),
+                source="censys"
+            )
+        
+        return None

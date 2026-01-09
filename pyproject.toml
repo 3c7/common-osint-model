@@ -20,6 +20,7 @@ mmh3 = "^3.0.0"
 cryptography = "^43.0.1"
 pydantic = "^2.7.4"
 hhhash = "^0.3"
+censys-platform = "^0.12.1"
 
 [tool.poetry.dev-dependencies]
 
