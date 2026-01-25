@@ -339,6 +339,7 @@ class TLSComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDa
     jarm: Optional[str] = None
 
     # Todo: Add other attributes relevant to TLS such as CipherSuits etc.
+    # Todo: Add JA4S
 
     @classmethod
     def from_shodan(cls, d: Dict):

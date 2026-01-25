@@ -7,17 +7,18 @@ requires-python = ">=3.11,<4"
 readme = "README.md"
 license = "MIT"
 classifiers = [
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
 ]
 dependencies = [
-    "DateTime>=4.3,<5",
-    "mmh3>=3.0.0,<4",
-    "cryptography==46.0.3",
-    "pydantic==2.12.5",
-    "hhhash>=0.3,<0.4",
-    "urllib3==2.6.3",
+  "DateTime>=4.3,<5",
+  "mmh3>=3.0.0,<4",
+  "cryptography==46.0.3",
+  "pydantic==2.12.5",
+  "hhhash>=0.3,<0.4",
+  "urllib3==2.6.3",
+  "censys-platform>=0.12.1,<0.13.0",
 ]
 
 [project.urls]
@@ -32,7 +33,7 @@ convcensys2 = "common_osint_model.cli:convcensys2"
 convcert = "common_osint_model.cli:convcert"
 
 [dependency-groups]
-dev = ["bump-pydantic>=0.8.0,<0.9"]
+dev = ["pytest>=9.0.2"]
 
 [build-system]
 requires = ["hatchling"]
