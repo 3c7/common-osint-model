@@ -1,5 +1,9 @@
 # Common OSINT Model
 
+> [!NOTE]
+> This project is in low-maintenance mode. I am not actively using this project anymore and therefore will not add new features. I will, however, try to fix reported bugs, if time permits.
+
+
 **Note:** This is work in progress and probably only covers my specific use case. If you find bugs or know how to
 enhance this project, please open an issue or - even better - create a pull request. The presented data model is
 evolving continuously. Therefore, it is recommended to use it in your project with a fixed version constraint (e.g. 
