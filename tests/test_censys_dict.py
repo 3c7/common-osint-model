@@ -3,13 +3,19 @@ import json
 import pytest
 from common_osint_model import Host
 
-def test_quad_one_success():
+from mocks import CENSYS_HOST_JSON
+
+def test_quad_one_file_success():
     file:pathlib.Path = pathlib.Path.cwd() / "test_data" / "1.1.1.1_censys.json"
     with open(file, "r") as censys_file:
         host = Host.from_censys(json.loads(censys_file.read()))
         assert host.ip == "1.1.1.1"
 
-def test_quad_nine_success():
+def test_censys_host_mock_success():
+    host = Host.from_censys(CENSYS_HOST_JSON)
+    assert host.ip == "8.8.8.8"
+
+def test_quad_nine_file_success():
     file:pathlib.Path = pathlib.Path.cwd() / "test_data" / "9.9.9.9_censys_v2.json"
     with open(file, "r") as censys_file:
         host = Host.from_censys(json.loads(censys_file.read()))
