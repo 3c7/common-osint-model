@@ -1,9 +1,15 @@
+from multiprocessing import Value
 from datetime import datetime, UTC
 from typing import Dict, List, Optional
 
 from pydantic import BaseModel
 
-from common_osint_model.models import ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger
+from common_osint_model.models import (
+    ShodanDataHandler,
+    CensysDataHandler,
+    BinaryEdgeDataHandler,
+    Logger,
+)
 from common_osint_model.models.http import HTTPComponent
 from common_osint_model.models.ssh import SSHComponent
 from common_osint_model.models.tls import TLSComponent
@@ -11,8 +17,11 @@ from common_osint_model.models.dns import DNSComponent
 from common_osint_model.utils import hash_all
 
 
-class Service(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger):
+class Service(
+    BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger
+):
     """Represents a single service answering connections on specific ports."""
+
     port: int
     # Banner is optional as not every scanning service offers complete banners as response. Banners might be
     # reconstructed from the data, but some attributes might have the wrong order then (e.g. HTTP headers).
@@ -41,9 +50,11 @@ class Service(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHan
     def from_shodan(cls, d: Dict):
         """Creates an instance of this class using a dictionary with typical shodan data."""
         if isinstance(d, List):
-            cls.info("The dictionary given is a list. Typically this list represents multiple services. Iterate over "
-                     "the list to create Service objects for every item available. "
-                     "This method just uses the first item.")
+            cls.info(
+                "The dictionary given is a list. Typically this list represents multiple services. Iterate over "
+                "the list to create Service objects for every item available. "
+                "This method just uses the first item."
+            )
             d = d[0]
 
         port = d["port"]
@@ -78,7 +89,7 @@ class Service(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHan
             tls=tlsobj,
             dns=dnsobj,
             timestamp=datetime.fromisoformat(d["timestamp"]),
-            source="shodan"
+            source="shodan",
         )
 
     @classmethod
@@ -106,7 +117,14 @@ class Service(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHan
         if "dns" in d:
             dnsobj = DNSComponent.from_censys(d)
 
-        timestamp = datetime.fromisoformat(d["observed_at"][:-4]) if "observed_at" in d else None
+        timestamp = None
+        if "observed_at" in d:
+            try:
+                timestamp = datetime.fromisoformat(d["observed_at"])
+            except ValueError as ve:
+                cls.warning(
+                    f"{d['observed_at']} could not be parsed as timestamp: {ve}"
+                )
         return Service(
             port=port,
             banner=banner,
@@ -119,7 +137,7 @@ class Service(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHan
             ssh=sshobj,
             dns=dnsobj,
             timestamp=timestamp,
-            source="censys"
+            source="censys",
         )
 
     @classmethod
@@ -127,7 +145,9 @@ class Service(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHan
         """Creates an instance of this class using a dictionary with typical BinaryEdge data. Contrary to the other
         scanning services, binaryedge provides multiple entries per port."""
         port = d[0]["target"]["port"]
-        type_index: Dict[str, int] = {service["origin"]["type"]: idx for idx, service in enumerate(d)}
+        type_index: Dict[str, int] = {
+            service["origin"]["type"]: idx for idx, service in enumerate(d)
+        }
 
         httpobj = None
         if "webv2" in type_index:
@@ -144,7 +164,9 @@ class Service(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHan
         banner = None
         md5, sha1, sha256, murmur = None, None, None, None
         if "service-simple" in type_index:
-            banner = d[type_index["service-simple"]]["result"]["data"]["service"].get("banner", None)
+            banner = d[type_index["service-simple"]]["result"]["data"]["service"].get(
+                "banner", None
+            )
         if banner:
             md5, sha1, sha256, murmur = hash_all(banner.encode("utf-8"))
 
@@ -158,5 +180,5 @@ class Service(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHan
             sha1=sha1,
             sha256=sha256,
             murmur=murmur,
-            source="binaryedge"
+            source="binaryedge",
         )

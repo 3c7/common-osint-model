@@ -1,39 +1,40 @@
-[tool.poetry]
+[project]
 name = "common-osint-model"
-version = "0.6.1"
+version = "0.6.2-beta1"
 description = "Converting data from services like BinaryEdge, Censys and Shodan to a common data model."
-authors = ["3c7 <3c7@posteo.de>"]
-license = "MIT"
+authors = [{ name = "3c7", email = "3c7@posteo.de" }]
+requires-python = ">=3.11,<4"
 readme = "README.md"
-homepage = "https://github.com/3c7/common-osint-model"
-repository = "https://github.com/3c7/common-osint-model"
+license = "MIT"
 classifiers = [
   "Programming Language :: Python :: 3",
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
 ]
+dependencies = [
+  "DateTime>=4.3,<5",
+  "mmh3>=3.0.0,<4",
+  "cryptography==46.0.3",
+  "pydantic==2.12.5",
+  "hhhash>=0.3,<0.4",
+  "urllib3==2.6.3",
+  "censys-platform>=0.12.1,<0.13.0",
+]
 
-[tool.poetry.dependencies]
-python = ">=3.11,<4"
-DateTime = "^4.3"
-mmh3 = "^3.0.0"
-cryptography = "^43.0.1"
-pydantic = "^2.7.4"
-hhhash = "^0.3"
-censys-platform = "^0.12.1"
+[project.urls]
+Homepage = "https://github.com/3c7/common-osint-model"
+Repository = "https://github.com/3c7/common-osint-model"
 
-[tool.poetry.dev-dependencies]
-
-[tool.poetry.group.dev.dependencies]
-bump-pydantic = "^0.8.0"
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.scripts]
+[project.scripts]
 convshodan = "common_osint_model.cli:convshodan"
 convcensys = "common_osint_model.cli:convcensys"
 convcensyscert = "common_osint_model.cli:convcensyscert"
 convcensys2 = "common_osint_model.cli:convcensys2"
 convcert = "common_osint_model.cli:convcert"
+
+[dependency-groups]
+dev = ["pytest>=9.0.2"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
