@@ -108,7 +108,9 @@ class Service(
                 md5, sha1, sha256, murmur = hash_all(banner.encode("utf-8"))
             # Overwrite calcuated sha256 hash with the one from source
             sha256 = service.banner_hash_sha256
-            ja4tscan = service.ja4tscan
+            ja4tscan = None
+            if service.ja4tscan is not None:
+                ja4tscan = service.ja4tscan.fingerprint
 
             # TODO: Implement TLSComponent, HTTPComponent, DNSComponent, SSHComponent
 
