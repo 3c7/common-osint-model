@@ -33,8 +33,13 @@ def test_censys_sdk_domain_mock_success():
     assert type(censys_host) is HostAsset
     assert censys_host.resource.ip == "27.33.219.14"
     
-    # Actual test for Domain
     com_host = Host.from_censys(censys_host)
     assert type(com_host) is Host
+    
+    # Actual test for Forward Domain
     assert len(com_host.domains[0].domain) > 0
     assert com_host.domains[0].domain == censys_host.resource.dns.forward_dns.get(com_host.domains[0].domain).name
+
+    # Actual test for Forward Domaims
+    assert len(com_host.domains[1].domain) > 0
+    assert com_host.domains[1].domain in censys_host.resource.dns.reverse_dns.names
