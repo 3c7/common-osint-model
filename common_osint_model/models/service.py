@@ -100,7 +100,7 @@ class Service(
         if isinstance(service, CensysService):
             port = service.port
             protocol = None
-            if service.protocol is not None:
+            if service.protocol is not None and not service.protocol == "UNKNOWN":
                 protocol = service.protocol
             else:
                 protocol = service.transport_protocol
