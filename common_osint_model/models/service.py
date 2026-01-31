@@ -31,6 +31,7 @@ class Service(
     sha1: Optional[str] = None
     sha256: Optional[str] = None
     murmur: Optional[str] = None
+    ja4tscan: Optional[str] = None
     # Every service object should include these timestamps. "timestamp" can be used for tracking the observation
     # timestamp from scanning services (e.g. Shodan)
     first_seen: Optional[datetime] = datetime.now(UTC)
