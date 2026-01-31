@@ -99,7 +99,11 @@ class Service(
     def from_censys(cls, service: Dict | CensysService):
         if isinstance(service, CensysService):
             port = service.port
-            protocol = service.protocol
+            protocol = None
+            if service.protocol is not None:
+                protocol = service.protocol
+            else:
+                protocol = service.transport_protocol
             
             # Set various banner and pivot hashes
             banner = service.banner
