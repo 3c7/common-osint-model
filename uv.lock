@@ -180,7 +180,7 @@ wheels = [
 
 [[package]]
 name = "common-osint-model"
-version = "0.6.1"
+version = "0.6.2"
 source = { editable = "." }
 dependencies = [
     { name = "censys-platform" },
