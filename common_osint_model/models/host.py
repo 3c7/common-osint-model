@@ -113,10 +113,14 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
             source="shodan",
             ports=[service.port for service in services]
         )
+    
     @classmethod
     def from_censys(cls, host: Dict | HostAsset | HostAssetWithMatchedServices):
         if isinstance(host, HostAsset) or isinstance(host, HostAssetWithMatchedServices):
             domains = list()
+            services = list()
+            
+            # Handle Forward DNS
             if host.resource.dns is not None and host.resource.dns.forward_dns is not None:
                 for domain in host.resource.dns.forward_dns.keys():
                     domains.append(
@@ -127,6 +131,8 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
                             type = host.resource.dns.forward_dns.get(domain).record_type
                         )
                     )
+            
+            # Handle Reverse DNS
             if host.resource.dns is not None and host.resource.dns.reverse_dns is not None:
                 for reverse_dns_domain in host.resource.dns.reverse_dns.names:
                     domains.append(
@@ -138,12 +144,18 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
                         )
                     )
             
-            # TODO: Check handling of Services
+            # Handle Services
+            if host.resource.services is not None:
+                for service in host.resource.services:
+                    services.append(Service.from_censys(service=service))
             
+            # Return Host
             return Host(
                 ip=host.resource.ip,
                 domains=domains,
                 source="censys",
+                services=services,
+                ports=[service.port for service in services],
                 autonomous_system=AutonomousSystem.from_censys(host.resource.autonomous_system)
             )
         if isinstance(host, Dict):

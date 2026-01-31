@@ -1,4 +1,3 @@
-from multiprocessing import Value
 from datetime import datetime, UTC
 from typing import Dict, List, Optional
 
@@ -16,6 +15,8 @@ from common_osint_model.models.tls import TLSComponent
 from common_osint_model.models.dns import DNSComponent
 from common_osint_model.utils import hash_all
 
+from censys_platform.models import Service as CensysService
+
 
 class Service(
     BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger
@@ -23,6 +24,7 @@ class Service(
     """Represents a single service answering connections on specific ports."""
 
     port: int
+    protocol: Optional[str] = None
     # Banner is optional as not every scanning service offers complete banners as response. Banners might be
     # reconstructed from the data, but some attributes might have the wrong order then (e.g. HTTP headers).
     # The according hashes are also not reliable because of this.
@@ -94,7 +96,92 @@ class Service(
         )
 
     @classmethod
-    def from_censys(cls, d: Dict):
+    def from_censys(cls, service: Dict | CensysService):
+        if isinstance(service, CensysService):
+            port = service.port
+            protocol = service.protocol
+            
+            # Set various banner and pivot hashes
+            banner = service.banner
+            md5, sha1, sha256, murmur = None, None, None, None
+            if banner:
+                md5, sha1, sha256, murmur = hash_all(banner.encode("utf-8"))
+            # Overwrite calcuated sha256 hash with the one from source
+            sha256 = service.banner_hash_sha256
+            ja4tscan = service.ja4tscan
+
+            # TODO: Implement TLSComponent, HTTPComponent, DNSComponent, SSHComponent
+
+            timestamp = None
+            try:
+                timestamp = datetime.fromisoformat(service.scan_time)
+            except ValueError as ve:
+                cls.warning(
+                    f"{service.scan_time} could not be parsed as timestamp: {ve}"
+                )
+            return Service(
+                port=port,
+                protocol=protocol,
+                banner=banner,
+                md5=md5,
+                sha1=sha1,
+                sha256=sha256,
+                murmur=murmur,
+                ja4tscan=ja4tscan,
+                timestamp=timestamp,
+                source="censys"
+            )
+
+            pass
+        if isinstance(service, Dict):
+            return cls._from_censys_dict(d=service)
+        
+
+    @classmethod
+    def from_binaryedge(cls, d: List):
+        """Creates an instance of this class using a dictionary with typical BinaryEdge data. Contrary to the other
+        scanning services, binaryedge provides multiple entries per port."""
+        port = d[0]["target"]["port"]
+        type_index: Dict[str, int] = {
+            service["origin"]["type"]: idx for idx, service in enumerate(d)
+        }
+
+        httpobj = None
+        if "webv2" in type_index:
+            httpobj = HTTPComponent.from_binaryedge(d[type_index["webv2"]])
+
+        tlsobj = None
+        if "ssl-simple" in type_index:
+            tlsobj = TLSComponent.from_binaryedge(d[type_index["ssl-simple"]])
+
+        sshobj = None
+        if "ssh" in type_index:
+            sshobj = SSHComponent.from_binaryedge(d[type_index["ssh"]])
+
+        banner = None
+        md5, sha1, sha256, murmur = None, None, None, None
+        if "service-simple" in type_index:
+            banner = d[type_index["service-simple"]]["result"]["data"]["service"].get(
+                "banner", None
+            )
+        if banner:
+            md5, sha1, sha256, murmur = hash_all(banner.encode("utf-8"))
+
+        return Service(
+            port=port,
+            http=httpobj,
+            tls=tlsobj,
+            ssh=sshobj,
+            banner=banner,
+            md5=md5,
+            sha1=sha1,
+            sha256=sha256,
+            murmur=murmur,
+            source="binaryedge",
+        )
+
+    @classmethod
+    def _from_censys_dict(cls, d: Dict):
         """Creates an instance of this class using a dictionary with typical Censys data."""
         port = d["port"]
         banner = d.get("banner", None)
@@ -139,47 +226,4 @@ class Service(
             dns=dnsobj,
             timestamp=timestamp,
             source="censys",
-        )
-
-    @classmethod
-    def from_binaryedge(cls, d: List):
-        """Creates an instance of this class using a dictionary with typical BinaryEdge data. Contrary to the other
-        scanning services, binaryedge provides multiple entries per port."""
-        port = d[0]["target"]["port"]
-        type_index: Dict[str, int] = {
-            service["origin"]["type"]: idx for idx, service in enumerate(d)
-        }
-
-        httpobj = None
-        if "webv2" in type_index:
-            httpobj = HTTPComponent.from_binaryedge(d[type_index["webv2"]])
-
-        tlsobj = None
-        if "ssl-simple" in type_index:
-            tlsobj = TLSComponent.from_binaryedge(d[type_index["ssl-simple"]])
-
-        sshobj = None
-        if "ssh" in type_index:
-            sshobj = SSHComponent.from_binaryedge(d[type_index["ssh"]])
-
-        banner = None
-        md5, sha1, sha256, murmur = None, None, None, None
-        if "service-simple" in type_index:
-            banner = d[type_index["service-simple"]]["result"]["data"]["service"].get(
-                "banner", None
-            )
-        if banner:
-            md5, sha1, sha256, murmur = hash_all(banner.encode("utf-8"))
-
-        return Service(
-            port=port,
-            http=httpobj,
-            tls=tlsobj,
-            ssh=sshobj,
-            banner=banner,
-            md5=md5,
-            sha1=sha1,
-            sha256=sha256,
-            murmur=murmur,
-            source="binaryedge",
         )
