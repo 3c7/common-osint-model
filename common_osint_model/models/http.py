@@ -204,22 +204,49 @@ class HTTPComponentContent(
         )
 
     @classmethod
-    def from_censys(cls, d: Dict):
-        """Creates an instance of this class based on Censys (2.0) data given as dictionary."""
-        http = d["http"]["response"]
-        raw = http["body"] if http["body_size"] > 0 else ""
-        md5, sha1, sha256, murmur = hash_all(raw.encode("utf-8"))
-        return HTTPComponentContent(
-            raw=raw,
-            length=len(raw),
-            md5=md5,
-            sha1=sha1,
-            sha256=sha256,
-            murmur=murmur,
-            favicon=HTTPComponentContentFavicon.from_censys(d),
-            robots_txt=HTTPComponentContentRobots.from_censys(d),
-            security_txt=HTTPComponentContentSecurity.from_censys(d),
-        )
+    def from_censys(cls, service: Dict | CensysService):
+        if isinstance(service, CensysService):
+            for endpoint in service.endpoints:
+                if endpoint.http is not None:
+                    http_body = endpoint.http.body
+                    md5, sha1, sha256, murmur = hash_all(http_body.encode("utf-8"))
+                    # Overwrite available hashes with CensysAPI data
+                    if endpoint.http.body_hash_sha1 is not None:
+                        sha1 = endpoint.http.body_hash_sha1
+                    if endpoint.http.body_hash_sha256 is not None:
+                        sha256 = endpoint.http.body_hash_sha256
+                    
+                    # TODO: Implement Favicon, Robots, Security
+                    return HTTPComponentContent(
+                        raw=http_body,
+                        length=len(http_body),
+                        md5=md5,
+                        sha1=sha1,
+                        sha256=sha256,
+                        murmur=murmur,
+                        #favicon=HTTPComponentContentFavicon.from_censys(service),
+                        #robots_txt=HTTPComponentContentRobots.from_censys(service),
+                        #security_txt=HTTPComponentContentSecurity.from_censys(service),
+                    )
+            # Fallback, if no endpoint or no HTTP endpoint
+            return None
+
+        if isinstance(service, Dict):
+            """Creates an instance of this class based on Censys (2.0) data given as dictionary."""
+            http = service["http"]["response"]
+            raw = http["body"] if http["body_size"] > 0 else ""
+            md5, sha1, sha256, murmur = hash_all(raw.encode("utf-8"))
+            return HTTPComponentContent(
+                raw=raw,
+                length=len(raw),
+                md5=md5,
+                sha1=sha1,
+                sha256=sha256,
+                murmur=murmur,
+                favicon=HTTPComponentContentFavicon.from_censys(service),
+                robots_txt=HTTPComponentContentRobots.from_censys(service),
+                security_txt=HTTPComponentContentSecurity.from_censys(service),
+            )
 
     @classmethod
     def from_binaryedge(cls, d: Union[Dict, List]):
@@ -248,6 +275,7 @@ class HTTPComponent(
     content: Optional[HTTPComponentContent] = None
     shodan_headers_hash: Optional[str] = None
     hhhash: Optional[str] = None
+    status_code: Optional[int] = None
 
     @classmethod
     def from_shodan(cls, d: Dict):
@@ -294,11 +322,10 @@ class HTTPComponent(
 
                     return HTTPComponent(
                         headers=headers,
-                        # TODO: Implement HTTPComponentContent
-                        #content=HTTPComponentContent.from_censys(d),
-                        content=None,
+                        content=HTTPComponentContent.from_censys(service),
                         shodan_headers_hash=headers_hash,
                         hhhash=hash_from_banner(service.banner),
+                        status_code=endpoint.http.status_code
                     )
             # Fallback, if no endpoint or no HTTP endpoint
             return None
