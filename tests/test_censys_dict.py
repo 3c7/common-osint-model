@@ -10,6 +10,7 @@ def test_quad_one_file_success():
     with open(file, "r") as censys_file:
         host = Host.from_censys(json.loads(censys_file.read()))
         assert host.ip == "1.1.1.1"
+        assert host.services[2].tls.ja3s == "d75f9129bb5d05492a65ff78e081bcb2"
 
 def test_host_mock_success():
     host = Host.from_censys(CENSYS_HOST_JSON_LEGACY)
