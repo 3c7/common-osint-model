@@ -281,7 +281,7 @@ class HTTPComponent(
                 if endpoint.http is not None:
                     headers:Dict[str,str] = dict()
                     # Store Header
-                    for header_name, header_values in endpoint.http.headers:
+                    for header_name, header_values in endpoint.http.headers.items():
                         for header_value in header_values:
                             headers[header_name] = header_value
                     banner_lines = service.banner.replace("\r", "").split("\n")
