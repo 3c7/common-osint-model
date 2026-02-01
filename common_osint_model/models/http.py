@@ -13,6 +13,8 @@ from common_osint_model.models import (
 )
 from common_osint_model.utils import hash_all
 
+from censys_platform.models import Service as CensysService
+
 
 class HTTPComponentContentFavicon(
     BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger
@@ -273,7 +275,47 @@ class HTTPComponent(
         )
 
     @classmethod
-    def from_censys(cls, d: Dict):
+    def from_censys(cls, service: Dict | CensysService):
+        if isinstance(service, CensysService):
+            for endpoint in service.endpoints:
+                if endpoint.http is not None:
+                    headers:Dict[str,str] = dict()
+                    # Store Header
+                    for header_name, header_values in endpoint.http.headers:
+                        for header_value in header_values:
+                            headers[header_name] = header_value
+                    banner_lines = service.banner.replace("\r", "").split("\n")
+                    banner_keys = banner_lines[0]
+                    for line in banner_lines:
+                        if ":" in line:
+                            k, _ = line.split(":", maxsplit=1)
+                            banner_keys += "\n" + k
+                    headers_hash = str(mmh3.hash(banner_keys.encode("utf-8")))
+
+                    return HTTPComponent(
+                        headers=headers,
+                        # TODO: Implement HTTPComponentContent
+                        #content=HTTPComponentContent.from_censys(d),
+                        content=None,
+                        shodan_headers_hash=headers_hash,
+                        hhhash=hash_from_banner(service.banner),
+                    )
+            # Fallback, if no endpoint or no HTTP endpoint
+            return None
+
+        if isinstance(service, Dict):
+            return cls._from_censys_dict(d=service)
+
+    @classmethod
+    def from_binaryedge(cls, d: Union[Dict, List]):
+        http_response = d["result"]["data"]["response"]
+        headers = http_response["headers"]["headers"]
+        return HTTPComponent(
+            headers=headers, content=HTTPComponentContent.from_binaryedge(d)
+        )
+
+    @classmethod
+    def _from_censys_dict(cls, d: Dict):
         """Todo: Is parsing from services.banner better than just looping over the headers found by Censys?"""
         http = d["http"]["response"]
         headers = {}
@@ -296,12 +338,4 @@ class HTTPComponent(
             content=HTTPComponentContent.from_censys(d),
             shodan_headers_hash=headers_hash,
             hhhash=hash_from_banner(d["banner"]),
-        )
-
-    @classmethod
-    def from_binaryedge(cls, d: Union[Dict, List]):
-        http_response = d["result"]["data"]["response"]
-        headers = http_response["headers"]["headers"]
-        return HTTPComponent(
-            headers=headers, content=HTTPComponentContent.from_binaryedge(d)
         )

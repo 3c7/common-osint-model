@@ -119,6 +119,10 @@ class Service(
             tls = None
             if service.tls is not None:
                 tls = TLSComponent.from_censys(service=service)
+            
+            http = None
+            if service.endpoints is not None:
+                http = HTTPComponent.from_censys(service=service)
 
             # TODO: Implement TLSComponent, HTTPComponent, DNSComponent, SSHComponent
 
@@ -140,6 +144,7 @@ class Service(
                 ja4tscan=ja4tscan,
                 timestamp=timestamp,
                 tls=tls,
+                http=http,
                 source="censys"
             )
 
