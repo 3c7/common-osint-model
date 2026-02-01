@@ -19,6 +19,7 @@ def test_host_mock_success():
     host = Host.from_censys(CENSYS_HOST_JSON_LEGACY)
     assert host.ip == "8.8.8.8"
     assert host.services[0].port == 53
+    assert host.services[0].dns.recursive == True
 
 def test_quad_nine_file_success():
     file:pathlib.Path = pathlib.Path.cwd() / "test_data" / "9.9.9.9_censys_v2.json"

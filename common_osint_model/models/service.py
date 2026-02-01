@@ -124,7 +124,11 @@ class Service(
             if service.endpoints is not None:
                 http = HTTPComponent.from_censys(service=service)
 
-            # TODO: Implement TLSComponent, HTTPComponent, DNSComponent, SSHComponent
+            dns = None
+            if service.dns is not None:
+                dns = DNSComponent.from_censys(service=service)
+            
+            # TODO: Implement SSHComponent
 
             timestamp = None
             try:
@@ -145,6 +149,7 @@ class Service(
                 timestamp=timestamp,
                 tls=tls,
                 http=http,
+                dns=dns,
                 source="censys"
             )
 

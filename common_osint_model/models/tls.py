@@ -178,7 +178,7 @@ class TLSComponentCertificateEntity(BaseModel, ShodanDataHandler, CensysDataHand
             email=email
         )
 
-
+# TODO: Implement Certificate
 class TLSComponentCertificate(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger):
     """Represents certificates."""
     issuer: Optional[TLSComponentCertificateEntity] = None

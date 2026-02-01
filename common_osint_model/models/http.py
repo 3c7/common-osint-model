@@ -216,7 +216,6 @@ class HTTPComponentContent(
                     if endpoint.http.body_hash_sha256 is not None:
                         sha256 = endpoint.http.body_hash_sha256
                     
-                    # TODO: Implement Favicon, Robots, Security
                     return HTTPComponentContent(
                         raw=http_body,
                         length=len(http_body),
@@ -224,6 +223,7 @@ class HTTPComponentContent(
                         sha1=sha1,
                         sha256=sha256,
                         murmur=murmur,
+                        # TODO: Implement Favicon, Robots, Security
                         #favicon=HTTPComponentContentFavicon.from_censys(service),
                         #robots_txt=HTTPComponentContentRobots.from_censys(service),
                         #security_txt=HTTPComponentContentSecurity.from_censys(service),
