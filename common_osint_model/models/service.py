@@ -115,6 +115,10 @@ class Service(
             ja4tscan = None
             if service.ja4tscan is not None:
                 ja4tscan = service.ja4tscan.fingerprint
+            
+            tls = None
+            if service.tls is not None:
+                tls = TLSComponent.from_censys(service=service)
 
             # TODO: Implement TLSComponent, HTTPComponent, DNSComponent, SSHComponent
 
@@ -135,6 +139,7 @@ class Service(
                 murmur=murmur,
                 ja4tscan=ja4tscan,
                 timestamp=timestamp,
+                tls=tls,
                 source="censys"
             )
 
