@@ -282,7 +282,7 @@ class HTTPComponent(
                     headers:Dict[str,str] = dict()
                     # Store Header
                     for header_name, header_values in endpoint.http.headers.items():
-                        for header_value in header_values:
+                        for header_value in header_values.headers:
                             headers[header_name] = header_value
                     banner_lines = service.banner.replace("\r", "").split("\n")
                     banner_keys = banner_lines[0]
