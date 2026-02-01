@@ -365,7 +365,9 @@ class TLSComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDa
                 certificate = None
                 ja3s = tls.ja3s
                 ja4s = tls.ja4s
-                jarm = service.jarm.fingerprint
+                jarm = None
+                if service.jarm is not None:
+                    jarm = service.jarm.fingerprint
                 return TLSComponent(
                     certificate=certificate,
                     ja3s=ja3s,
