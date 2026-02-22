@@ -141,3 +141,4 @@ cython_debug/
 .idea
 
 /test_data/test.json
+.vscode/*

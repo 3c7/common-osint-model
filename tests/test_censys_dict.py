@@ -10,11 +10,16 @@ def test_quad_one_file_success():
     with open(file, "r") as censys_file:
         host = Host.from_censys(json.loads(censys_file.read()))
         assert host.ip == "1.1.1.1"
+        assert host.services[2].tls.ja3s == "d75f9129bb5d05492a65ff78e081bcb2"
+        assert "Content-Type" in host.services[1].http.headers.keys()
+        assert host.services[1].http.headers.get("Location") == "https://1.1.1.1/application/notifications_redirections"
+        assert len(host.services[1].http.headers.keys()) == 7
 
 def test_host_mock_success():
     host = Host.from_censys(CENSYS_HOST_JSON_LEGACY)
     assert host.ip == "8.8.8.8"
     assert host.services[0].port == 53
+    assert host.services[0].dns.recursive == True
 
 def test_quad_nine_file_success():
     file:pathlib.Path = pathlib.Path.cwd() / "test_data" / "9.9.9.9_censys_v2.json"

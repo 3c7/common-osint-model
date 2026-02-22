@@ -13,6 +13,8 @@ from common_osint_model.models import (
 )
 from common_osint_model.utils import hash_all
 
+from censys_platform.models import Service as CensysService
+
 
 class HTTPComponentContentFavicon(
     BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger
@@ -202,22 +204,49 @@ class HTTPComponentContent(
         )
 
     @classmethod
-    def from_censys(cls, d: Dict):
-        """Creates an instance of this class based on Censys (2.0) data given as dictionary."""
-        http = d["http"]["response"]
-        raw = http["body"] if http["body_size"] > 0 else ""
-        md5, sha1, sha256, murmur = hash_all(raw.encode("utf-8"))
-        return HTTPComponentContent(
-            raw=raw,
-            length=len(raw),
-            md5=md5,
-            sha1=sha1,
-            sha256=sha256,
-            murmur=murmur,
-            favicon=HTTPComponentContentFavicon.from_censys(d),
-            robots_txt=HTTPComponentContentRobots.from_censys(d),
-            security_txt=HTTPComponentContentSecurity.from_censys(d),
-        )
+    def from_censys(cls, service: Dict | CensysService):
+        if isinstance(service, CensysService):
+            for endpoint in service.endpoints:
+                if endpoint.http is not None:
+                    http_body = endpoint.http.body
+                    md5, sha1, sha256, murmur = hash_all(http_body.encode("utf-8"))
+                    # Overwrite available hashes with CensysAPI data
+                    if endpoint.http.body_hash_sha1 is not None:
+                        sha1 = endpoint.http.body_hash_sha1
+                    if endpoint.http.body_hash_sha256 is not None:
+                        sha256 = endpoint.http.body_hash_sha256
+                    
+                    return HTTPComponentContent(
+                        raw=http_body,
+                        length=len(http_body),
+                        md5=md5,
+                        sha1=sha1,
+                        sha256=sha256,
+                        murmur=murmur,
+                        # TODO: Implement Favicon, Robots, Security
+                        #favicon=HTTPComponentContentFavicon.from_censys(service),
+                        #robots_txt=HTTPComponentContentRobots.from_censys(service),
+                        #security_txt=HTTPComponentContentSecurity.from_censys(service),
+                    )
+            # Fallback, if no endpoint or no HTTP endpoint
+            return None
+
+        if isinstance(service, Dict):
+            """Creates an instance of this class based on Censys (2.0) data given as dictionary."""
+            http = service["http"]["response"]
+            raw = http["body"] if http["body_size"] > 0 else ""
+            md5, sha1, sha256, murmur = hash_all(raw.encode("utf-8"))
+            return HTTPComponentContent(
+                raw=raw,
+                length=len(raw),
+                md5=md5,
+                sha1=sha1,
+                sha256=sha256,
+                murmur=murmur,
+                favicon=HTTPComponentContentFavicon.from_censys(service),
+                robots_txt=HTTPComponentContentRobots.from_censys(service),
+                security_txt=HTTPComponentContentSecurity.from_censys(service),
+            )
 
     @classmethod
     def from_binaryedge(cls, d: Union[Dict, List]):
@@ -246,6 +275,7 @@ class HTTPComponent(
     content: Optional[HTTPComponentContent] = None
     shodan_headers_hash: Optional[str] = None
     hhhash: Optional[str] = None
+    status_code: Optional[int] = None
 
     @classmethod
     def from_shodan(cls, d: Dict):
@@ -273,7 +303,46 @@ class HTTPComponent(
         )
 
     @classmethod
-    def from_censys(cls, d: Dict):
+    def from_censys(cls, service: Dict | CensysService):
+        if isinstance(service, CensysService):
+            for endpoint in service.endpoints:
+                if endpoint.http is not None:
+                    headers:Dict[str,str] = dict()
+                    # Store Header
+                    for header_name, header_values in endpoint.http.headers.items():
+                        for header_value in header_values.headers:
+                            headers[header_name] = header_value
+                    banner_lines = service.banner.replace("\r", "").split("\n")
+                    banner_keys = banner_lines[0]
+                    for line in banner_lines:
+                        if ":" in line:
+                            k, _ = line.split(":", maxsplit=1)
+                            banner_keys += "\n" + k
+                    headers_hash = str(mmh3.hash(banner_keys.encode("utf-8")))
+
+                    return HTTPComponent(
+                        headers=headers,
+                        content=HTTPComponentContent.from_censys(service),
+                        shodan_headers_hash=headers_hash,
+                        hhhash=hash_from_banner(service.banner),
+                        status_code=endpoint.http.status_code
+                    )
+            # Fallback, if no endpoint or no HTTP endpoint
+            return None
+
+        if isinstance(service, Dict):
+            return cls._from_censys_dict(d=service)
+
+    @classmethod
+    def from_binaryedge(cls, d: Union[Dict, List]):
+        http_response = d["result"]["data"]["response"]
+        headers = http_response["headers"]["headers"]
+        return HTTPComponent(
+            headers=headers, content=HTTPComponentContent.from_binaryedge(d)
+        )
+
+    @classmethod
+    def _from_censys_dict(cls, d: Dict):
         """Todo: Is parsing from services.banner better than just looping over the headers found by Censys?"""
         http = d["http"]["response"]
         headers = {}
@@ -296,12 +365,4 @@ class HTTPComponent(
             content=HTTPComponentContent.from_censys(d),
             shodan_headers_hash=headers_hash,
             hhhash=hash_from_banner(d["banner"]),
-        )
-
-    @classmethod
-    def from_binaryedge(cls, d: Union[Dict, List]):
-        http_response = d["result"]["data"]["response"]
-        headers = http_response["headers"]["headers"]
-        return HTTPComponent(
-            headers=headers, content=HTTPComponentContent.from_binaryedge(d)
         )

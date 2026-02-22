@@ -10,6 +10,8 @@ from pydantic import BaseModel
 
 from common_osint_model.models import ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger
 
+from censys_platform.models import Service as CensysService
+
 
 class TLSComponentCertificateEntity(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger):
     """Represents certificate entities, typically issuer and subject."""
@@ -176,7 +178,7 @@ class TLSComponentCertificateEntity(BaseModel, ShodanDataHandler, CensysDataHand
             email=email
         )
 
-
+# TODO: Implement Certificate
 class TLSComponentCertificate(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger):
     """Represents certificates."""
     issuer: Optional[TLSComponentCertificateEntity] = None
@@ -336,10 +338,10 @@ class TLSComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDa
     certificate: Optional[TLSComponentCertificate] = None
     ja3: Optional[str] = None
     ja3s: Optional[str] = None
+    ja4s: Optional[str] = None
     jarm: Optional[str] = None
 
     # Todo: Add other attributes relevant to TLS such as CipherSuits etc.
-    # Todo: Add JA4S
 
     @classmethod
     def from_shodan(cls, d: Dict):
@@ -355,18 +357,37 @@ class TLSComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDa
         )
 
     @classmethod
-    def from_censys(cls, d: Dict):
-        try:
-            tls = d["tls"]
-            return TLSComponent(
-                certificate=TLSComponentCertificate.from_censys(tls["certificates"]["leaf_data"]),
-                ja3s=tls.get("ja3s", None),
-                jarm=d.get("jarm", {}).get("fingerprint", None)
-            )
-        except KeyError as e:
-            cls.error(f"Exception during certificate data extraction. "
-                      f"The key 'tls.certificates.leaf_data' is not available: {e}\nReturning None...")
-            return None
+    def from_censys(cls, service: Dict | CensysService):
+        if isinstance(service, CensysService):
+            if service.tls is not None:
+                tls = service.tls
+                # TODO: Implement TLSComponentCertificate
+                certificate = None
+                ja3s = tls.ja3s
+                ja4s = tls.ja4s
+                jarm = None
+                if service.jarm is not None:
+                    jarm = service.jarm.fingerprint
+                return TLSComponent(
+                    certificate=certificate,
+                    ja3s=ja3s,
+                    ja4s=ja4s,
+                    jarm=jarm
+                )
+            else:
+                return None
+        if isinstance(service, Dict):
+            try:
+                tls = service["tls"]
+                return TLSComponent(
+                    certificate=TLSComponentCertificate.from_censys(tls["certificates"]["leaf_data"]),
+                    ja3s=tls.get("ja3s", None),
+                    jarm=service.get("jarm", {}).get("fingerprint", None)
+                )
+            except KeyError as e:
+                cls.error(f"Exception during certificate data extraction. "
+                        f"The key 'tls.certificates.leaf_data' is not available: {e}\nReturning None...")
+                return None
 
     @classmethod
     def from_binaryedge(cls, d: Union[Dict, List]):
