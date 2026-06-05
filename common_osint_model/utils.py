@@ -1,7 +1,6 @@
 import hashlib
-from typing import Tuple
 
-import mmh3
+import mmh3  # type: ignore[import]
 
 
 def flatten(d: dict, parent_key: str = "") -> dict:
@@ -13,7 +12,7 @@ def flatten(d: dict, parent_key: str = "") -> dict:
     """
     items = []
     for key, value in d.items():
-        combined_key = "{}.{}".format(parent_key, key) if parent_key != "" else key
+        combined_key = f"{parent_key}.{key}" if parent_key != "" else key
         try:
             items.extend(flatten(value, combined_key).items())
         except AttributeError:
@@ -21,7 +20,7 @@ def flatten(d: dict, parent_key: str = "") -> dict:
     return dict(items)
 
 
-def hash_all(data: bytes) -> Tuple[str, str, str, str]:
+def hash_all(data: bytes) -> tuple[str, str, str, str]:
     """
     Helper function to create all hashes for data given.
 

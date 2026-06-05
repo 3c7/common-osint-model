@@ -1,44 +1,48 @@
 import ipaddress
 import json
+import logging
 from datetime import datetime, UTC
-from typing import Optional, Dict, List, Union
+from typing import Any
 
-from pydantic import field_validator, BaseModel
+from pydantic import field_validator, BaseModel, Field
 
-from common_osint_model.models import ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger
+from common_osint_model.models import ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler
 from common_osint_model.models.autonomous_system import AutonomousSystem
 from common_osint_model.models.domain import Domain
 from common_osint_model.models.service import Service
 from common_osint_model.utils import flatten
 from censys_platform.models import HostAsset, HostAssetWithMatchedServices
+from censys_platform.models import Service as CensysService
+
+logger = logging.getLogger(__name__)
 
 
-class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger):
+class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler):
     """This class represents a host and can be used to handle results from the common model in a pythonic way."""
     ip: str
     # Information about the autonomous system the host is assigned to
-    autonomous_system: Optional[AutonomousSystem] = None
+    autonomous_system: AutonomousSystem | None = None
     # List of services running (listening) on the IP
-    services: Optional[List[Service]] = None
+    services: list[Service] | None = None
     # List of open ports also mentioned in the open
-    ports: Optional[List[int]] = None
+    ports: list[int] | None = None
     # Timestamps for activity tracking
-    first_seen: Optional[datetime] = datetime.now(UTC)
-    last_seen: Optional[datetime] = datetime.now(UTC)
+    first_seen: datetime | None = Field(default_factory=lambda: datetime.now(UTC))
+    last_seen: datetime | None = Field(default_factory=lambda: datetime.now(UTC))
     # A list of domains, fqdns, common names - or other attributes which represent domainnames -  assigned to the host
-    domains: Optional[List[Domain]] = None
+    domains: list[Domain] | None = None
     # This represents the source where the host information was obtained, e.g. shodan, censys...
-    source: Optional[str] = None
+    source: str | None = None
     # Optionally, the used query to find the host can be assigned to the object also which might be useful for comparing
     # different hosts later on
-    query: Optional[str] = None
+    query: str | None = None
 
     @field_validator("ip")
     @classmethod
     def validates_ip(cls, v):
         try:
             ipaddress.ip_address(v)
-        except Exception as e:
+        except ValueError as e:
             raise ValueError(f"\"{v}\" is not a correct IP address or at least it is not parseable with the ipaddress"
                              f"module: {e}")
         return v
@@ -47,7 +51,7 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
     def services_dict(self):
         """Returns the services as dictionary in the form of {port: service}. Uses exclude_none to skip empty keys."""
         # Load the JSON dump, so datetime objects are in iso format.
-        json_dict = json.loads(self.json(exclude_none=True))
+        json_dict = json.loads(self.model_dump_json(exclude_none=True))
         json_dict.update({s["port"]: s for s in json_dict["services"]})
         del json_dict["services"]
         return json_dict
@@ -62,19 +66,19 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
         """Dynamic attribute which loops over available services and grabs the port number. This is kind of redundant
         to the ports attribute, if given, but can help to easily get the values needed for the attribute. Unfortunately
         Pydantic does not support these kind of properties in the data model right now."""
-        return [service.port for service in self.services]
+        return [service.port for service in (self.services or [])]
 
     def flattened_json(self) -> str:
         """Returns in the structure formally introduced with the common model."""
         return json.dumps(self.flattened_dict, indent=2)
 
     @classmethod
-    def from_shodan(cls, d: Dict, skip_shodan_domains: Optional[bool] = False):
-        if "data" in d and isinstance(d["data"], List):
+    def from_shodan(cls, d: dict, skip_shodan_domains: bool = False):
+        if "data" in d and isinstance(d["data"], list):
             d = d["data"]
         domains = []
         domain_strings = []
-        if isinstance(d, List):
+        if isinstance(d, list):
             for entry in d:
                 if "domains" in entry and not skip_shodan_domains:
                     for domain in entry["domains"]:
@@ -115,59 +119,74 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
         )
     
     @classmethod
-    def from_censys(cls, host: Dict | HostAsset | HostAssetWithMatchedServices):
+    def from_censys(cls, host: dict | HostAsset | HostAssetWithMatchedServices):
         if isinstance(host, HostAsset) or isinstance(host, HostAssetWithMatchedServices):
             domains = list()
             services = list()
             
             # Handle Forward DNS
             if host.resource.dns is not None and host.resource.dns.forward_dns is not None:
-                for domain in host.resource.dns.forward_dns.keys():
-                    domains.append(
-                        Domain(
-                            domain=domain,
-                            first_seen = host.resource.dns.forward_dns.get(domain).resolve_time,
-                            source = "censys",
-                            type = host.resource.dns.forward_dns.get(domain).record_type
-                        )
-                    )
+                for domain, resolution in host.resource.dns.forward_dns.items():
+                    if resolution is None:
+                        continue
+                    domain_kwargs: dict[str, Any] = {
+                        "domain": domain,
+                        "source": "censys",
+                        "type": resolution.record_type,
+                    }
+                    if resolution.resolve_time:
+                        domain_kwargs["first_seen"] = datetime.fromisoformat(resolution.resolve_time)
+                    domains.append(Domain(**domain_kwargs))
             
             # Handle Reverse DNS
             if host.resource.dns is not None and host.resource.dns.reverse_dns is not None:
-                for reverse_dns_domain in host.resource.dns.reverse_dns.names:
-                    domains.append(
-                        Domain(
-                            domain=reverse_dns_domain,
-                            first_seen = host.resource.dns.reverse_dns.resolve_time,
-                            source = "censys",
-                            type = "rdns"
-                        )
-                    )
+                names = host.resource.dns.reverse_dns.names
+                if isinstance(names, list):
+                    for reverse_dns_domain in names:
+                        if not isinstance(reverse_dns_domain, str):
+                            continue
+                        domain_kwargs: dict[str, Any] = {
+                            "domain": reverse_dns_domain,
+                            "source": "censys",
+                            "type": "rdns",
+                        }
+                        if host.resource.dns.reverse_dns.resolve_time:
+                            domain_kwargs["first_seen"] = datetime.fromisoformat(
+                                host.resource.dns.reverse_dns.resolve_time
+                            )
+                        domains.append(Domain(**domain_kwargs))
             
             # Handle Services
             if host.resource.services is not None:
-                for service in host.resource.services:
-                    services.append(Service.from_censys(service=service))
+                services_list = host.resource.services
+                if isinstance(services_list, list):
+                    for service in services_list:
+                        if isinstance(service, CensysService):
+                            services.append(Service.from_censys(service=service))
             
             # Return Host
+            ip = host.resource.ip
+            if ip is None:
+                raise ValueError("Host IP is None")
+            as_obj = host.resource.autonomous_system
             return Host(
-                ip=host.resource.ip,
+                ip=ip,
                 domains=domains,
                 source="censys",
                 services=services,
                 ports=[service.port for service in services],
-                autonomous_system=AutonomousSystem.from_censys(host.resource.autonomous_system)
+                autonomous_system=AutonomousSystem.from_censys(as_obj) if as_obj is not None else None
             )
-        if isinstance(host, Dict):
+        if isinstance(host, dict):
             return cls._from_censys_dict(host)
 
     @classmethod
-    def from_binaryedge(cls, d: Union[Dict, List]):
+    def from_binaryedge(cls, d: dict | list):
         """This can either be a complete query result, or a list of services running on the same ip."""
-        if isinstance(d, Dict) and "results" in d:
+        if isinstance(d, dict) and "results" in d:
             # This is a complete result dictionary, extract the list of services.
             d = d["results"][list(d["results"].keys())[0]]
-        elif isinstance(d, Dict) and "events" in d:
+        elif isinstance(d, dict) and "events" in d:
             d = d["events"]
 
         services = {}
@@ -202,7 +221,7 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
         )
 
     @classmethod
-    def _from_censys_dict(cls, d: Dict):
+    def _from_censys_dict(cls, d: dict):
         ip = d["ip"]
         services = []
         for service in d["services"]:
@@ -211,7 +230,7 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
         domains = []
         domain_strings = []
         for service in services:
-            if service.tls:
+            if service.tls and service.tls.certificate:
                 for domain in service.tls.certificate.domains:
                     if domain not in domain_strings:
                         domain_strings.append(domain)

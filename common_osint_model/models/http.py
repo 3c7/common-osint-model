@@ -1,7 +1,7 @@
 import base64
-from typing import Dict, List, Optional, Union
+import logging
 
-import mmh3
+import mmh3  # type: ignore[import]
 from pydantic import BaseModel
 from hhhash import hash_from_banner
 
@@ -9,29 +9,31 @@ from common_osint_model.models import (
     ShodanDataHandler,
     CensysDataHandler,
     BinaryEdgeDataHandler,
-    Logger,
 )
 from common_osint_model.utils import hash_all
 
 from censys_platform.models import Service as CensysService
+from censys_platform.models import EndpointScanState
+
+logger = logging.getLogger(__name__)
 
 
 class HTTPComponentContentFavicon(
-    BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger
+    BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler
 ):
     """Represents the favicon which might be included in HTTP components."""
 
-    raw: Optional[str] = None
-    md5: Optional[str] = None
-    sha1: Optional[str] = None
-    sha256: Optional[str] = None
-    murmur: Optional[str] = None
-    shodan_murmur: Optional[str] = None
+    raw: str | None = None
+    md5: str | None = None
+    sha1: str | None = None
+    sha256: str | None = None
+    murmur: str | None = None
+    shodan_murmur: str | None = None
 
     @classmethod
-    def from_shodan(cls, d: Dict):
+    def from_shodan(cls, d: dict):
         """Creates an instance of this class based on Shodan data given as dictionary."""
-        if not isinstance(d, Dict):
+        if not isinstance(d, dict):
             raise TypeError(
                 f"Method HTTPComponentContentFavicon.from_shodan expects parameter d to be a dictionary, "
                 f"but it was {type(d)}."
@@ -41,7 +43,7 @@ class HTTPComponentContentFavicon(
         raw = base64.b64decode(raw)
         md5, sha1, sha256, murmur = hash_all(raw)
         shodan_murmur = str(mmh3.hash(d["http"]["favicon"]["data"]))
-        cls.info(
+        logger.info(
             "Shodan's favicon hash only hashes the base64 encoded favicon, not the data itself. The hash can be "
             'found as "shodan_murmur" in this instance. "murmur" and the other hashes are calculated based on '
             "the raw data of the favicon."
@@ -56,7 +58,7 @@ class HTTPComponentContentFavicon(
         )
 
     @classmethod
-    def from_censys(cls, d: Dict):
+    def from_censys(cls, d: dict):
         """
         Not supported by Censys right now.
         TODO: Censys implemented Favicons.
@@ -64,7 +66,12 @@ class HTTPComponentContentFavicon(
         return None
 
     @classmethod
-    def from_binaryedge(cls, d: Union[Dict, List]):
+    def from_binaryedge(cls, d: dict | list):
+        if not isinstance(d, dict):
+            raise TypeError(
+                f"Method HTTPComponentContentFavicon.from_binaryedge expects parameter d to be a dictionary, "
+                f"but it was {type(d)}."
+            )
         favicon = d["result"]["data"]["response"]["favicon"]["content"]
         favicon_bytes = base64.b64decode(favicon.encode("utf-8"))
         md5, sha1, sha256, murmur = hash_all(favicon_bytes)
@@ -82,16 +89,16 @@ class HTTPComponentContentFavicon(
 class HTTPComponentContentRobots(BaseModel, ShodanDataHandler, CensysDataHandler):
     """Represents the robots.txt file in webroots."""
 
-    raw: Optional[str] = None
-    md5: Optional[str] = None
-    sha1: Optional[str] = None
-    sha256: Optional[str] = None
-    murmur: Optional[str] = None
+    raw: str | None = None
+    md5: str | None = None
+    sha1: str | None = None
+    sha256: str | None = None
+    murmur: str | None = None
 
     @classmethod
-    def from_shodan(cls, d: Dict):
+    def from_shodan(cls, d: dict):
         """Creates an instance of this class based on Shodan data given as dictionary."""
-        if not isinstance(d, Dict):
+        if not isinstance(d, dict):
             raise TypeError(
                 f"Method HTTPComponentContentRobots.from_shodan expects parameter d to be a dictionary, "
                 f"but it was {type(d)}."
@@ -104,7 +111,7 @@ class HTTPComponentContentRobots(BaseModel, ShodanDataHandler, CensysDataHandler
         )
 
     @classmethod
-    def from_censys(cls, d: Dict):
+    def from_censys(cls, d: dict):
         """Not supported by Censys right now."""
         return None
 
@@ -112,16 +119,16 @@ class HTTPComponentContentRobots(BaseModel, ShodanDataHandler, CensysDataHandler
 class HTTPComponentContentSecurity(BaseModel, ShodanDataHandler, CensysDataHandler):
     """Represents the security.txt file in webroots."""
 
-    raw: Optional[str] = None
-    md5: Optional[str] = None
-    sha1: Optional[str] = None
-    sha256: Optional[str] = None
-    murmur: Optional[str] = None
+    raw: str | None = None
+    md5: str | None = None
+    sha1: str | None = None
+    sha256: str | None = None
+    murmur: str | None = None
 
     @classmethod
-    def from_shodan(cls, d: Dict):
+    def from_shodan(cls, d: dict):
         """Creates an instance of this class based on Shodan data given as dictionary."""
-        if not isinstance(d, Dict):
+        if not isinstance(d, dict):
             raise TypeError(
                 f"Method HTTPComponentContentRobots.from_shodan expects parameter d to be a dictionary, "
                 f"but it was {type(d)}."
@@ -134,66 +141,66 @@ class HTTPComponentContentSecurity(BaseModel, ShodanDataHandler, CensysDataHandl
         )
 
     @classmethod
-    def from_censys(cls, d: Dict):
+    def from_censys(cls, d: dict):
         """Not supported by Censys right now."""
         return None
 
 
 class HTTPComponentContent(
-    BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger
+    BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler
 ):
     """Represents the content (body) of HTTP responses."""
 
-    raw: Optional[str] = None
-    length: Optional[int] = None
-    md5: Optional[str] = None
-    sha1: Optional[str] = None
-    sha256: Optional[str] = None
-    murmur: Optional[str] = None
-    favicon: Optional[HTTPComponentContentFavicon] = None
-    robots_txt: Optional[HTTPComponentContentRobots] = None
-    security_txt: Optional[HTTPComponentContentSecurity] = None
+    raw: str | None = None
+    length: int | None = None
+    md5: str | None = None
+    sha1: str | None = None
+    sha256: str | None = None
+    murmur: str | None = None
+    favicon: HTTPComponentContentFavicon | None = None
+    robots_txt: HTTPComponentContentRobots | None = None
+    security_txt: HTTPComponentContentSecurity | None = None
 
     @classmethod
-    def from_shodan(cls, d: Dict):
+    def from_shodan(cls, d: dict):
         """Creates an instance of this class based on Shodan data given as dictionary."""
-        if not isinstance(d, Dict):
+        if not isinstance(d, dict):
             raise TypeError(
                 f"Method HTTPComponentContent.from_shodan expects parameter d to be a dictionary, "
                 f"but it was {type(d)}."
             )
 
         favicon = None
-        if "favicon" in d["http"]:
-            cls.debug("Favicon key found in Shodan data.")
+        if "favicon" in d.get("http", {}):
+            logger.debug("Favicon key found in Shodan data.")
             favicon = HTTPComponentContentFavicon.from_shodan(d)
 
         security_txt = None
-        if d["http"]["securitytxt"]:
-            cls.debug("Security.txt key found in Shodan data.")
+        if d.get("http", {}).get("securitytxt"):
+            logger.debug("Security.txt key found in Shodan data.")
             security_txt = HTTPComponentContentSecurity.from_shodan(d)
 
         robots_txt = None
-        if d["http"]["robots"]:
-            cls.debug("Robots.txt key found in Shodan data.")
+        if d.get("http", {}).get("robots"):
+            logger.debug("Robots.txt key found in Shodan data.")
             robots_txt = HTTPComponentContentRobots.from_shodan(d)
 
-        raw = d["http"].get("html", "")
-        if not raw:
-            raw = ""
+        raw_str = d["http"].get("html", "")
+        if not raw_str:
+            raw_str = ""
 
         try:
-            raw = raw.encode("utf-8")
+            raw_bytes = raw_str.encode("utf-8")
         except UnicodeEncodeError as uee:
             # TODO: This is very ugly, but spontanously I can't find a solution for the weird Shodan encoding issue.
-            cls.error(f"UnicodeEncodeError during Shodan result encoding: {uee}")
-            cls.warning("Using empty strings as HTML body.")
-            raw = "".encode("utf-8")
+            logger.error(f"UnicodeEncodeError during Shodan result encoding: {uee}")
+            logger.warning("Using empty strings as HTML body.")
+            raw_bytes = "".encode("utf-8")
 
-        md5, sha1, sha256, murmur = hash_all(raw)
+        md5, sha1, sha256, murmur = hash_all(raw_bytes)
         return HTTPComponentContent(
-            raw=raw,
-            length=len(raw),
+            raw=raw_str,
+            length=len(raw_bytes),
             md5=md5,
             sha1=sha1,
             sha256=sha256,
@@ -204,34 +211,38 @@ class HTTPComponentContent(
         )
 
     @classmethod
-    def from_censys(cls, service: Dict | CensysService):
+    def from_censys(cls, service: dict | CensysService):
         if isinstance(service, CensysService):
-            for endpoint in service.endpoints:
-                if endpoint.http is not None:
-                    http_body = endpoint.http.body
-                    md5, sha1, sha256, murmur = hash_all(http_body.encode("utf-8"))
-                    # Overwrite available hashes with CensysAPI data
-                    if endpoint.http.body_hash_sha1 is not None:
-                        sha1 = endpoint.http.body_hash_sha1
-                    if endpoint.http.body_hash_sha256 is not None:
-                        sha256 = endpoint.http.body_hash_sha256
-                    
-                    return HTTPComponentContent(
-                        raw=http_body,
-                        length=len(http_body),
-                        md5=md5,
-                        sha1=sha1,
-                        sha256=sha256,
-                        murmur=murmur,
-                        # TODO: Implement Favicon, Robots, Security
-                        #favicon=HTTPComponentContentFavicon.from_censys(service),
-                        #robots_txt=HTTPComponentContentRobots.from_censys(service),
-                        #security_txt=HTTPComponentContentSecurity.from_censys(service),
-                    )
+            endpoints = service.endpoints
+            if isinstance(endpoints, list):
+                for endpoint in endpoints:
+                    if isinstance(endpoint, EndpointScanState) and endpoint.http is not None:
+                        http_body = endpoint.http.body
+                        if http_body is None:
+                            continue
+                        md5, sha1, sha256, murmur = hash_all(http_body.encode("utf-8"))
+                        # Overwrite available hashes with CensysAPI data
+                        if endpoint.http.body_hash_sha1 is not None:
+                            sha1 = endpoint.http.body_hash_sha1
+                        if endpoint.http.body_hash_sha256 is not None:
+                            sha256 = endpoint.http.body_hash_sha256
+                        
+                        return HTTPComponentContent(
+                            raw=http_body,
+                            length=len(http_body),
+                            md5=md5,
+                            sha1=sha1,
+                            sha256=sha256,
+                            murmur=murmur,
+                            # TODO: Implement Favicon, Robots, Security
+                            #favicon=HTTPComponentContentFavicon.from_censys(service),
+                            #robots_txt=HTTPComponentContentRobots.from_censys(service),
+                            #security_txt=HTTPComponentContentSecurity.from_censys(service),
+                        )
             # Fallback, if no endpoint or no HTTP endpoint
             return None
 
-        if isinstance(service, Dict):
+        if isinstance(service, dict):
             """Creates an instance of this class based on Censys (2.0) data given as dictionary."""
             http = service["http"]["response"]
             raw = http["body"] if http["body_size"] > 0 else ""
@@ -249,9 +260,14 @@ class HTTPComponentContent(
             )
 
     @classmethod
-    def from_binaryedge(cls, d: Union[Dict, List]):
+    def from_binaryedge(cls, d: dict | list):
         """Creates an instance of this class based on BinaryEdge data given as dictionary. Robots and Security.txt are
         not supported by BinaryEdge."""
+        if not isinstance(d, dict):
+            raise TypeError(
+                f"Method HTTPComponentContent.from_binaryedge expects parameter d to be a dictionary, "
+                f"but it was {type(d)}."
+            )
         http_response = d["result"]["data"]["response"]
         raw = http_response["body"]["content"]
         md5, sha1, sha256, murmur = hash_all(raw.encode("utf-8"))
@@ -271,16 +287,16 @@ class HTTPComponent(
 ):
     """Represents the HTTP component of services."""
 
-    headers: Optional[Dict[str, str]] = None
-    content: Optional[HTTPComponentContent] = None
-    shodan_headers_hash: Optional[str] = None
-    hhhash: Optional[str] = None
-    status_code: Optional[int] = None
+    headers: dict[str, str] | None = None
+    content: HTTPComponentContent | None = None
+    shodan_headers_hash: str | None = None
+    hhhash: str | None = None
+    status_code: int | None = None
 
     @classmethod
-    def from_shodan(cls, d: Dict):
+    def from_shodan(cls, d: dict):
         """Creates an instance of this class based on Shodan data given as dictionary."""
-        if not isinstance(d, Dict):
+        if not isinstance(d, dict):
             raise TypeError(
                 f"Method HTTPComponent.from_shodan expects parameter d to be a dictionary, "
                 f"but it was {type(d)}."
@@ -303,38 +319,51 @@ class HTTPComponent(
         )
 
     @classmethod
-    def from_censys(cls, service: Dict | CensysService):
+    def from_censys(cls, service: dict | CensysService):
         if isinstance(service, CensysService):
-            for endpoint in service.endpoints:
-                if endpoint.http is not None:
-                    headers:Dict[str,str] = dict()
-                    # Store Header
-                    for header_name, header_values in endpoint.http.headers.items():
-                        for header_value in header_values.headers:
-                            headers[header_name] = header_value
-                    banner_lines = service.banner.replace("\r", "").split("\n")
-                    banner_keys = banner_lines[0]
-                    for line in banner_lines:
-                        if ":" in line:
-                            k, _ = line.split(":", maxsplit=1)
-                            banner_keys += "\n" + k
-                    headers_hash = str(mmh3.hash(banner_keys.encode("utf-8")))
+            endpoints = service.endpoints
+            if isinstance(endpoints, list):
+                for endpoint in endpoints:
+                    if isinstance(endpoint, EndpointScanState) and endpoint.http is not None:
+                        headers: dict[str, str] = dict()
+                        # Store Header
+                        if endpoint.http.headers is not None:
+                            for header_name, header_values in endpoint.http.headers.items():
+                                if header_values.headers is not None and isinstance(header_values.headers, list):
+                                    for header_value in header_values.headers:
+                                        if isinstance(header_value, str):
+                                            headers[header_name] = header_value
+                        banner = service.banner
+                        if banner is None:
+                            continue
+                        banner_lines = banner.replace("\r", "").split("\n")
+                        banner_keys = banner_lines[0]
+                        for line in banner_lines:
+                            if ":" in line:
+                                k, _ = line.split(":", maxsplit=1)
+                                banner_keys += "\n" + k
+                        headers_hash = str(mmh3.hash(banner_keys.encode("utf-8")))
 
-                    return HTTPComponent(
-                        headers=headers,
-                        content=HTTPComponentContent.from_censys(service),
-                        shodan_headers_hash=headers_hash,
-                        hhhash=hash_from_banner(service.banner),
-                        status_code=endpoint.http.status_code
-                    )
+                        return HTTPComponent(
+                            headers=headers,
+                            content=HTTPComponentContent.from_censys(service),
+                            shodan_headers_hash=headers_hash,
+                            hhhash=hash_from_banner(banner),
+                            status_code=endpoint.http.status_code
+                        )
             # Fallback, if no endpoint or no HTTP endpoint
             return None
 
-        if isinstance(service, Dict):
+        if isinstance(service, dict):
             return cls._from_censys_dict(d=service)
 
     @classmethod
-    def from_binaryedge(cls, d: Union[Dict, List]):
+    def from_binaryedge(cls, d: dict | list):
+        if not isinstance(d, dict):
+            raise TypeError(
+                f"Method HTTPComponent.from_binaryedge expects parameter d to be a dictionary, "
+                f"but it was {type(d)}."
+            )
         http_response = d["result"]["data"]["response"]
         headers = http_response["headers"]["headers"]
         return HTTPComponent(
@@ -342,7 +371,7 @@ class HTTPComponent(
         )
 
     @classmethod
-    def _from_censys_dict(cls, d: Dict):
+    def _from_censys_dict(cls, d: dict):
         """Todo: Is parsing from services.banner better than just looping over the headers found by Censys?"""
         http = d["http"]["response"]
         headers = {}

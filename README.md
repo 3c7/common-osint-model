@@ -112,7 +112,7 @@ shodan_client = shodan.Shodan("My API key")
 raw_shodan_response = shodan_client.host("140.82.121.4")
 host = Host.from_shodan(raw_shodan_response)
 print(f"Host: {host.ip}")
-print(f"AS: {host.autonomous_system.dict(exclude_none=True)}")
+print(f"AS: {host.autonomous_system.model_dump(exclude_none=True)}")
 
 for service in host.services:
     print(f"Service: {service}")

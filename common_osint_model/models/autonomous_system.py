@@ -1,18 +1,20 @@
 import ipaddress
-from typing import Dict, List, Optional
+import logging
 
 from pydantic import field_validator, BaseModel
 
-from common_osint_model.models import ShodanDataHandler, CensysDataHandler, Logger
+from common_osint_model.models import ShodanDataHandler, CensysDataHandler
 from censys_platform.models import Routing
 
+logger = logging.getLogger(__name__)
 
-class AutonomousSystem(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
+
+class AutonomousSystem(BaseModel, ShodanDataHandler, CensysDataHandler):
     """Represents an autonomous system"""
-    number: Optional[int] = None
-    name: Optional[str] = None
-    country: Optional[str] = None
-    prefix: Optional[str] = None
+    number: int | None = None
+    name: str | None = None
+    country: str | None = None
+    prefix: str | None = None
     source: str
     # TODO: Add ASN Description and Organization
 
@@ -23,16 +25,16 @@ class AutonomousSystem(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
             return v
         try:
             ipaddress.ip_network(v)
-        except Exception as e:
+        except ValueError as e:
             raise ValueError(f"Prefix given could not be parsed by ipaddress module. Likely \"{v}\" has a "
                              f"wrong format: {e}")
         return v
 
     @classmethod
-    def from_shodan(cls, d: Dict):
+    def from_shodan(cls, d: dict):
         """Creates an instance of this class using a typical Shodan dictionary."""
-        if isinstance(d, List):
-            cls.debug("Got a list instead of a dictionary. Usually multiple services of the same host are represented "
+        if isinstance(d, list):
+            logger.debug("Got a list instead of a dictionary. Usually multiple services of the same host are represented "
                       "as multiple list items by shodan, so this should not be a problem as the AS is the same for all."
                       " Using the first item.")
             d = d[0]
@@ -46,7 +48,7 @@ class AutonomousSystem(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
         )
 
     @classmethod
-    def from_censys(cls, autonomous_system: Dict | Routing):
+    def from_censys(cls, autonomous_system: dict | Routing):
         if isinstance(autonomous_system, Routing):
             return AutonomousSystem(
                 number=autonomous_system.asn,
@@ -56,7 +58,7 @@ class AutonomousSystem(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
                 source="censys"
             )
         
-        if isinstance(autonomous_system, Dict):
+        if isinstance(autonomous_system, dict):
             autonomous_system = autonomous_system.get("autonomous_system", {})
             return AutonomousSystem(
                 number=autonomous_system.get("asn", None),

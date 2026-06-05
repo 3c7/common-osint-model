@@ -15,7 +15,7 @@ dependencies = [
   "DateTime>=4.3,<5",
   "mmh3>=3.0.0,<4",
   "cryptography==46.0.3",
-  "pydantic==2.12.5",
+  "pydantic==2.13.4",
   "hhhash>=0.3,<0.4",
   "urllib3==2.6.3",
   "censys-platform>=0.12.1,<0.13.0",
@@ -25,15 +25,12 @@ dependencies = [
 Homepage = "https://github.com/3c7/common-osint-model"
 Repository = "https://github.com/3c7/common-osint-model"
 
-[project.scripts]
-convshodan = "common_osint_model.cli:convshodan"
-convcensys = "common_osint_model.cli:convcensys"
-convcensyscert = "common_osint_model.cli:convcensyscert"
-convcensys2 = "common_osint_model.cli:convcensys2"
-convcert = "common_osint_model.cli:convcert"
-
 [dependency-groups]
-dev = ["pytest>=9.0.2"]
+dev = [
+    "pytest>=9.0.2",
+    "ruff",
+    "ty",
+]
 
 [build-system]
 requires = ["hatchling"]

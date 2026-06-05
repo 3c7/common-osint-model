@@ -4,38 +4,38 @@ from common_osint_model import Host, Service
 from censys_platform.utils import unmarshal_json
 from censys_platform.models import HostAsset, Service as CensysService
 
-from mocks import CENSYS_HOST_JSON_PLATFORM
+from tests.mocks import CENSYS_HOST_JSON_PLATFORM
 
 def test_host_mock_success():
     # Make sure that import works
     censys_host = unmarshal_json(json.dumps(CENSYS_HOST_JSON_PLATFORM), HostAsset)
-    assert type(censys_host) is HostAsset
+    assert isinstance(censys_host, HostAsset)
     assert censys_host.resource.ip == "27.33.219.14"
     
     # Actual test for Basic Host
     com_host = Host.from_censys(censys_host)
-    assert type(com_host) is Host
+    assert isinstance(com_host, Host)
     assert com_host.ip == censys_host.resource.ip
 
 def test_asn_mock_success():
     # Make sure that import works
     censys_host = unmarshal_json(json.dumps(CENSYS_HOST_JSON_PLATFORM), HostAsset)
-    assert type(censys_host) is HostAsset
+    assert isinstance(censys_host, HostAsset)
     assert censys_host.resource.ip == "27.33.219.14"
     
     # Actual test for ASN
     com_host = Host.from_censys(censys_host)
-    assert type(com_host) is Host
+    assert isinstance(com_host, Host)
     assert com_host.autonomous_system.number == 20115
 
 def test_domain_mock_success():
     # Make sure that import works
     censys_host = unmarshal_json(json.dumps(CENSYS_HOST_JSON_PLATFORM), HostAsset)
-    assert type(censys_host) is HostAsset
+    assert isinstance(censys_host, HostAsset)
     assert censys_host.resource.ip == "27.33.219.14"
     
     com_host = Host.from_censys(censys_host)
-    assert type(com_host) is Host
+    assert isinstance(com_host, Host)
     
     # Actual test for Forward Domain
     assert len(com_host.domains[0].domain) > 0
@@ -48,12 +48,12 @@ def test_domain_mock_success():
 def test_host_services_mock_success():
     # Make sure that import works
     censys_host = unmarshal_json(json.dumps(CENSYS_HOST_JSON_PLATFORM), HostAsset)
-    assert type(censys_host) is HostAsset
+    assert isinstance(censys_host, HostAsset)
     assert censys_host.resource.ip == "27.33.219.14"
     
     # Actual test for service
     com_host = Host.from_censys(censys_host)
-    assert type(com_host) is Host
+    assert isinstance(com_host, Host)
     assert len(com_host.ports) == 1
     assert 7547 in com_host.ports
     assert len(com_host.services) == 1
@@ -65,11 +65,11 @@ def test_host_services_mock_success():
 def test_service_success():
     # Make sure that import works
     censys_host = unmarshal_json(json.dumps(CENSYS_HOST_JSON_PLATFORM), HostAsset)
-    assert type(censys_host) is HostAsset
+    assert isinstance(censys_host, HostAsset)
     censys_services = censys_host.resource.services
     assert len(censys_services) == 1
     censys_service = censys_services[0]
-    assert type(censys_service) is CensysService
+    assert isinstance(censys_service, CensysService)
     
     # Actual test for service
     com_service = Service.from_censys(censys_service)
