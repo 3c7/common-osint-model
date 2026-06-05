@@ -1,6 +1,6 @@
 [project]
 name = "common-osint-model"
-version = "0.6.3"
+version = "0.6.4-beta1"
 description = "Converting data from services like BinaryEdge, Censys and Shodan to a common data model."
 authors = [{ name = "3c7", email = "3c7@posteo.de" }]
 requires-python = ">=3.11,<4"
@@ -26,11 +26,7 @@ Homepage = "https://github.com/3c7/common-osint-model"
 Repository = "https://github.com/3c7/common-osint-model"
 
 [dependency-groups]
-dev = [
-    "pytest>=9.0.2",
-    "ruff",
-    "ty",
-]
+dev = ["pytest>=9.0.2", "ruff", "ty"]
 
 [build-system]
 requires = ["hatchling"]
