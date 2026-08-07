@@ -14,7 +14,7 @@ classifiers = [
 dependencies = [
   "DateTime>=4.3,<5",
   "mmh3>=3.0.0,<4",
-  "cryptography==46.0.3",
+  "cryptography==50.0.0",
   "pydantic==2.12.5",
   "hhhash>=0.3,<0.4",
   "urllib3==2.6.3",
