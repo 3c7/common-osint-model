@@ -5,7 +5,12 @@ from typing import Optional, Dict, List, Union
 
 from pydantic import field_validator, BaseModel
 
-from common_osint_model.models import ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger
+from common_osint_model.models import (
+    ShodanDataHandler,
+    CensysDataHandler,
+    BinaryEdgeDataHandler,
+    Logger,
+)
 from common_osint_model.models.autonomous_system import AutonomousSystem
 from common_osint_model.models.domain import Domain
 from common_osint_model.models.service import Service
@@ -13,8 +18,11 @@ from common_osint_model.utils import flatten
 from censys_platform.models import HostAsset, HostAssetWithMatchedServices
 
 
-class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger):
+class Host(
+    BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler, Logger
+):
     """This class represents a host and can be used to handle results from the common model in a pythonic way."""
+
     ip: str
     # Information about the autonomous system the host is assigned to
     autonomous_system: Optional[AutonomousSystem] = None
@@ -39,8 +47,10 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
         try:
             ipaddress.ip_address(v)
         except Exception as e:
-            raise ValueError(f"\"{v}\" is not a correct IP address or at least it is not parseable with the ipaddress"
-                             f"module: {e}")
+            raise ValueError(
+                f'"{v}" is not a correct IP address or at least it is not parseable with the ipaddress'
+                f"module: {e}"
+            )
         return v
 
     @property
@@ -80,13 +90,17 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
                     for domain in entry["domains"]:
                         if domain not in domain_strings:
                             domain_strings.append(domain)
-                            domains.append(Domain(domain=domain, source="shodan", type="domain"))
+                            domains.append(
+                                Domain(domain=domain, source="shodan", type="domain")
+                            )
                 # Check Shodans reverse dns lookups
                 if "hostnames" in entry and not skip_shodan_domains:
                     for hostname in entry["hostnames"]:
                         if hostname not in domain_strings:
                             domain_strings.append(hostname)
-                            domains.append(Domain(domain=hostname, source="shodan", type="rdns"))
+                            domains.append(
+                                Domain(domain=hostname, source="shodan", type="rdns")
+                            )
             ip = d[0]["ip_str"]
             services = [Service.from_shodan(service) for service in d]
         else:
@@ -97,13 +111,15 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
                 for domain in service.tls.certificate.domains:
                     if domain not in domain_strings:
                         domain_strings.append(domain)
-                        domains.append(Domain(
-                            domain=domain,
-                            first_seen=service.tls.certificate.issued,
-                            last_seen=service.tls.certificate.expires,
-                            source="shodan",
-                            type="common_name"
-                        ))
+                        domains.append(
+                            Domain(
+                                domain=domain,
+                                first_seen=service.tls.certificate.issued,
+                                last_seen=service.tls.certificate.expires,
+                                source="shodan",
+                                type="common_name",
+                            )
+                        )
         autonomous_system = AutonomousSystem.from_shodan(d)
         return Host(
             ip=ip,
@@ -111,44 +127,54 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
             services=services,
             domains=domains,
             source="shodan",
-            ports=[service.port for service in services]
+            ports=[service.port for service in services],
         )
-    
+
     @classmethod
     def from_censys(cls, host: Dict | HostAsset | HostAssetWithMatchedServices):
-        if isinstance(host, HostAsset) or isinstance(host, HostAssetWithMatchedServices):
+        if isinstance(host, HostAsset) or isinstance(
+            host, HostAssetWithMatchedServices
+        ):
             domains = list()
             services = list()
-            
+
             # Handle Forward DNS
-            if host.resource.dns is not None and host.resource.dns.forward_dns is not None:
+            if (
+                host.resource.dns is not None
+                and host.resource.dns.forward_dns is not None
+            ):
                 for domain in host.resource.dns.forward_dns.keys():
                     domains.append(
                         Domain(
                             domain=domain,
-                            first_seen = host.resource.dns.forward_dns.get(domain).resolve_time,
-                            source = "censys",
-                            type = host.resource.dns.forward_dns.get(domain).record_type
+                            first_seen=host.resource.dns.forward_dns.get(
+                                domain
+                            ).resolve_time,
+                            source="censys",
+                            type=host.resource.dns.forward_dns.get(domain).record_type,
                         )
                     )
-            
+
             # Handle Reverse DNS
-            if host.resource.dns is not None and host.resource.dns.reverse_dns is not None:
+            if (
+                host.resource.dns is not None
+                and host.resource.dns.reverse_dns is not None
+            ):
                 for reverse_dns_domain in host.resource.dns.reverse_dns.names:
                     domains.append(
                         Domain(
                             domain=reverse_dns_domain,
-                            first_seen = host.resource.dns.reverse_dns.resolve_time,
-                            source = "censys",
-                            type = "rdns"
+                            first_seen=host.resource.dns.reverse_dns.resolve_time,
+                            source="censys",
+                            type="rdns",
                         )
                     )
-            
+
             # Handle Services
             if host.resource.services is not None:
                 for service in host.resource.services:
                     services.append(Service.from_censys(service=service))
-            
+
             # Return Host
             return Host(
                 ip=host.resource.ip,
@@ -156,7 +182,9 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
                 source="censys",
                 services=services,
                 ports=[service.port for service in services],
-                autonomous_system=AutonomousSystem.from_censys(host.resource.autonomous_system)
+                autonomous_system=AutonomousSystem.from_censys(
+                    host.resource.autonomous_system
+                ),
             )
         if isinstance(host, Dict):
             return cls._from_censys_dict(host)
@@ -177,7 +205,9 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
                 services[port] = [service]
             else:
                 services[port].append(service)
-        services_objects = [Service.from_binaryedge(service) for service in services.values()]
+        services_objects = [
+            Service.from_binaryedge(service) for service in services.values()
+        ]
         ip = d[0]["target"]["ip"]
         domains = []
         domain_strings = []
@@ -186,19 +216,21 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
                 for domain in service.tls.certificate.domains:
                     if domain not in domain_strings:
                         domain_strings.append(domain)
-                        domains.append(Domain(
-                            domain=domain,
-                            first_seen=service.tls.certificate.issued,
-                            last_seen=service.tls.certificate.expires,
-                            source="binaryedge",
-                            type="common_name"
-                        ))
+                        domains.append(
+                            Domain(
+                                domain=domain,
+                                first_seen=service.tls.certificate.issued,
+                                last_seen=service.tls.certificate.expires,
+                                source="binaryedge",
+                                type="common_name",
+                            )
+                        )
         return Host(
             ip=ip,
             services=services_objects,
             domains=domains,
             source="binaryedge",
-            ports=[service.port for service in services_objects]
+            ports=[service.port for service in services_objects],
         )
 
     @classmethod
@@ -215,19 +247,44 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
                 for domain in service.tls.certificate.domains:
                     if domain not in domain_strings:
                         domain_strings.append(domain)
-                        domains.append(Domain(
-                            domain=domain,
-                            # Currently not given by API
-                            # first_seen=service.tls.certificate.issued,
-                            # last_seen=service.tls.certificate.expires,
-                            source="censys",
-                            type="common_name"
-                        ))
+                        domains.append(
+                            Domain(
+                                domain=domain,
+                                # Currently not given by API
+                                # first_seen=service.tls.certificate.issued,
+                                # last_seen=service.tls.certificate.expires,
+                                source="censys",
+                                type="common_name",
+                            )
+                        )
         return Host(
             ip=ip,
             autonomous_system=AutonomousSystem.from_censys(d),
             services=services,
             domains=domains,
             source="censys",
-            ports=[service.port for service in services]
+            ports=[service.port for service in services],
+        )
+
+    @classmethod
+    def from_modat(cls, d: Dict):
+        """Create a Host instance based on the JSON data returned by the Modat API. d is the dict given in the page list."""
+        services = [Service.from_modat(service) for service in d.get("services", [])]
+        domains = [
+            Domain(domain=domain, type="rdns", source="modat")
+            for domain in d.get("rdns", [])
+        ]
+        domains.extend(
+            [
+                Domain(domain=domain, type="domain", source="modat")
+                for domain in d.get("fqdns", [])
+            ]
+        )
+        return Host(
+            ip=d["ip"],
+            autonomous_system=AutonomousSystem.from_modat(d),
+            domains=domains,
+            services=services,
+            ports=[service["port"] for service in d.get("services", [])],
+            source="modat",
         )

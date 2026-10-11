@@ -9,6 +9,7 @@ from censys_platform.models import Routing
 
 class AutonomousSystem(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
     """Represents an autonomous system"""
+
     number: Optional[int] = None
     name: Optional[str] = None
     country: Optional[str] = None
@@ -24,17 +25,21 @@ class AutonomousSystem(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
         try:
             ipaddress.ip_network(v)
         except Exception as e:
-            raise ValueError(f"Prefix given could not be parsed by ipaddress module. Likely \"{v}\" has a "
-                             f"wrong format: {e}")
+            raise ValueError(
+                f'Prefix given could not be parsed by ipaddress module. Likely "{v}" has a '
+                f"wrong format: {e}"
+            )
         return v
 
     @classmethod
     def from_shodan(cls, d: Dict):
         """Creates an instance of this class using a typical Shodan dictionary."""
         if isinstance(d, List):
-            cls.debug("Got a list instead of a dictionary. Usually multiple services of the same host are represented "
-                      "as multiple list items by shodan, so this should not be a problem as the AS is the same for all."
-                      " Using the first item.")
+            cls.debug(
+                "Got a list instead of a dictionary. Usually multiple services of the same host are represented "
+                "as multiple list items by shodan, so this should not be a problem as the AS is the same for all."
+                " Using the first item."
+            )
             d = d[0]
         asn = d.get("asn", None)
         return AutonomousSystem(
@@ -42,7 +47,7 @@ class AutonomousSystem(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
             name=d.get("isp"),
             country=d.get("location", {}).get("country_code", None),
             prefix=None,  # Not available in Shodan data
-            source="shodan"
+            source="shodan",
         )
 
     @classmethod
@@ -53,9 +58,9 @@ class AutonomousSystem(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
                 name=autonomous_system.name,
                 country=autonomous_system.country_code,
                 prefix=autonomous_system.bgp_prefix,
-                source="censys"
+                source="censys",
             )
-        
+
         if isinstance(autonomous_system, Dict):
             autonomous_system = autonomous_system.get("autonomous_system", {})
             return AutonomousSystem(
@@ -63,7 +68,17 @@ class AutonomousSystem(BaseModel, ShodanDataHandler, CensysDataHandler, Logger):
                 name=autonomous_system.get("name", None),
                 country=autonomous_system.get("country_code", None),
                 prefix=autonomous_system.get("bgp_prefix", None),
-                source="censys"
+                source="censys",
             )
-        
+
         return None
+
+    @classmethod
+    def from_modat(cls, d: Dict):
+        d = d.get("asn", {})
+        return AutonomousSystem(
+            number=d.get("number"),
+            name=d.get("org"),
+            prefix=d.get("netblock"),
+            source="modat",
+        )
