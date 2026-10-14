@@ -5,14 +5,21 @@ from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicNumbers
 from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
 from pydantic import BaseModel
 
-from common_osint_model.models import ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler
+from common_osint_model.models import (
+    ShodanDataHandler,
+    CensysDataHandler,
+    BinaryEdgeDataHandler,
+)
 from common_osint_model.utils import hash_all
 
 logger = logging.getLogger(__name__)
 
 
-class SSHComponentAlgorithms(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler):
+class SSHComponentAlgorithms(
+    BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler
+):
     """Represents algorithms supported by SSH server."""
+
     encryption: list[str] | None = None
     key_exchange: list[str] | None = None
     mac: list[str] | None = None
@@ -23,15 +30,17 @@ class SSHComponentAlgorithms(BaseModel, ShodanDataHandler, CensysDataHandler, Bi
     def from_shodan(cls, d: dict) -> "SSHComponentAlgorithms | None":
         """Returns an instance of this class based on Shodan data given as dictionary."""
         if not isinstance(d, dict):
-            raise TypeError(f"Method SSHComponentAlgorithms.from_shodan expects parameter d to be a dictionary, "
-                            f"but it was {type(d)}.")
+            raise TypeError(
+                f"Method SSHComponentAlgorithms.from_shodan expects parameter d to be a dictionary, "
+                f"but it was {type(d)}."
+            )
         try:
             return SSHComponentAlgorithms(
                 encryption=d["ssh"]["kex"]["encryption_algorithms"],
                 key_exchange=d["ssh"]["kex"]["kex_algorithms"],
                 mac=d["ssh"]["kex"]["mac_algorithms"],
                 key_algorithms=d["ssh"]["kex"]["server_host_key_algorithms"],
-                compression=d["ssh"]["kex"]["compression_algorithms"]
+                compression=d["ssh"]["kex"]["compression_algorithms"],
             )
         except KeyError as ke:
             logger.warning(f"Shodan data is missing key: {ke}")
@@ -46,7 +55,9 @@ class SSHComponentAlgorithms(BaseModel, ShodanDataHandler, CensysDataHandler, Bi
                 key_exchange=d["ssh"]["kex_init_message"]["kex_algorithms"],
                 mac=d["ssh"]["kex_init_message"]["server_to_client_macs"],
                 key_algorithms=d["ssh"]["kex_init_message"]["host_key_algorithms"],
-                compression=d["ssh"]["kex_init_message"]["server_to_client_compression"]
+                compression=d["ssh"]["kex_init_message"][
+                    "server_to_client_compression"
+                ],
             )
         except KeyError as ke:
             logger.warning(f"Censys data is missing key: {ke}")
@@ -61,15 +72,18 @@ class SSHComponentAlgorithms(BaseModel, ShodanDataHandler, CensysDataHandler, Bi
                 key_exchange=d["kex"],
                 mac=d["mac"],
                 key_algorithms=d["server_host_key"],
-                compression=d["compression"]
+                compression=d["compression"],
             )
         except KeyError as ke:
             logger.warning(f"BinaryEdge data is missing key: {ke}")
             return None
 
 
-class SSHComponentKey(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler):
+class SSHComponentKey(
+    BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler
+):
     """Represents the public key exposed by the SSH server."""
+
     # Type represents the ssh-key type, e.g. ssh-rsa
     raw: str | None = None
     type: str | None = None
@@ -82,8 +96,10 @@ class SSHComponentKey(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdg
     def from_shodan(cls, d: dict) -> "SSHComponentKey | None":
         """Returns an instance of this class based on Shodan data given as dictionary."""
         if not isinstance(d, dict):
-            raise TypeError(f"Method SSHComponentKey.from_shodan expects parameter d to be a dictionary, but it was "
-                            f"{type(d)}.")
+            raise TypeError(
+                f"Method SSHComponentKey.from_shodan expects parameter d to be a dictionary, but it was "
+                f"{type(d)}."
+            )
 
         try:
             key = d["ssh"]["key"]
@@ -95,7 +111,7 @@ class SSHComponentKey(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdg
                 md5=md5,
                 sha1=sha1,
                 sha256=sha256,
-                murmur=murmur
+                murmur=murmur,
             )
         except KeyError as ke:
             logger.warning(f"Shodan data is missing key: {ke}")
@@ -104,30 +120,39 @@ class SSHComponentKey(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdg
     @classmethod
     def from_censys(cls, d: dict) -> "SSHComponentKey | None":
         """Returns an instance of this class based on Censys data given as dictionary."""
-        logger.info("Censys data does not contain the key as raw data. The public key can be constructed with given "
-                 "data, however, currently this is only supported for RSA keys.")
+        logger.info(
+            "Censys data does not contain the key as raw data. The public key can be constructed with given "
+            "data, however, currently this is only supported for RSA keys."
+        )
 
         try:
             if "rsa_public_key" in d["ssh"]["server_host_key"]:
-                logger.debug("Seems to be a RSA key. Trying to create public key from modulus and exponent.")
+                logger.debug(
+                    "Seems to be a RSA key. Trying to create public key from modulus and exponent."
+                )
                 public_numbers = RSAPublicNumbers(
                     e=int.from_bytes(
-                        base64.b64decode(d["ssh"]["server_host_key"]["rsa_public_key"]["exponent"]),
+                        base64.b64decode(
+                            d["ssh"]["server_host_key"]["rsa_public_key"]["exponent"]
+                        ),
                         byteorder="big",
-                        signed=False
+                        signed=False,
                     ),
                     n=int.from_bytes(
-                        base64.b64decode(d["ssh"]["server_host_key"]["rsa_public_key"]["modulus"]),
+                        base64.b64decode(
+                            d["ssh"]["server_host_key"]["rsa_public_key"]["modulus"]
+                        ),
                         byteorder="big",
-                        signed=False
-                    )
+                        signed=False,
+                    ),
                 )
                 public_key = public_numbers.public_key()
                 public_key_string = public_key.public_bytes(
-                    encoding=Encoding.OpenSSH,
-                    format=PublicFormat.OpenSSH
+                    encoding=Encoding.OpenSSH, format=PublicFormat.OpenSSH
                 ).decode("utf-8")
-                logger.debug(f"Created public key from modulus and exponent: {public_key_string}")
+                logger.debug(
+                    f"Created public key from modulus and exponent: {public_key_string}"
+                )
                 public_key_b64 = public_key_string.split(" ", maxsplit=1)[1]
                 public_key_raw_data = base64.b64decode(public_key_b64)
                 md5, sha1, sha256, murmur = hash_all(public_key_raw_data)
@@ -137,7 +162,7 @@ class SSHComponentKey(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdg
                     md5=md5,
                     sha1=sha1,
                     sha256=sha256,
-                    murmur=murmur
+                    murmur=murmur,
                 )
             else:
                 key_type = "unknown"
@@ -145,10 +170,12 @@ class SSHComponentKey(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdg
                     if "public_key" in key:
                         key_type = key.replace("_public_key", "")
 
-                logger.info(f"SSH key type is {key_type}. Currently, only RSA SSH keys are supported in Censys model.")
+                logger.info(
+                    f"SSH key type is {key_type}. Currently, only RSA SSH keys are supported in Censys model."
+                )
                 return SSHComponentKey(
                     type=key_type,
-                    sha256=d["ssh"]["server_host_key"]["fingerprint_sha256"]
+                    sha256=d["ssh"]["server_host_key"]["fingerprint_sha256"],
                 )
         except KeyError as ke:
             logger.warning(f"Censys data is missing key: {ke}")
@@ -166,15 +193,18 @@ class SSHComponentKey(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdg
                 md5=md5,
                 sha1=sha1,
                 sha256=sha256,
-                murmur=murmur
+                murmur=murmur,
             )
         except KeyError as ke:
             logger.warning(f"BinaryEdge data is missing key: {ke}")
             return None
 
 
-class SSHComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler):
+class SSHComponent(
+    BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler
+):
     """Represents the SSH component of services."""
+
     algorithms: SSHComponentAlgorithms | None = None
     key: SSHComponentKey | None = None
     hassh: str | None = None
@@ -183,15 +213,17 @@ class SSHComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDa
     def from_shodan(cls, d: dict):
         """Creates an instance of this class based on Shodan data given as dictionary."""
         if not isinstance(d, dict):
-            raise TypeError(f"Method SSHComponent.from_shodan expects parameter d to be a dictionary, "
-                            f"but it was {type(d)}.")
+            raise TypeError(
+                f"Method SSHComponent.from_shodan expects parameter d to be a dictionary, "
+                f"but it was {type(d)}."
+            )
 
         hassh = d.get("ssh", {}).get("hashh", None)
 
         return SSHComponent(
             algorithms=SSHComponentAlgorithms.from_shodan(d),
             key=SSHComponentKey.from_shodan(d),
-            hassh=hassh
+            hassh=hassh,
         )
 
     @classmethod
@@ -201,7 +233,7 @@ class SSHComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDa
         return SSHComponent(
             algorithms=SSHComponentAlgorithms.from_censys(d),
             key=SSHComponentKey.from_censys(d),
-            hassh=hassh
+            hassh=hassh,
         )
 
     @classmethod
@@ -216,11 +248,13 @@ class SSHComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDa
                 if c["cypher"] == "ssh-dss":
                     continue
                 cypher = c
-            key = SSHComponentKey.from_binaryedge(cypher) if cypher is not None else None
+            key = (
+                SSHComponentKey.from_binaryedge(cypher) if cypher is not None else None
+            )
             return SSHComponent(
                 algorithms=SSHComponentAlgorithms.from_binaryedge(algorithms),
                 key=key,
-                hassh=hassh
+                hassh=hassh,
             )
         except KeyError as ke:
             logger.warning(f"BinaryEdge data is missing key: {ke}")

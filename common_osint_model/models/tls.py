@@ -3,19 +3,32 @@ import logging
 from datetime import datetime, UTC
 
 from cryptography.hazmat.primitives.hashes import MD5, SHA1, SHA256
-from cryptography.x509 import OID_COMMON_NAME, ExtensionOID, DNSName, ExtensionNotFound, SubjectAlternativeName
+from cryptography.x509 import (
+    OID_COMMON_NAME,
+    ExtensionOID,
+    DNSName,
+    ExtensionNotFound,
+    SubjectAlternativeName,
+)
 from cryptography.x509 import load_pem_x509_certificate
 from pydantic import BaseModel
 
-from common_osint_model.models import ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler
+from common_osint_model.models import (
+    ShodanDataHandler,
+    CensysDataHandler,
+    BinaryEdgeDataHandler,
+)
 
 from censys_platform.models import Service as CensysService
 
 logger = logging.getLogger(__name__)
 
 
-class TLSComponentCertificateEntity(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler):
+class TLSComponentCertificateEntity(
+    BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler
+):
     """Represents certificate entities, typically issuer and subject."""
+
     dn: str | None = None
     country: str | None = None
     state: str | None = None
@@ -29,7 +42,9 @@ class TLSComponentCertificateEntity(BaseModel, ShodanDataHandler, CensysDataHand
     def from_shodan(cls, d: dict) -> "TLSComponentCertificateEntity | None":
         """Creates an instance of this class using a given Shodan data dictionary."""
         if all(key not in d for key in ["C", "L", "CN", "O", "ST"]):
-            logger.warning("The dictionary given does not contain typical values for issuer/subject.")
+            logger.warning(
+                "The dictionary given does not contain typical values for issuer/subject."
+            )
             return None
 
         c = d.get("C", None)
@@ -70,15 +85,26 @@ class TLSComponentCertificateEntity(BaseModel, ShodanDataHandler, CensysDataHand
             organization=o,
             organizational_unit=ou,
             common_name=cn,
-            email_address=email
+            email_address=email,
         )
 
     @classmethod
     def from_censys(cls, d: dict):
         """Creates an instance of this class based on Censys data given as dictionary."""
-        if all(key not in d for key in ["common_name", "locality", "organization", "organizational_unit", "province"]):
-            raise KeyError("The dictionary given to TLSComponentCertificateEntity.from_censys is missing the typical "
-                           "censys keys.")
+        if all(
+            key not in d
+            for key in [
+                "common_name",
+                "locality",
+                "organization",
+                "organizational_unit",
+                "province",
+            ]
+        ):
+            raise KeyError(
+                "The dictionary given to TLSComponentCertificateEntity.from_censys is missing the typical "
+                "censys keys."
+            )
 
         c = d.get("country", [])
         st = d.get("province", [])
@@ -133,7 +159,7 @@ class TLSComponentCertificateEntity(BaseModel, ShodanDataHandler, CensysDataHand
             organization=", ".join(o),
             organizational_unit=", ".join(ou),
             common_name=", ".join(cn),
-            email_address=", ".join(email)
+            email_address=", ".join(email),
         )
 
     @classmethod
@@ -149,7 +175,9 @@ class TLSComponentCertificateEntity(BaseModel, ShodanDataHandler, CensysDataHand
         o = d.get("organization_name", None)
         ou = d.get("organizational_unit_name", None)
         cn = d.get("common_name", None)
-        email = d.get("email_address", None)  # Todo: Check if this key is actually correct
+        email = d.get(
+            "email_address", None
+        )  # Todo: Check if this key is actually correct
 
         dn = ""
         if c:
@@ -181,12 +209,16 @@ class TLSComponentCertificateEntity(BaseModel, ShodanDataHandler, CensysDataHand
             organization=o,
             organizational_unit=ou,
             common_name=cn,
-            email_address=email
+            email_address=email,
         )
 
+
 # TODO: Implement Certificate
-class TLSComponentCertificate(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler):
+class TLSComponentCertificate(
+    BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler
+):
     """Represents certificates."""
+
     issuer: TLSComponentCertificateEntity | None = None
     subject: TLSComponentCertificateEntity | None = None
     issued: datetime | None = None
@@ -216,8 +248,10 @@ class TLSComponentCertificate(BaseModel, ShodanDataHandler, CensysDataHandler, B
     def from_shodan(cls, d: dict):
         """Creates an instance of this class based on Shodan data given as dictionary."""
         if not isinstance(d, dict):
-            raise TypeError(f"Method TLSComponentCertificate.from_shodan expects parameter d to be a dictionary, "
-                            f"but it was {type(d)}.")
+            raise TypeError(
+                f"Method TLSComponentCertificate.from_shodan expects parameter d to be a dictionary, "
+                f"but it was {type(d)}."
+            )
 
         issuer = TLSComponentCertificateEntity.from_shodan(d["ssl"]["cert"]["issuer"])
         subject = TLSComponentCertificateEntity.from_shodan(d["ssl"]["cert"]["subject"])
@@ -254,7 +288,9 @@ class TLSComponentCertificate(BaseModel, ShodanDataHandler, CensysDataHandler, B
                 try:
                     attributes = cert.subject.get_attributes_for_oid(OID_COMMON_NAME)
                 except Exception:
-                    logger.info("Could not get attributes for OID_COMMON_NAME. Skipping this certificate.")
+                    logger.info(
+                        "Could not get attributes for OID_COMMON_NAME. Skipping this certificate."
+                    )
                     continue
                 for attribute in attributes:
                     if subject is not None and attribute.value == subject.common_name:
@@ -264,15 +300,19 @@ class TLSComponentCertificate(BaseModel, ShodanDataHandler, CensysDataHandler, B
             md5, sha1, sha256 = (
                 binascii.hexlify(cert.fingerprint(MD5())).decode("utf-8"),
                 binascii.hexlify(cert.fingerprint(SHA1())).decode("utf-8"),
-                binascii.hexlify(cert.fingerprint(SHA256())).decode("utf-8")
+                binascii.hexlify(cert.fingerprint(SHA256())).decode("utf-8"),
             )
 
             try:
-                ext = cert.extensions.get_extension_for_oid(ExtensionOID.SUBJECT_ALTERNATIVE_NAME)
+                ext = cert.extensions.get_extension_for_oid(
+                    ExtensionOID.SUBJECT_ALTERNATIVE_NAME
+                )
                 if isinstance(ext.value, SubjectAlternativeName):
                     altnames.extend(ext.value.get_values_for_type(DNSName))
             except ExtensionNotFound:
-                logger.debug("Could not extract alternative names from the certificate extensions.")
+                logger.debug(
+                    "Could not extract alternative names from the certificate extensions."
+                )
 
         if len(altnames) == 0:
             altnames = None
@@ -291,14 +331,16 @@ class TLSComponentCertificate(BaseModel, ShodanDataHandler, CensysDataHandler, B
             md5=md5,
             sha1=sha1,
             sha256=sha256,
-            trusted=trusted
+            trusted=trusted,
         )
 
     @classmethod
     def from_censys(cls, d: dict):
         """Creates an instance of this class based on Censys data given as dictionary."""
-        logger.info("Censys does not provide raw certificate data, to hashes must be taken from the data and cannot be "
-                 "calculated.")
+        logger.info(
+            "Censys does not provide raw certificate data, to hashes must be taken from the data and cannot be "
+            "calculated."
+        )
         trusted = not d.get("signature", {}).get("self_signed", False)
         return TLSComponentCertificate(
             issuer=TLSComponentCertificateEntity.from_censys(d["issuer"]),
@@ -308,7 +350,7 @@ class TLSComponentCertificate(BaseModel, ShodanDataHandler, CensysDataHandler, B
             expired=None,
             alternative_names=d.get("names", None),
             sha256=d["fingerprint"],
-            trusted=trusted
+            trusted=trusted,
         )
 
     @classmethod
@@ -324,10 +366,14 @@ class TLSComponentCertificate(BaseModel, ShodanDataHandler, CensysDataHandler, B
         md5, sha1, sha256 = (
             binascii.hexlify(cert.fingerprint(MD5())).decode("utf-8"),
             binascii.hexlify(cert.fingerprint(SHA1())).decode("utf-8"),
-            binascii.hexlify(cert.fingerprint(SHA256())).decode("utf-8")
+            binascii.hexlify(cert.fingerprint(SHA256())).decode("utf-8"),
         )
-        issued = datetime.fromisoformat(data["validity"]["not_before"]).replace(tzinfo=UTC)
-        expires = datetime.fromisoformat(data["validity"]["not_after"]).replace(tzinfo=UTC)
+        issued = datetime.fromisoformat(data["validity"]["not_before"]).replace(
+            tzinfo=UTC
+        )
+        expires = datetime.fromisoformat(data["validity"]["not_after"]).replace(
+            tzinfo=UTC
+        )
         expired = datetime.now(UTC) > expires
         trusted = not data.get("self_issued", False) or data.get("self_signed", False)
         return TLSComponentCertificate(
@@ -341,12 +387,15 @@ class TLSComponentCertificate(BaseModel, ShodanDataHandler, CensysDataHandler, B
             md5=md5,
             sha1=sha1,
             sha256=sha256,
-            trusted=trusted
+            trusted=trusted,
         )
 
 
-class TLSComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler):
+class TLSComponent(
+    BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler
+):
     """Represents the TLS component of services."""
+
     certificate: TLSComponentCertificate | None = None
     ja3: str | None = None
     ja3s: str | None = None
@@ -359,13 +408,15 @@ class TLSComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDa
     def from_shodan(cls, d: dict):
         """Creates an instance of this class based on Shodan data given as dictionary."""
         if not isinstance(d, dict):
-            raise TypeError(f"Method TLSComponent.from_shodan expects parameter d to be a dictionary, "
-                            f"but it was {type(d)}.")
+            raise TypeError(
+                f"Method TLSComponent.from_shodan expects parameter d to be a dictionary, "
+                f"but it was {type(d)}."
+            )
 
         return TLSComponent(
             certificate=TLSComponentCertificate.from_shodan(d),
             ja3s=d.get("ssl", {}).get("ja3s", None),
-            jarm=d.get("ssl", {}).get("jarm", None)
+            jarm=d.get("ssl", {}).get("jarm", None),
         )
 
     @classmethod
@@ -381,10 +432,7 @@ class TLSComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDa
                 if service.jarm is not None:
                     jarm = service.jarm.fingerprint
                 return TLSComponent(
-                    certificate=certificate,
-                    ja3s=ja3s,
-                    ja4s=ja4s,
-                    jarm=jarm
+                    certificate=certificate, ja3s=ja3s, ja4s=ja4s, jarm=jarm
                 )
             else:
                 return None
@@ -392,13 +440,17 @@ class TLSComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDa
             try:
                 tls = service["tls"]
                 return TLSComponent(
-                    certificate=TLSComponentCertificate.from_censys(tls["certificates"]["leaf_data"]),
+                    certificate=TLSComponentCertificate.from_censys(
+                        tls["certificates"]["leaf_data"]
+                    ),
                     ja3s=tls.get("ja3s", None),
-                    jarm=service.get("jarm", {}).get("fingerprint", None)
+                    jarm=service.get("jarm", {}).get("fingerprint", None),
                 )
             except KeyError as e:
-                logger.error(f"Exception during certificate data extraction. "
-                        f"The key 'tls.certificates.leaf_data' is not available: {e}\nReturning None...")
+                logger.error(
+                    f"Exception during certificate data extraction. "
+                    f"The key 'tls.certificates.leaf_data' is not available: {e}\nReturning None..."
+                )
                 return None
 
     @classmethod
@@ -411,7 +463,9 @@ class TLSComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDa
             )
         data = d.get("result", {}).get("data", None)
         if not data:
-            logger.error("No data key available in binary edge dictionary. Returning None...")
+            logger.error(
+                "No data key available in binary edge dictionary. Returning None..."
+            )
             return None
 
         cert = None
@@ -427,8 +481,4 @@ class TLSComponent(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDa
         if "jarm_hash" in data:
             jarm = data["jarm_hash"]
 
-        return TLSComponent(
-            certificate=cert,
-            ja3=ja3,
-            jarm=jarm
-        )
+        return TLSComponent(certificate=cert, ja3=ja3, jarm=jarm)

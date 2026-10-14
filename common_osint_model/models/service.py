@@ -19,9 +19,7 @@ from censys_platform.models import Service as CensysService
 logger = logging.getLogger(__name__)
 
 
-class Service(
-    BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler
-):
+class Service(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandler):
     """Represents a single service answering connections on specific ports."""
 
     port: int
@@ -105,7 +103,7 @@ class Service(
                 protocol = service.protocol
             else:
                 protocol = service.transport_protocol
-            
+
             # Set various banner and pivot hashes
             banner = service.banner
             md5, sha1, sha256, murmur = None, None, None, None
@@ -116,11 +114,11 @@ class Service(
             ja4tscan = None
             if service.ja4tscan is not None:
                 ja4tscan = service.ja4tscan.fingerprint
-            
+
             tls = None
             if service.tls is not None:
                 tls = TLSComponent.from_censys(service=service)
-            
+
             http = None
             if service.endpoints is not None:
                 http = HTTPComponent.from_censys(service=service)
@@ -128,7 +126,7 @@ class Service(
             dns = None
             if service.dns is not None:
                 dns = DNSComponent.from_censys(service=service)
-            
+
             # TODO: Implement SSHComponent
 
             timestamp = None
@@ -154,12 +152,11 @@ class Service(
                 tls=tls,
                 http=http,
                 dns=dns,
-                source="censys"
+                source="censys",
             )
 
         if isinstance(service, dict):
             return cls._from_censys_dict(d=service)
-        
 
     @classmethod
     def from_binaryedge(cls, d: list):

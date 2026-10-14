@@ -216,7 +216,10 @@ class HTTPComponentContent(
             endpoints = service.endpoints
             if isinstance(endpoints, list):
                 for endpoint in endpoints:
-                    if isinstance(endpoint, EndpointScanState) and endpoint.http is not None:
+                    if (
+                        isinstance(endpoint, EndpointScanState)
+                        and endpoint.http is not None
+                    ):
                         http_body = endpoint.http.body
                         if http_body is None:
                             continue
@@ -226,7 +229,7 @@ class HTTPComponentContent(
                             sha1 = endpoint.http.body_hash_sha1
                         if endpoint.http.body_hash_sha256 is not None:
                             sha256 = endpoint.http.body_hash_sha256
-                        
+
                         return HTTPComponentContent(
                             raw=http_body,
                             length=len(http_body),
@@ -235,9 +238,9 @@ class HTTPComponentContent(
                             sha256=sha256,
                             murmur=murmur,
                             # TODO: Implement Favicon, Robots, Security
-                            #favicon=HTTPComponentContentFavicon.from_censys(service),
-                            #robots_txt=HTTPComponentContentRobots.from_censys(service),
-                            #security_txt=HTTPComponentContentSecurity.from_censys(service),
+                            # favicon=HTTPComponentContentFavicon.from_censys(service),
+                            # robots_txt=HTTPComponentContentRobots.from_censys(service),
+                            # security_txt=HTTPComponentContentSecurity.from_censys(service),
                         )
             # Fallback, if no endpoint or no HTTP endpoint
             return None
@@ -324,12 +327,20 @@ class HTTPComponent(
             endpoints = service.endpoints
             if isinstance(endpoints, list):
                 for endpoint in endpoints:
-                    if isinstance(endpoint, EndpointScanState) and endpoint.http is not None:
+                    if (
+                        isinstance(endpoint, EndpointScanState)
+                        and endpoint.http is not None
+                    ):
                         headers: dict[str, str] = dict()
                         # Store Header
                         if endpoint.http.headers is not None:
-                            for header_name, header_values in endpoint.http.headers.items():
-                                if header_values.headers is not None and isinstance(header_values.headers, list):
+                            for (
+                                header_name,
+                                header_values,
+                            ) in endpoint.http.headers.items():
+                                if header_values.headers is not None and isinstance(
+                                    header_values.headers, list
+                                ):
                                     for header_value in header_values.headers:
                                         if isinstance(header_value, str):
                                             headers[header_name] = header_value
@@ -349,7 +360,7 @@ class HTTPComponent(
                             content=HTTPComponentContent.from_censys(service),
                             shodan_headers_hash=headers_hash,
                             hhhash=hash_from_banner(banner),
-                            status_code=endpoint.http.status_code
+                            status_code=endpoint.http.status_code,
                         )
             # Fallback, if no endpoint or no HTTP endpoint
             return None
