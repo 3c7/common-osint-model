@@ -248,3 +248,11 @@ class Service(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHan
             timestamp=timestamp,
             source="censys",
         )
+
+    @classmethod
+    def from_modat(cls, d: dict):
+        return Service(
+            port=d["port"],
+            timestamp=datetime.fromisoformat(d["scanned_at"]),
+            source="modat",
+        )

@@ -281,3 +281,26 @@ class Host(BaseModel, ShodanDataHandler, CensysDataHandler, BinaryEdgeDataHandle
             source="censys",
             ports=[service.port for service in services],
         )
+
+    @classmethod
+    def from_modat(cls, d: dict):
+        """Create a Host instance based on the JSON data returned by the Modat API. d is the dict given in the page list."""
+        services = [Service.from_modat(service) for service in d.get("services", [])]
+        domains = [
+            Domain(domain=domain, type="rdns", source="modat")
+            for domain in d.get("rdns", [])
+        ]
+        domains.extend(
+            [
+                Domain(domain=domain, type="domain", source="modat")
+                for domain in d.get("fqdns", [])
+            ]
+        )
+        return Host(
+            ip=d["ip"],
+            autonomous_system=AutonomousSystem.from_modat(d),
+            domains=domains,
+            services=services,
+            ports=[service["port"] for service in d.get("services", [])],
+            source="modat",
+        )

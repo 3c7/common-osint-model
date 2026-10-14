@@ -74,3 +74,13 @@ class AutonomousSystem(BaseModel, ShodanDataHandler, CensysDataHandler):
             )
 
         return None
+
+    @classmethod
+    def from_modat(cls, d: dict):
+        d = d.get("asn", {})
+        return AutonomousSystem(
+            number=d.get("number"),
+            name=d.get("org"),
+            prefix=d.get("netblock"),
+            source="modat",
+        )
